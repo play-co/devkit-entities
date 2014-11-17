@@ -25,6 +25,10 @@ exports = Class(function() {
 		this.ax = 0;
 		this.ay = 0;
 
+		// position from the previous frame
+		this.xPrev = 0;
+		this.yPrev = 0;
+
 		// entities are either circles or rectangles
 		this.isCircle = false;
 
@@ -67,6 +71,8 @@ exports = Class(function() {
 	this.reset = function(x, y, config) {
 		this.x = x || 0;
 		this.y = y || 0;
+		this.xPrev = this.x;
+		this.yPrev = this.y;
 
 		config = config || {};
 		this.vx = config.vx || 0;
@@ -98,6 +104,8 @@ exports = Class(function() {
 	};
 
 	this.update = function(dt) {
+		this.xPrev = this.x;
+		this.yPrev = this.y;
 		this.physics.stepPosition(this, dt);
 		this.view && this.updateView(dt);
 	};

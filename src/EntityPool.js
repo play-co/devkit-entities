@@ -96,14 +96,8 @@ exports = Class(function() {
 	 * call a fn on the first from this pool to collide with entity
 	 */
 	this.onFirstCollision = function(entity, fn, ctx) {
-		var entities = this.entities;
-		for (var i = this._freeIndex - 1; i >= 0; i--) {
-			var testEntity = entities[i];
-			if (testEntity.collidesWith(entity)) {
-				fn.call(ctx, testEntity);
-				break;
-			}
-		}
+		var collidingEntity = this.getFirstCollidingEntity(entity);
+		collidingEntity && fn.call(ctx, collidingEntity);
 	};
 
 	/**
@@ -125,14 +119,9 @@ exports = Class(function() {
 	this.onFirstPoolCollisions = function(pool, fn, ctx) {
 		var entities = this.entities;
 		for (var i = this._freeIndex - 1; i >= 0; i--) {
-			var iEntity = entities[i];
-			for (var j = pool._freeIndex - 1; j >= 0; j--) {
-				var jEntity = pool.entities[j];
-				if (iEntity.collidesWith(jEntity)) {
-					fn.call(ctx, iEntity, jEntity);
-					break;
-				}
-			}
+			var testEntity = entities[i];
+			var collidingEntity = pool.getFirstCollidingEntity(testEntity);
+			collidingEntity && fn.call(ctx, testEntity, collidingEntity);
 		}
 	};
 

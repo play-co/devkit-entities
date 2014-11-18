@@ -176,7 +176,7 @@ exports = Class(function() {
 			poolIndex: entities.length
 		});
 		entities.push(entity);
-		this._logCreation && logger.warn("Entity creation:", entity.id);
+		this._logCreation && logger.warn("Entity creation:", entity.uid);
 		return entity;
 	};
 });

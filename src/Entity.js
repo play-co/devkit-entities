@@ -4,7 +4,7 @@ var _imageMap = loader.getMap();
 
 import .EntityPhysics;
 
-var uid = 1;
+var _uid = 1;
 
 exports = Class(function() {
 	// default prototype properties, should usually be overridden by subclasses
@@ -13,7 +13,7 @@ exports = Class(function() {
 
 	this.init = function(opts) {
 		// unique IDs are helpful for logging and debugging
-		this.id = this.name + uid++;
+		this.uid = this.name + _uid++;
 
 		// primary position point
 		this.x = 0;

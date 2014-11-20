@@ -131,6 +131,8 @@ exports = {
 			}
 		}
 	},
+	// TODO: change from relying on velocity to always relying on distance
+	// add anchored flag to Entities to push the movement to one or the other
 	resolveCollidingCircles: function(circ1, circ2) {
 		var b1 = circ1.hitBounds;
 		var x1 = circ1.x + b1.x;

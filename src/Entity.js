@@ -118,7 +118,11 @@ exports = Class(function() {
 	};
 
 	this.collidesWith = function(entity) {
-		return this.physics.collidesWith(this, entity);
+		return this.physics.collides(this, entity);
+	};
+
+	this.resolveCollidingStateWith = function(entity) {
+		return this.physics.resolveCollidingState(this, entity);
 	};
 
 	this.release = function() {

@@ -85,7 +85,6 @@ exports = {
 
 		var dx = abs(cx - rx);
 		var dy = abs(cy - ry);
-
 		if (dx > rwHalf + cr || dy > rhHalf + cr) {
 			// far case: circle's center is too far from rect's center
 			return false;
@@ -184,13 +183,67 @@ exports = {
 		return dd;
 	},
 	/**
-	 * ~ resolveCollidingCircleRect forces apart a circle and rect, but only
-	 * in one direction
+	 * ~ resolveCollidingCircleRect forces apart a circle and rect
 	 * ~ good default collision behavior for landing on a platforms vs.
 	 * hitting the side (missing the platform)
 	 */
 	resolveCollidingCircleRect: function(circ, rect) {
+		var cb = circ.hitBounds;
+		var cx = circ.x + cb.x;
+		var cy = circ.y + cb.y;
+		var cr = cb.r;
+		var cMult = 0.5;
 
+		var rb = rect.hitBounds;
+		var rwHalf = rb.w / 2;
+		var rhHalf = rb.h / 2;
+		var rx = rect.x + rb.x + rwHalf;
+		var ry = rect.y + rb.y + rhHalf;
+		var rMult = 0.5;
+
+		var dx = abs(cx - rx);
+		var dy = abs(cy - ry);
+		if (dx > rwHalf + cr || dy > rhHalf + cr
+			|| (circ.isAnchored && rect.isAnchored))
+		{
+			// far case: circle's center too far or both entities are anchored
+			return 0;
+		} else if (dx <= rwHalf || dy <= rhHalf) {
+			// close case: treat the circle like another rect, then resolve
+			var fakeRect = {
+				isCircle: false,
+				isAnchored: circ.isAnchored,
+				x: circ.x,
+				y: circ.y,
+				hitBounds: {
+					x: cb.x - cr,
+					y: cb.y - cr,
+					w: 2 * cr,
+					h: 2 * cr
+				}
+			};
+			var dd = this.resolveCollidingRects(rect, fakeRect);
+			circ.x = fakeRect.x;
+			circ.y = fakeRect.y;
+			return dd;
+		} else {
+			// corner case: treat the rect like another circle, radius to corner
+			var fakeCirc = {
+				isCircle: true,
+				isAnchored: rect.isAnchored,
+				x: rect.x,
+				y: rect.y,
+				hitBounds: {
+					x: rx - rect.x,
+					y: ry - rect.y,
+					r: sqrt(rwHalf * rwHalf + rhHalf * rhHalf)
+				}
+			};
+			var dd = this.resolveCollidingCircles(circ, fakeCirc);
+			rect.x = fakeCirc.x;
+			rect.y = fakeCirc.y;
+			return dd;
+		}
 	},
 	/**
 	 * ~ resolveCollidingRects forces two rects apart, but only in one direction

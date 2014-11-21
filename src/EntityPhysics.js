@@ -1,3 +1,5 @@
+var min = Math.min;
+var max = Math.max;
 var abs = Math.abs;
 var sqrt = Math.sqrt;
 
@@ -5,14 +7,21 @@ var sqrt = Math.sqrt;
 var COLLISION_OFFSET = 0.001;
 
 /**
- * default collision functions support circles and axis-aligned rectangles,
- * optimized to support many calls within a single tick
+ * IMPORTANT NOTES:
+ * ~ all required functions to interface with Entity are labeled
+ * ~ collisions support circles and axis-aligned rectangles only
+ * ~ these are NOT continuous collision detection algorithms, meaning a large
+ * value of dt could cause entities to pass through each other - it's up to the
+ * developer to manage the time step of his/her game to prevent this behavior
+ * ~ collisions use entities' x, y, and hitBounds properties; more info on
+ * hitBounds can be found within Entity.js
  */
 exports = {
 	/**
-	 * stepPosition updates an entity's position based on time passed
-	 * velocity is added half before update and half after,
-	 * providing smoother, more frame independent animations
+	 * ~ REQUIRED for Entity
+	 * ~ stepPosition updates an entity's position based on dt (delta time)
+	 * ~ velocity is added half before update and half after, which helps
+	 * mitigate lag spikes, for smoother, more frame independent animations
 	 */
 	stepPosition: function(entity, dt) {
 		entity.x += dt * entity.vx / 2;
@@ -24,10 +33,11 @@ exports = {
 		entity.y += dt * entity.vy / 2;
 	},
 	/**
-	 * collides defines how collisions behave and what data is returned:
-	 * by default, it returns a bool, and only works with circles and rects;
+	 * ~ REQUIRED for Entity
+	 * ~ collide defines how collisions behave and what data is returned
+	 * ~ by default, returns a bool, and only works with circles and rects
 	 */
-	collides: function(entity1, entity2) {
+	collide: function(entity1, entity2) {
 		if (entity1.isCircle) {
 			if (entity2.isCircle) {
 				return this.circleCollidesWithCircle(entity1, entity2);
@@ -42,10 +52,6 @@ exports = {
 			}
 		}
 	},
-	/**
-	 * circle and rect collision functions are needed by default collides
-	 * other physics implementations may not need the same set of functions
-	 */
 	circleCollidesWithCircle: function(circ1, circ2) {
 		var b1 = circ1.hitBounds;
 		var x1 = circ1.x + b1.x;
@@ -110,11 +116,11 @@ exports = {
 		return x1 <= xf2 && xf1 >= x2 && y1 <= yf2 && yf1 >= y2;
 	},
 	/**
-	 * resolveCollidingState uses hitBounds and velocities to ensure that two
-	 * provided entities are no longer colliding by pushing them apart;
-	 * returns the time in milliseconds to step back to the initial collision;
-	 * it ignores acceleration and assumes the entities are currently colliding;
-	 * if velocities are to be changed, then do so after resolveCollidingState
+	 * ~ REQUIRED for Entity
+	 * ~ resolveCollidingState uses hitBounds to guarantee that two entities
+	 * are no longer colliding by pushing them apart
+	 * ~ entities with isAnchored true are never moved
+	 * ~ returns total distance moved to separate the objects
 	 */
 	resolveCollidingState: function(entity1, entity2) {
 		if (entity1.isCircle) {
@@ -131,61 +137,66 @@ exports = {
 			}
 		}
 	},
-	// TODO: change from relying on velocity to always relying on distance
-	// add anchored flag to Entities to push the movement to one or the other
+	/**
+	 * ~ resolveCollidingCircles forces two circles apart based on their centers
+	 */
 	resolveCollidingCircles: function(circ1, circ2) {
 		var b1 = circ1.hitBounds;
 		var x1 = circ1.x + b1.x;
 		var y1 = circ1.y + b1.y;
 		var r1 = b1.r;
-		var vx1 = circ1.vx;
-		var vy1 = circ1.vy;
-		var vMag1 = sqrt(vx1 * vx1 + vy1 * vy1);
+		var mult1 = 0.5;
 
 		var b2 = circ2.hitBounds;
 		var x2 = circ2.x + b2.x;
 		var y2 = circ2.y + b2.y;
 		var r2 = b2.r;
-		var vx2 = circ2.vx;
-		var vy2 = circ2.vy;
-		var vMag2 = sqrt(vx2 * vx2 + vy2 * vy2);
+		var mult2 = 0.5;
 
 		var dx = x2 - x1;
 		var dy = y2 - y1;
 		var dist = sqrt(dx * dx + dy * dy);
 		var distColl = r1 + r2 + COLLISION_OFFSET;
-		var dd = distColl - dist;
 
-		var dt = 0;
-		var vMagTotal = vMag1 + vMag2;
-		// if there's no velocity, use distance instead
-		if (vMagTotal === 0) {
-			// if there's no distance, force a very small distance
-			if (dist === 0) {
-				dx = COLLISION_OFFSET;
-				dist = COLLISION_OFFSET;
-			}
-			vx1 = dx;
-			vy1 = dy;
-			vMag1 = dist;
-			vx2 = -dx;
-			vy2 = -dy;
-			vMag2 = dist;
-			vMagTotal = vMag1 + vMag2;
-		} else {
-			dt = dd / vMagTotal;
+		// if concentric, force a very small distance
+		if (dist === 0) {
+			dx = COLLISION_OFFSET;
+			dist = COLLISION_OFFSET;
 		}
 
-		circ1.x += dd * -(vx1 / vMagTotal);
-		circ1.y += dd * -(vy1 / vMagTotal);
-		circ2.x += dd * -(vx2 / vMagTotal);
-		circ2.y += dd * -(vy2 / vMagTotal);
+		// anchored entities cannot be moved by physics
+		var dd = distColl - dist;
+		if (circ1.isAnchored && circ2.isAnchored) {
+			dd = 0;
+		} else if (circ1.isAnchored) {
+			mult1 = 0;
+			mult2 = 1;
+		} else if (circ2.isAnchored) {
+			mult1 = 1;
+			mult2 = 0;
+		}
 
-		return dt;
+		circ1.x += mult1 * dd * -(dx / dist);
+		circ1.y += mult1 * dd * -(dy / dist);
+		circ2.x += mult2 * dd * (dx / dist);
+		circ2.y += mult2 * dd * (dy / dist);
+
+		return dd;
 	},
+	/**
+	 * ~ resolveCollidingCircleRect forces apart a circle and rect, but only
+	 * in one direction
+	 * ~ good default collision behavior for landing on a platforms vs.
+	 * hitting the side (missing the platform)
+	 */
 	resolveCollidingCircleRect: function(circ, rect) {
 
 	},
+	/**
+	 * ~ resolveCollidingRects forces two rects apart, but only in one direction
+	 * ~ good default collision behavior for landing on a platforms vs.
+	 * hitting the side (missing the platform)
+	 */
 	resolveCollidingRects: function(rect1, rect2) {
 		var b1 = rect1.hitBounds;
 		var x1 = rect1.x + b1.x;
@@ -194,9 +205,7 @@ exports = {
 		var h1 = b1.h;
 		var xf1 = x1 + w1;
 		var yf1 = y1 + h1;
-		var vx1 = rect1.vx;
-		var vy1 = rect1.vy;
-		var vMag1 = sqrt(vx1 * vx1 + vy1 * vy1);
+		var mult1 = 0.5;
 
 		var b2 = rect2.hitBounds;
 		var x2 = rect2.x + b2.x;
@@ -205,13 +214,72 @@ exports = {
 		var h2 = b2.h;
 		var xf2 = x2 + w2;
 		var yf2 = y2 + h2;
-		var vx2 = rect2.vx;
-		var vy2 = rect2.vy;
-		var vMag2 = sqrt(vx2 * vx2 + vy2 * vy2);
+		var mult2 = 0.5;
 
-		var dt = 0;
+		// find shallowest collision overlap, positive value means no overlap
+		var dx = 1;
+		var dx1 = x1 - xf2;
+		var dx2 = x2 - xf1;
+		if (dx1 <= 0 && dx2 <= 0) {
+			dx = max(dx1, dx2) - COLLISION_OFFSET;
+		} else if (dx1 <= 0) {
+			dx = dx1 - COLLISION_OFFSET;
+		} else if (dx2 <= 0) {
+			dx = dx2 - COLLISION_OFFSET;
+		}
 
+		var dy = 1;
+		var dy1 = y1 - yf2;
+		var dy2 = y2 - yf1;
+		if (dy1 <= 0 && dy2 <= 0) {
+			dy = max(dy1, dy2) - COLLISION_OFFSET;
+		} else if (dy1 <= 0) {
+			dy = dy1 - COLLISION_OFFSET;
+		} else if (dy2 <= 0) {
+			dy = dy2 - COLLISION_OFFSET;
+		}
 
-		return dt;
+		// step out in only one direction, pick the smallest overlap
+		if (dx <= 0 && dy <= 0) {
+			if (dx > dy) {
+				dy = 0;
+			} else {
+				dx = 0;
+			}
+		} else if (dx <= 0) {
+			dy = 0;
+		} else if (dy <= 0) {
+			dx = 0;
+		} else {
+			// there was no collision to begin with
+			dx = 0;
+			dy = 0;
+		}
+
+		// anchored entities cannot be moved by physics
+		if (rect1.isAnchored && rect2.isAnchored) {
+			dx = 0;
+			dy = 0;
+		} else if (rect1.isAnchored) {
+			mult1 = 0;
+			mult2 = 1;
+		} else if (rect2.isAnchored) {
+			mult1 = 1;
+			mult2 = 0;
+		}
+
+		// dx and dy are never positive; so fix signs here based on rect centers
+		var cx1 = x1 + w1 / 2;
+		var cx2 = x2 + w2 / 2;
+		var cy1 = y1 + h1 / 2;
+		var cy2 = y2 + h2 / 2;
+		var sign = (dx && cx1 > cx2) || (dy && cy1 > cy2) ? -1 : 1;
+		rect1.x += mult1 * sign * dx;
+		rect1.y += mult1 * sign * dy;
+		rect2.x += mult2 * sign * -dx;
+		rect2.y += mult2 * sign * -dy;
+
+		// one of these will always be 0, so this is also the delta distance
+		return dx + dy;
 	}
 };

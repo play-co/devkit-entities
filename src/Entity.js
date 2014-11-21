@@ -32,6 +32,9 @@ exports = Class(function() {
 		// entities are either circles or rectangles
 		this.isCircle = false;
 
+		// anchored entities cannot be moved by physics
+		this.isAnchored = false;
+
 		// collision bounds, offset from primary point
 		this.hitBounds = createBounds();
 
@@ -80,6 +83,7 @@ exports = Class(function() {
 		this.ax = config.ax || 0;
 		this.ay = config.ay || 0;
 		this.isCircle = config.isCircle || false;
+		this.isAnchored = config.isAnchored || false;
 
 		applyBoundsFromConfig(config.hitBounds, this.hitBounds, config, 'hit');
 		applyBoundsFromConfig(config.viewBounds, this.viewBounds, config, 'view');
@@ -118,7 +122,7 @@ exports = Class(function() {
 	};
 
 	this.collidesWith = function(entity) {
-		return this.physics.collides(this, entity);
+		return this.physics.collide(this, entity);
 	};
 
 	this.resolveCollidingStateWith = function(entity) {

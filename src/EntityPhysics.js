@@ -9,12 +9,10 @@ var COLLISION_OFFSET = 0.001;
 /**
  * IMPORTANT NOTES:
  * ~ all required functions to interface with Entity are labeled
- * ~ collisions support circles and axis-aligned rectangles only
+ * ~ by default, collisions support circles and axis-aligned rectangles only
  * ~ these are NOT continuous collision detection algorithms, meaning a large
  * value of dt could cause entities to pass through each other - it's up to the
  * developer to manage the time step of his/her game to prevent this behavior
- * ~ collisions use entities' x, y, and hitBounds properties; more info on
- * hitBounds can be found within Entity.js
  */
 exports = {
 	/**
@@ -53,15 +51,12 @@ exports = {
 		}
 	},
 	circleCollidesWithCircle: function(circ1, circ2) {
-		var b1 = circ1.hitBounds;
-		var x1 = circ1.x + b1.x;
-		var y1 = circ1.y + b1.y;
-		var r1 = b1.r;
-
-		var b2 = circ2.hitBounds;
-		var x2 = circ2.x + b2.x;
-		var y2 = circ2.y + b2.y;
-		var r2 = b2.r;
+		var x1 = circ1.getHitX();
+		var y1 = circ1.getHitY();
+		var r1 = circ1.getHitRadius();
+		var x2 = circ2.getHitX();
+		var y2 = circ2.getHitY();
+		var r2 = circ2.getHitRadius();
 
 		var dx = x2 - x1;
 		var dy = y2 - y1;
@@ -72,16 +67,13 @@ exports = {
 		return distSqrd <= distCollSqrd;
 	},
 	circleCollidesWithRect: function(circ, rect) {
-		var cb = circ.hitBounds;
-		var cx = circ.x + cb.x;
-		var cy = circ.y + cb.y;
-		var cr = cb.r;
-
-		var rb = rect.hitBounds;
-		var rwHalf = rb.w / 2;
-		var rhHalf = rb.h / 2;
-		var rx = rect.x + rb.x + rwHalf;
-		var ry = rect.y + rb.y + rhHalf;
+		var cx = circ.getHitX();
+		var cy = circ.getHitY();
+		var cr = circ.getHitRadius();
+		var rwHalf = rect.getHitWidth() / 2;
+		var rhHalf = rect.getHitHeight() / 2;
+		var rx = rect.getMinHitX() + rwHalf;
+		var ry = rect.getMinHitY() + rhHalf;
 
 		var dx = abs(cx - rx);
 		var dy = abs(cy - ry);
@@ -100,23 +92,20 @@ exports = {
 		}
 	},
 	rectCollidesWithRect: function(rect1, rect2) {
-		var b1 = rect1.hitBounds;
-		var x1 = rect1.x + b1.x;
-		var y1 = rect1.y + b1.y;
-		var xf1 = x1 + b1.w;
-		var yf1 = y1 + b1.h;
-
-		var b2 = rect2.hitBounds;
-		var x2 = rect2.x + b2.x;
-		var y2 = rect2.y + b2.y;
-		var xf2 = x2 + b2.w;
-		var yf2 = y2 + b2.h;
+		var x1 = rect1.getMinHitX();
+		var y1 = rect1.getMinHitY();
+		var xf1 = rect1.getMaxHitX();
+		var yf1 = rect1.getMaxHitY();
+		var x2 = rect2.getMinHitX();
+		var y2 = rect2.getMinHitY();
+		var xf2 = rect2.getMaxHitX();
+		var yf2 = rect2.getMaxHitY();
 
 		return x1 <= xf2 && xf1 >= x2 && y1 <= yf2 && yf1 >= y2;
 	},
 	/**
 	 * ~ REQUIRED for Entity
-	 * ~ resolveCollidingState uses hitBounds to guarantee that two entities
+	 * ~ resolveCollidingState uses hit bounds to guarantee that two entities
 	 * are no longer colliding by pushing them apart
 	 * ~ entities with isAnchored true are never moved
 	 * ~ returns total distance moved to separate the objects
@@ -140,16 +129,13 @@ exports = {
 	 * ~ resolveCollidingCircles forces two circles apart based on their centers
 	 */
 	resolveCollidingCircles: function(circ1, circ2) {
-		var b1 = circ1.hitBounds;
-		var x1 = circ1.x + b1.x;
-		var y1 = circ1.y + b1.y;
-		var r1 = b1.r;
+		var x1 = circ1.getHitX();
+		var y1 = circ1.getHitY();
+		var r1 = circ1.getHitRadius();
 		var mult1 = 0.5;
-
-		var b2 = circ2.hitBounds;
-		var x2 = circ2.x + b2.x;
-		var y2 = circ2.y + b2.y;
-		var r2 = b2.r;
+		var x2 = circ2.getHitX();
+		var y2 = circ2.getHitY();
+		var r2 = circ2.getHitRadius();
 		var mult2 = 0.5;
 
 		var dx = x2 - x1;
@@ -188,17 +174,14 @@ exports = {
 	 * hitting the side (missing the platform)
 	 */
 	resolveCollidingCircleRect: function(circ, rect) {
-		var cb = circ.hitBounds;
-		var cx = circ.x + cb.x;
-		var cy = circ.y + cb.y;
-		var cr = cb.r;
+		var cx = circ.getHitX();
+		var cy = circ.getHitY();
+		var cr = circ.getHitRadius();
 		var cMult = 0.5;
-
-		var rb = rect.hitBounds;
-		var rwHalf = rb.w / 2;
-		var rhHalf = rb.h / 2;
-		var rx = rect.x + rb.x + rwHalf;
-		var ry = rect.y + rb.y + rhHalf;
+		var rwHalf = rect.getHitWidth() / 2;
+		var rhHalf = rect.getHitHeight() / 2;
+		var rx = rect.getMinHitX() + rwHalf;
+		var ry = rect.getMinHitY() + rhHalf;
 		var rMult = 0.5;
 
 		var dx = abs(cx - rx);
@@ -216,8 +199,8 @@ exports = {
 				x: circ.x,
 				y: circ.y,
 				hitBounds: {
-					x: cb.x - cr,
-					y: cb.y - cr,
+					x: cx - circ.x - cr,
+					y: cy - circ.y - cr,
 					w: 2 * cr,
 					h: 2 * cr
 				}
@@ -251,22 +234,19 @@ exports = {
 	 * hitting the side (missing the platform)
 	 */
 	resolveCollidingRects: function(rect1, rect2) {
-		var b1 = rect1.hitBounds;
-		var x1 = rect1.x + b1.x;
-		var y1 = rect1.y + b1.y;
-		var w1 = b1.w;
-		var h1 = b1.h;
-		var xf1 = x1 + w1;
-		var yf1 = y1 + h1;
+		var x1 = rect1.getMinHitX();
+		var y1 = rect1.getMinHitY();
+		var w1 = rect1.getHitWidth();
+		var h1 = rect1.getHitHeight();
+		var xf1 = rect1.getMaxHitX();
+		var yf1 = rect1.getMaxHitY();
 		var mult1 = 0.5;
-
-		var b2 = rect2.hitBounds;
-		var x2 = rect2.x + b2.x;
-		var y2 = rect2.y + b2.y;
-		var w2 = b2.w;
-		var h2 = b2.h;
-		var xf2 = x2 + w2;
-		var yf2 = y2 + h2;
+		var x2 = rect2.getMinHitX();
+		var y2 = rect2.getMinHitY();
+		var w2 = rect2.getHitWidth();
+		var h2 = rect2.getHitHeight();
+		var xf2 = rect2.getMaxHitX();
+		var yf2 = rect2.getMaxHitY();
 		var mult2 = 0.5;
 
 		// find shallowest collision overlap, positive value means no overlap

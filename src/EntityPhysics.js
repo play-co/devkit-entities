@@ -193,38 +193,28 @@ exports = {
 			return 0;
 		} else if (dx <= rwHalf || dy <= rhHalf) {
 			// close case: treat the circle like another rect, then resolve
-			var fakeRect = {
-				isCircle: false,
-				isAnchored: circ.isAnchored,
-				x: circ.x,
-				y: circ.y,
-				hitBounds: {
-					x: cx - circ.x - cr,
-					y: cy - circ.y - cr,
-					w: 2 * cr,
-					h: 2 * cr
-				}
+			var origHitBounds = circ.hitBounds;
+			circ.hitBounds = {
+				x: cx - circ.x - cr,
+				y: cy - circ.y - cr,
+				w: 2 * cr,
+				h: 2 * cr
 			};
-			var dd = this.resolveCollidingRects(rect, fakeRect);
-			circ.x = fakeRect.x;
-			circ.y = fakeRect.y;
+
+			var dd = this.resolveCollidingRects(rect, circ);
+			circ.hitBounds = origHitBounds;
 			return dd;
 		} else {
 			// corner case: treat the rect like another circle, radius to corner
-			var fakeCirc = {
-				isCircle: true,
-				isAnchored: rect.isAnchored,
-				x: rect.x,
-				y: rect.y,
-				hitBounds: {
-					x: rx - rect.x,
-					y: ry - rect.y,
-					r: sqrt(rwHalf * rwHalf + rhHalf * rhHalf)
-				}
+			var origHitBounds = rect.hitBounds;
+			rect.hitBounds = {
+				x: rx - rect.x,
+				y: ry - rect.y,
+				r: sqrt(rwHalf * rwHalf + rhHalf * rhHalf)
 			};
-			var dd = this.resolveCollidingCircles(circ, fakeCirc);
-			rect.x = fakeCirc.x;
-			rect.y = fakeCirc.y;
+
+			var dd = this.resolveCollidingCircles(circ, rect);
+			rect.hitBounds = origHitBounds;
 			return dd;
 		}
 	},

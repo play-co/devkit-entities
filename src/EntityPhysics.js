@@ -212,7 +212,8 @@ exports = {
 			dx = nx - cx;
 			dy = ny - cy;
 			var dist = sqrt(dx * dx + dy * dy);
-			var dd = cr - dist;
+			var distColl = cr + COLLISION_OFFSET;
+			var dd = distColl - dist;
 
 			// anchored entities cannot be moved by physics
 			if (circ.isAnchored) {

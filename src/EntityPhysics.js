@@ -149,8 +149,9 @@ exports = {
 			dist = COLLISION_OFFSET;
 		}
 
-		// anchored entities cannot be moved by physics
 		var dd = distColl - dist;
+
+		// anchored entities cannot be moved by physics
 		if (circ1.isAnchored && circ2.isAnchored) {
 			dd = 0;
 		} else if (circ1.isAnchored) {
@@ -177,13 +178,10 @@ exports = {
 		var cx = circ.getHitX();
 		var cy = circ.getHitY();
 		var cr = circ.getHitRadius();
-		var cMult = 0.5;
 		var rwHalf = rect.getHitWidth() / 2;
 		var rhHalf = rect.getHitHeight() / 2;
 		var rx = rect.getMinHitX() + rwHalf;
 		var ry = rect.getMinHitY() + rhHalf;
-		var rMult = 0.5;
-
 		var dx = abs(cx - rx);
 		var dy = abs(cy - ry);
 		if (dx > rwHalf + cr || dy > rhHalf + cr
@@ -205,16 +203,31 @@ exports = {
 			circ.hitBounds = origHitBounds;
 			return dd;
 		} else {
-			// corner case: treat the rect like another circle, radius to corner
-			var origHitBounds = rect.hitBounds;
-			rect.hitBounds = {
-				x: rx - rect.x,
-				y: ry - rect.y,
-				r: sqrt(rwHalf * rwHalf + rhHalf * rhHalf)
-			};
+			// corner case: the two meet at a rect corner, push them away
+			var mult1 = 0.5;
+			var mult2 = 0.5;
+			// get the right corner point
+			var nx = cx < rx ? rx - rwHalf : rx + rwHalf;
+			var ny = cy < ry ? ry - rhHalf : ry + rhHalf;
+			dx = nx - cx;
+			dy = ny - cy;
+			var dist = sqrt(dx * dx + dy * dy);
+			var dd = cr - dist;
 
-			var dd = this.resolveCollidingCircles(circ, rect);
-			rect.hitBounds = origHitBounds;
+			// anchored entities cannot be moved by physics
+			if (circ.isAnchored) {
+				mult1 = 0;
+				mult2 = 1;
+			} else if (rect.isAnchored) {
+				mult1 = 1;
+				mult2 = 0;
+			}
+
+			circ.x += mult1 * dd * -(dx / dist);
+			circ.y += mult1 * dd * -(dy / dist);
+			rect.x += mult2 * dd * (dx / dist);
+			rect.y += mult2 * dd * (dy / dist);
+
 			return dd;
 		}
 	},

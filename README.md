@@ -77,10 +77,13 @@ These class-wide properties are shared by all instances of a given class:
 
 The following functions determine how and when your entities live and die. You are encouraged to override these functions as needed, but you should almost always be sure to call the superclass function from within your overriden function.
 
+#### `reset(x, y, config)`
 When an `Entity` appears in a game, its `reset` function should should be called to set its primary point within the game-space and to apply its config. If you are using `EntityPool`, the `reset` function gets called automatically by the pool's `obtain` function, which takes the same parameters. The `resetView` function gets called automatically by the `reset` function if the instance's `view` property is not `null`.
 
+#### `update(dt)`
 While an `Entity` is active in your game, you should call its `update` function once per tick and pass in the time elapsed since the last tick, `dt` (delta time). If you're using `EntityPool`, you can just call the pool's `update` function, passing `dt` in the same way, and it will update all active entities within the pool. The `updateView` function gets called automatically by the `update` function if the instance's `view` property is not `null`.
 
+#### `release()`
 Finally, when the life of an `Entity` is over, you can call the `release` function to hide it and make it inactive. If you're using an `EntityPool`, this call will recycle it back into the pool automatically.
 
 ### Entity Config

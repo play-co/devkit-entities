@@ -7,23 +7,25 @@ This module includes the Entity base class, EntityPhysics as a default physics c
 
 ## Installation and Imports
 
-Just add devkit-entities to your dependencies in your game's manifest.json, like this:
+Add devkit-entities to dependencies in your game's manifest.json:
 ```
   "dependencies": {
     "devkit-entities": "https://github.com/gameclosure/devkit-entities#v0.2.1"
   },
 ```
 
-Change the `v0.2.1` to whatever tag of entities you want to use. Once this is in place, run `devkit install` within your game project's directory. Once you've installed devkit-entities, you can now import any of the entity files, like this:
+Feel free to change the `v0.2.1` to a tag or branch of entities, then run `devkit install` within your game's directory. Once installed, you can import any of the entity files into your game code:
 ```
   import entities.Entity as Entity;
 ```
 
 ## Entity.js
 
+### Inheriting Entity
+
 TODO: ...
 
-### Inheriting Entity
+#### Entity Prototype Properties
 
 TODO: ...
 
@@ -34,3 +36,7 @@ TODO: ...
 ## EntityPool.js
 
 TODO: ...
+
+## Example Game
+
+TODO: Link

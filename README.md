@@ -23,9 +23,39 @@ Feel free to change the `v0.2.1` to a tag or branch of entities, then run `devki
 
 ### Inheriting Entity
 
+Entity is intended to be the base class of any game element that exists in a 2D game-space. Here's an example of what a Bullet class that inherits Entity might look like:
+```
+var Bullet = Class(Entity, function() {
+	var sup = Entity.prototype;
+
+	this.name = "Bullet";
+
+	this.init = function(opts) {
+		sup.init.call(this, opts);
+
+		this.damage = 1;
+		this.isHoming = false;
+	};
+});
+```
+
+When overriding a function that exists in the Entity class, you almost always want to call the super function, so that you keep the default behavior of entities intact. It's best to use `Entity.prototype._fn_name_.call()` to avoid array allocations incurred by using `.apply()`, especially if you have many instances of your class. In this example, I save a reference `sup` to the `Entity.prototype` for ease of use.
+
+It's also important to note the differences between *Prototype Properties* and *Instance Properties*. In the above example, `name` is a *Prototype Property* shared by all instances of class Bullet, while `damage` is an *Instance Property* that may vary from bullet to bullet.
+
+#### Instance Properties
+
 TODO: ...
 
-#### Entity Prototype Properties
+#### Prototype Properties
+
+TODO: ...
+
+### Entity Lifecycle
+
+TODO: ...
+
+### Entity Config
 
 TODO: ...
 

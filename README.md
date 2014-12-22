@@ -41,7 +41,7 @@ var Bullet = Class(Entity, function() {
 
 When overriding a function that exists in the `Entity` class, you almost always want to call the super function, so that you keep the default behavior of entities intact. It's best to use `Entity.prototype._fn_name_.call()` to avoid array allocations incurred by using `.apply()`, especially if you have many instances of your class. In this example, I save a reference `sup` to the `Entity.prototype` for ease of use.
 
-It's also important to note the differences between *Prototype Properties* and *Instance Properties*. In the above example, `name` is a *Prototype Property* shared by all instances of class `Bullet`, while `damage` is an *Instance Property* that may vary from bullet to bullet.
+It's also important to note the differences between **Prototype Properties** and **Instance Properties**. In the above example, `name` is a **Prototype Property** shared by all instances of class `Bullet`, while `damage` is an **Instance Property** that may vary from bullet to bullet.
 
 #### Instance Properties
 
@@ -88,7 +88,7 @@ Finally, when the life of an `Entity` is over, you can call the `release` functi
 
 ### Entity Config
 
-The third parameter of the `reset` function is a config object containinng initial values to apply to an instance of `Entity`. If you're pooling entities, it's the third parameter of your pool's `obtain` function. Each property has reasonable defaults, and if you supply an `image` property, the entity's view and hit bounds will default to the dimensions of the image asset. Here's an example config object for our hypothetical `Bullet` class:
+The third parameter of the `reset` function is a config object containing initial values to apply to an instance of `Entity`. If you're pooling entities, it's the third parameter of your pool's `obtain` function. Each property has reasonable defaults, and if you supply an `image` property, the entity's view and hit bounds will default to the dimensions of the image asset. Here's an example config object for our hypothetical `Bullet` class:
 ```
 {
     isCircle: true,
@@ -125,7 +125,7 @@ Each instance of `Entity` has a physics object reference that defaults to `Entit
 
 ## EntityPool.js
 
-It can be expensive to create and throw away objects, especially those as complicated as entities with DevKit views. Instead, it's best to use pools to manage their creation and recycling. `EntityPool`, similar to DevKit's `ViewPool` class, serves this purpose for entities. See the "Entity Lifecycle" section above for more information on obtaining and recycling entities with `EntityPool`.
+It can be expensive to create and throw away objects, especially those as complicated as entities with DevKit views. Instead, it's best to use pools to manage their creation and recycling. `EntityPool`, similar to DevKit's `ViewPool` class, serves this purpose for entities. See the **Entity Lifecycle** section above for more information on obtaining and recycling entities with `EntityPool`.
 
 ## Example Game
 

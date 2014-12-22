@@ -21,7 +21,7 @@ Feel free to change the `v0.2.1` to a tag or branch of entities, then run `devki
 
 ## Entity.js
 
-### Inheriting `Entity`
+### Inheriting Entity
 
 `Entity` is intended to be the base class of any game element that exists in a 2D game-space. Here's an example of what a `Bullet` class that inherits `Entity` might look like:
 ```
@@ -88,19 +88,44 @@ Finally, when the life of an `Entity` is over, you can call the `release` functi
 
 ### Entity Config
 
-TODO: ...
+The third parameter of the `reset` function is a config object containinng initial values to apply to an instance of `Entity`. If you're pooling entities, it's the third parameter of your pool's `obtain` function. Each property has reasonable defaults, and if you supply an `image` property, the entity's view and hit bounds will default to the dimensions of the image asset. Here's an example config object for our hypothetical `Bullet` class:
+```
+{
+    isCircle: true,
+    vx: 0,
+    vy: -1.25,
+    hitBounds: {
+        x: 0,
+        y: 0,
+        r: BULLET_SIZE / 2
+    },
+    viewBounds: {
+        x: -BULLET_SIZE / 2,
+        y: -BULLET_SIZE / 2,
+        w: BULLET_SIZE,
+        h: BULLET_SIZE
+    },
+    image: "resources/images/game/shapeCircle.png"
+}
+```
 
 ### Entity Bounds
 
-TODO: ...
+The view and hit bounds used by entities are objects with only 5 properties. They support both rectangles and circles for hit bounds, but it's important to note that view bounds are always rectangular because DevKit views are always rectangular. To match DevKit view usage, rectangular bounds' offsets determine the top-left corner. Circular bounds' offsets determine the center point.  Each bounds object has the following properties:
+
+ * `x` - type: `number` - the x offset from the entity's primary point; for rectangles, this is the offset to the left-side, but for circles, this is the offset to the center
+ * `y` - type: `number` - the y offset from the entity's primary point; for rectangles, this is the offset to the top-side, but for circles, this is the offset to the center
+ * `r` - type: `number` - radius, used only for circles
+ * `w` - type: `number` - width, used only for rectangles
+ * `h` - type: `number` - height, used only for rectangles
 
 ## EntityPhysics.js
 
-TODO: ...
+Each instance of `Entity` has a physics object reference that defaults to `EntityPhysics`. It defines how the entities move and collide. Entities have a `collidesWith` function to detect collisions with other entities, and a `resolveCollidingStateWith` function to resolve collisions by pushing colliding entities apart. Both of these functions rely on the physics object for their behavior. On each call to update, entities also call the physics object's `stepPosition` function to move according to velocity and acceleration. By swapping out the physics object, you can write your own custom physics and behaviors. Instances of `EntityPool` also provide several ways to detect collisions between pools (see the class's code for more details).
 
 ## EntityPool.js
 
-TODO: ...
+It can be expensive to create and throw away objects, especially those as complicated as entities with DevKit views. Instead, it's best to use pools to manage their creation and recycling. `EntityPool`, similar to DevKit's `ViewPool` class, serves this purpose for entities. See the "Entity Lifecycle" section above for more information on obtaining and recycling entities with `EntityPool`.
 
 ## Example Game
 

@@ -153,6 +153,7 @@ exports = Class(function() {
 		var b = this.viewBounds;
 		s.x = this.x + b.x;
 		s.y = this.y + b.y;
+		s.zIndex = config.zIndex !== void 0 ? config.zIndex : s.zIndex;
 		s.visible = true;
 
 		// setImage is expensive, so only call it if we have to

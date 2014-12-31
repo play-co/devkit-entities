@@ -279,6 +279,39 @@ exports = Class(function() {
 	this.getViewHeight = function() {
 		return this.viewBounds.h;
 	};
+
+	/**
+	 * Debugging Utilities
+	 */
+
+	this.showHitBounds = function() {
+		if (!this.hitBoundsView) {
+			this.hitBoundsView = new ImageView({ parent: this.view });
+		} else {
+			this.hitBoundsView.style.visible = true;
+		}
+
+		var hbvs = this.hitBoundsView.style;
+		if (this.isCircle) {
+			this.hitBoundsView.setImage("resources/images/shapeCircle.png");
+			hbvs.x = -this.viewBounds.x + this.hitBounds.x - this.hitBounds.r;
+			hbvs.y = -this.viewBounds.y + this.hitBounds.y - this.hitBounds.r;
+			hbvs.width = 2 * this.hitBounds.r;
+			hbvs.height = 2 * this.hitBounds.r;
+		} else {
+			this.hitBoundsView.setImage("resources/images/shapeRect.png");
+			hbvs.x = -this.viewBounds.x + this.hitBounds.x;
+			hbvs.y = -this.viewBounds.y + this.hitBounds.y;
+			hbvs.width = this.hitBounds.w;
+			hbvs.height = this.hitBounds.h;
+		}
+	};
+
+	this.hideHitBounds = function() {
+		if (this.hitBoundsView) {
+			this.hitBoundsView.style.visible = false;
+		}
+	};
 });
 
 /**

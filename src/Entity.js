@@ -4,6 +4,9 @@ var _imageMap = loader.getMap();
 
 import .EntityPhysics;
 
+// entities module image path (for showing hit bounds)
+var IMG_PATH = "addons/devkit-entities/images/";
+
 // global unique identifier incremented for each instance of Entity
 var _uid = 1;
 
@@ -293,13 +296,13 @@ exports = Class(function() {
 
 		var hbvs = this.hitBoundsView.style;
 		if (this.isCircle) {
-			this.hitBoundsView.setImage("resources/images/shapeCircle.png");
+			this.hitBoundsView.setImage(IMG_PATH + "shapeCircle.png");
 			hbvs.x = -this.viewBounds.x + this.hitBounds.x - this.hitBounds.r;
 			hbvs.y = -this.viewBounds.y + this.hitBounds.y - this.hitBounds.r;
 			hbvs.width = 2 * this.hitBounds.r;
 			hbvs.height = 2 * this.hitBounds.r;
 		} else {
-			this.hitBoundsView.setImage("resources/images/shapeRect.png");
+			this.hitBoundsView.setImage(IMG_PATH + "shapeRect.png");
 			hbvs.x = -this.viewBounds.x + this.hitBounds.x;
 			hbvs.y = -this.viewBounds.y + this.hitBounds.y;
 			hbvs.width = this.hitBounds.w;

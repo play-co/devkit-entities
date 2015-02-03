@@ -150,6 +150,11 @@ exports = Class(function() {
 		this.isCircle = config.isCircle || false;
 		this.isAnchored = config.isAnchored || false;
 
+		this.collidedTop = false;
+		this.collidedRight = false;
+		this.collidedBottom = false;
+		this.collidedLeft = false;
+
 		applyBoundsFromConfig(config.hitBounds, this.hitBounds, config, 'hit');
 		applyBoundsFromConfig(config.viewBounds, this.viewBounds, config, 'view');
 

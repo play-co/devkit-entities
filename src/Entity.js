@@ -65,6 +65,12 @@ exports = Class(function() {
 		// anchored entities cannot be moved by physics
 		this.isAnchored = false;
 
+		// collision directional flags
+		this.collidedTop = false;
+		this.collidedRight = false;
+		this.collidedBottom = false;
+		this.collidedLeft = false;
+
 		// collision bounds, offset from primary point
 		this.hitBounds = createBounds();
 
@@ -208,7 +214,17 @@ exports = Class(function() {
 	};
 
 	this.resolveCollidingStateWith = function(entity) {
-		return this.physics.resolveCollidingState(this, entity);
+		var xPrev = this.x;
+		var yPrev = this.y;
+		var deltaDistance = this.physics.resolveCollidingState(this, entity);
+
+		// set directional collision flags based on change in position
+		this.collidedLeft = this.x > xPrev;
+		this.collidedRight = this.x < xPrev;
+		this.collidedTop = this.y > yPrev;
+		this.collidedBottom = this.y < yPrev;
+
+		return deltaDistance;
 	};
 
 	/**

@@ -1,3 +1,25 @@
+## Changelog
+
+Using SAT (https://github.com/jriecken/sat-js) to detect the collision.
+Base on devkit-entities (https://github.com/gameclosure/devkit-entities#v0.2.5).
+- Supporting rectangle with rotation
+- Adding more rotate and setAnchor
+- Changing response object on EntityPool
+
+## Next features
+- Easy to change code to support polygon. Ex: Triangle.
+
+## Installation and Imports
+
+Add devkit-entities to dependencies in your game's manifest.json:
+```
+  devkit install https://github.com/tuanna222/devkit-entities.git
+```
+Import to your project:
+```
+  import entities.Entity as Entity;
+```
+
 DevKit Entities Module
 ======================
 
@@ -19,31 +41,28 @@ Feel free to change the `v0.2.4` to a tag or branch of entities, then run `devki
   import entities.Entity as Entity;
 ```
 
-## Entity.js
-
-### Inheriting Entity
-
-`Entity` is intended to be the base class of any game element that exists in a 2D game-space. Here's an example of what a `Bullet` class that inherits `Entity` might look like:
+## Example
 ```
-var Bullet = Class(Entity, function() {
-	var sup = Entity.prototype;
+	this.tick = function(dt) {
+		if(this.running !== true) return;
+		// speed up or slow down the passage of time
+		dt = Math.min(1 * dt, 100);
+		// update entities
+		this.player.update(dt);//Player Entity
+		this.enemies.update(dt);//Enemy EntityPool
+		//collision
+		this.enemies.onAllCollisions(this.player, this.onColision, this);
+	}
 
-	this.name = "Bullet";
-
-	this.init = function(opts) {
-		sup.init.call(this, opts);
-
-		this.damage = 1;
-		this.isHoming = false;
-	};
-});
+	this.onColision = function(response){
+		console.log("collision===========", response);//SAT.Response
+		//response.a.entity -> Enemy Entity
+		//response.b.entity -> Player Entity
+	}
 ```
 
-When overriding a function that exists in the `Entity` class, you almost always want to call the super function, so that you keep the default behavior of entities intact. It's best to use `Entity.prototype._fn_name_.call()` to avoid array allocations incurred by using `.apply()`, especially if you have many instances of the class. In this example, I save a reference `sup` to the `Entity.prototype` for ease of use.
-
-It's also important to note the differences between **Prototype Properties** and **Instance Properties**. In the above example, `name` is a **Prototype Property** shared by all instances of class `Bullet`, while `damage` is an **Instance Property** that may vary from bullet to bullet.
-
-#### Instance Properties
+## Instance Properties
+#### Entity Properties
 
 Each instance of a class that inherits `Entity` will have its own value for the following properties:
 
@@ -65,70 +84,24 @@ Each instance of a class that inherits `Entity` will have its own value for the 
  * `pool` - type: `object` - a reference to the entity's `EntityPool`, if it's being pooled; this is managed automatically and should be ignored
  * `poolIndex` - type: `number` - the index of the entity in its pool, if it's being pooled; this is managed automatically and should be ignored
 
+####Entity Bounds
 
-#### Prototype Properties
+    x - type: number - the x offset from the entity's primary point; for rectangles, this is the offset to the left-side, but for circles, this is the offset to the center
+    y - type: number - the y offset from the entity's primary point; for rectangles, this is the offset to the top-side, but for circles, this is the offset to the center
+    r - type: number - radius, used only for circles
+    w - type: number - width, used only for rectangles
+    h - type: number - height, used only for rectangles
 
-These class-wide properties are shared by all instances of a given class:
 
- * `name` - type: `string` - aids in constructing a unique identifier for each instance of the class; useful for debugging
- * `viewClass` - type: `object` - defaults to `ImageView`; must either be `null` or a class constructor that inherits from `View`; this property determines what type of view to construct and attach to each instance of the class
+#### Response Properties
 
-### Entity Lifecycle
+    a - The first object in the collision.
+	a.entity - The first Entity in the collision
+    b - The second object in the collison.
+	b.entity - The second Entity in the collision
+    overlap - Magnitude of the overlap on the shortest colliding axis.
+    overlapN - The shortest colliding axis (unit-vector)
+    overlapV - The overlap vector (i.e. overlapN.scale(overlap, overlap)). If this vector is subtracted from the position of a, a and b will no longer be colliding.
+    aInB - Whether the first object is completely inside the second.
+    bInA - Whether the second object is completely inside the first.
 
-The following functions determine how and when your entities live and die. You are encouraged to override these functions as needed, but you should almost always be sure to call the superclass function from within your overriden function, as described in the **Inheriting Entity** section above.
-
-#### `reset(x, y, config)`
-When an `Entity` should appear, call its `reset` function to set its primary point within the game-space and to apply its config. When using `EntityPool`, the `reset` function gets called automatically by the pool's `obtain` function, which takes the same parameters. The `resetView` function gets called automatically by the `reset` function if the instance's `view` property is not `null`.
-
-#### `update(dt)`
-While an `Entity` is active, call its `update` function once per tick and pass in the time elapsed since the last tick, `dt` (delta time). When using `EntityPool`, call the pool's `update` function, passing `dt` in the same way, and it will update all active entities within the pool. The `updateView` function gets called automatically by the `update` function if the instance's `view` property is not `null`.
-
-#### `release()`
-Finally, when the life of an `Entity` is over, call the `release` function to hide it and make it inactive. When using an `EntityPool`, this call will recycle it back into the pool automatically.
-
-### Entity Config
-
-The third parameter of the `reset` function is a config object. When pooling entities, it's the third parameter of the pool's `obtain` function. Each configurable property has reasonable defaults, and if supplied an `image` property, the entity's view and hit bounds will default to the dimensions of the image asset. Here's an example config object for our hypothetical `Bullet` class:
-```
-{
-    isCircle: true,
-    vx: 0,
-    vy: -1.25,
-    hitBounds: {
-        x: 0,
-        y: 0,
-        r: BULLET_SIZE / 2
-    },
-    viewBounds: {
-        x: -BULLET_SIZE / 2,
-        y: -BULLET_SIZE / 2,
-        w: BULLET_SIZE,
-        h: BULLET_SIZE
-    },
-    image: "resources/images/game/shapeCircle.png"
-}
-```
-
-### Entity Bounds
-
-The view and hit bounds used by entities are objects with only 5 properties. They support both rectangles and circles for hit bounds, but it's important to note that view bounds are always rectangular because DevKit views are always rectangular. To match DevKit view usage, rectangular bounds' offsets determine the top-left corner. Circular bounds' offsets determine the center point. Each bounds object has the following properties:
-
- * `x` - type: `number` - the x offset from the entity's primary point; for rectangles, this is the offset to the left-side, but for circles, this is the offset to the center
- * `y` - type: `number` - the y offset from the entity's primary point; for rectangles, this is the offset to the top-side, but for circles, this is the offset to the center
- * `r` - type: `number` - radius, used only for circles
- * `w` - type: `number` - width, used only for rectangles
- * `h` - type: `number` - height, used only for rectangles
-
-## EntityPhysics.js
-
-Each instance of `Entity` has a physics object reference that defaults to `EntityPhysics`. It defines how the entities move and collide. Entities' `collidesWith` function detects collisions with other entities, and their `resolveCollidingStateWith` function resolves collisions by pushing entities apart. Both of these functions rely on the physics object for their behavior. On each call to update, entities also call the physics object's `stepPosition` function, which moves entities based on their velocity and acceleration. By swapping out the physics object, you can write your own custom physics and behaviors. Instances of `EntityPool` also provide several ways to detect collisions between pools (see [EntityPool](https://github.com/gameclosure/devkit-entities/blob/master/src/EntityPool.js) for more details).
-
-## EntityPool.js
-
-It can be expensive to create and throw away objects, especially those as complicated as entities with DevKit views. Instead, it's best to use pools to manage their creation and recycling. `EntityPool`, similar to DevKit's `ViewPool` class, serves this purpose for entities. See the **Entity Lifecycle** section above for more information on obtaining and recycling entities with `EntityPool`.
-
-## Examples
-
-Open-source example(s) built on DevKit with this module:
-
- * [Drone Swarm](https://github.com/weebygames/swarm)

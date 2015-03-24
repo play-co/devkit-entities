@@ -3,6 +3,7 @@ import ui.resource.loader as loader;
 var _imageMap = loader.getMap();
 
 import .EntityPhysics;
+import .SAT;
 
 // entities module image path (for showing hit bounds)
 var IMG_PATH = "addons/devkit-entities/images/";
@@ -149,6 +150,8 @@ exports = Class(function() {
 		this.ay = config.ay || 0;
 		this.isCircle = config.isCircle || false;
 		this.isAnchored = config.isAnchored || false;
+		this.anchorX = config.anchorX || 0;
+		this.anchorY = config.anchorY || 0;
 
 		this.collidedTop = false;
 		this.collidedRight = false;
@@ -157,6 +160,16 @@ exports = Class(function() {
 
 		applyBoundsFromConfig(config.hitBounds, this.hitBounds, config, 'hit');
 		applyBoundsFromConfig(config.viewBounds, this.viewBounds, config, 'view');
+
+		this.rigidbody2d = null;
+		if(this.isCircle){
+			this.rigidbody2d = new SAT.Circle(
+				new SAT.Vector(this.x + this.hitBounds.x, this.y + this.hitBounds.y), 
+				this.hitBounds.r);
+		}else{
+			this.rigidbody2d = new SAT.Box(new SAT.Vector(this.x + this.hitBounds.x, this.y + this.hitBounds.y), 
+				this.hitBounds.w, this.hitBounds.h).toPolygon();
+		}
 
 		this.view && this.resetView(config);
 	};
@@ -177,6 +190,23 @@ exports = Class(function() {
 			v.currImage = image;
 		}
 	};
+
+	this.rotate = function(angle){
+		this.view.style.r += angle;
+		if(!this.isCircle){
+			this.rigidbody2d.rotate(angle);
+		}
+	}
+
+	this.setAnchor = function(x, y){
+		this.anchorX = x;
+		this.anchorY = y;
+		this.view.updateOpts({
+			anchorX: x,
+			anchorY: y
+		});
+		this.rigidbody2d.setOffset(new SAT.Vector(x, y));
+	}
 
 	this.update = function(dt) {
 		this.xPrev = this.x;
@@ -214,22 +244,9 @@ exports = Class(function() {
 	 *         ~ returns the total distance moved by the two entities
 	 */
 
-	this.collidesWith = function(entity) {
-		return this.physics.collide(this, entity);
-	};
-
-	this.resolveCollidingStateWith = function(entity) {
-		var xPrev = this.x;
-		var yPrev = this.y;
-		var deltaDistance = this.physics.resolveCollidingState(this, entity);
-
-		// set directional collision flags based on change in position
-		this.collidedLeft = this.x > xPrev;
-		this.collidedRight = this.x < xPrev;
-		this.collidedTop = this.y > yPrev;
-		this.collidedBottom = this.y < yPrev;
-
-		return deltaDistance;
+	this.collidesWith = function(entity, response) {
+		var res = response || false;
+		return this.physics.collide(this, entity, res);
 	};
 
 	/**

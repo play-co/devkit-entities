@@ -50,7 +50,7 @@ var Enemy = Class(Entity, function() {
 	}
 
 	this.onColision = function(response){
-		console.log("collision===========", response);//SAT.Response
+		console.log("collision response", response);//SAT.Response
 		//response.a.entity -> Enemy Entity
 		//response.b.entity -> Player Entity
 	}
@@ -91,7 +91,7 @@ Each instance of a class that inherits `Entity` will have its own value for the 
  * `setAnchor(x, y)` - Set (x, y) pivot point from origin position of entity. Ex: entity.x = 10, entity.y = 10, setAnchor(5, 5) causing rotate around (15, 15) point on xy axis.
  * `rotate(radians)` - Rotating this entity around anchor point 
 
-#### Response Properties
+####Collision Response Properties
 
     a - The first object in the collision.
 	a.entity - The first Entity in the collision

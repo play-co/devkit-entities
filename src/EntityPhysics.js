@@ -36,9 +36,16 @@ exports = {
 		if(dx == 0 && dy == 0){
 			return;
 		}
+	},
+
+	updatePosition: function(entity, dx, dy){
+		if(dx == 0 && dy == 0){
+			return;
+		}
 		entity.rigidbody2d.pos.x += dx;
 		entity.rigidbody2d.pos.y += dy;
 	},
+
 	/**
 	 * ~ REQUIRED for Entity
 	 * ~ collide defines how collisions behave and what data is returned

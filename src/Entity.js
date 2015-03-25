@@ -216,8 +216,11 @@ exports = Class(function() {
 	this.updateView = function(dt) {
 		var s = this.view.style;
 		var b = this.viewBounds;
+		var xPrev = s.x;
+		var yPrev = s.y;
 		s.x = this.x + b.x;
 		s.y = this.y + b.y;
+		this.physics.updatePosition(this, s.x - xPrev, s.y - yPrev);
 	};
 
 	this.release = function() {

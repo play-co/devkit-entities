@@ -4,6 +4,7 @@ var _imageMap = loader.getMap();
 
 import .EntityPhysics;
 import .SAT;
+import .SATPhysics;
 
 // entities module image path (for showing hit bounds)
 var IMG_PATH = "addons/devkit-entities/images/";
@@ -152,6 +153,7 @@ exports = Class(function() {
 		this.isAnchored = config.isAnchored || false;
 		this.anchorX = config.anchorX || 0;
 		this.anchorY = config.anchorY || 0;
+		this.physics = config.physics || EntityPhysics;
 
 		this.collidedTop = false;
 		this.collidedRight = false;
@@ -161,15 +163,17 @@ exports = Class(function() {
 		applyBoundsFromConfig(config.hitBounds, this.hitBounds, config, 'hit');
 		applyBoundsFromConfig(config.viewBounds, this.viewBounds, config, 'view');
 
-		this.rigidbody2d = null;
-		if(this.isCircle){
-			this.rigidbody2d = new SAT.Circle(
-				new SAT.Vector(this.x + this.hitBounds.x, this.y + this.hitBounds.y), this.hitBounds.r);
-		}else{
-			this.rigidbody2d = new SAT.Box(new SAT.Vector(this.x + this.hitBounds.x, this.y + this.hitBounds.y), 
-				this.hitBounds.w, this.hitBounds.h).toPolygon();
+		if(this.physics.name == "SATPhysics"){
+			this.rigidbody2d = null;
+			if(this.isCircle){
+				this.rigidbody2d = new SAT.Circle(
+					new SAT.Vector(this.x + this.hitBounds.x, this.y + this.hitBounds.y), this.hitBounds.r);
+			}else{
+				this.rigidbody2d = new SAT.Box(new SAT.Vector(this.x + this.hitBounds.x, this.y + this.hitBounds.y), 
+					this.hitBounds.w, this.hitBounds.h).toPolygon();
+			}
+			this.setAnchor(this.anchorX, this.anchorY);
 		}
-		this.setAnchor(this.anchorX, this.anchorY);
 
 		this.view && this.resetView(config);
 	};
@@ -193,7 +197,9 @@ exports = Class(function() {
 
 	this.rotate = function(angle){
 		this.view.style.r += angle;
-		this.rigidbody2d.rotate(angle);
+		if(this.physics.name == "SATPhysics"){
+			this.rigidbody2d.rotate(angle);
+		}
 	}
 
 	this.setAnchor = function(x, y){
@@ -203,7 +209,9 @@ exports = Class(function() {
 			anchorX: x,
 			anchorY: y
 		});
-		this.rigidbody2d.setPivot(new SAT.Vector(this.x + x, this.y + y));
+		if(this.physics.name == "SATPhysics"){
+			this.rigidbody2d.setPivot(new SAT.Vector(this.x + x, this.y + y));
+		}
 	}
 
 	this.update = function(dt) {
@@ -220,7 +228,9 @@ exports = Class(function() {
 		var yPrev = s.y;
 		s.x = this.x + b.x;
 		s.y = this.y + b.y;
-		this.physics.updatePosition(this, s.x - xPrev, s.y - yPrev);
+		if(this.physics.name == "SATPhysics"){
+			this.physics.updatePosition(this, s.x - xPrev, s.y - yPrev);
+		}
 	};
 
 	this.release = function() {

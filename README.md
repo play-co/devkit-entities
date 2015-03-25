@@ -3,8 +3,9 @@
  
 ## Changelog
 
+- Adding SATPhysics component
 - Adding rotate and setAnchor (pivot point) function on Entity
-- Supporting detect collision with rotation on any pivot
+- Supporting detect collision with rotation on any pivot (using SATPhysics)
 - Changing response object on EntityPool
 
 ## Next features
@@ -19,6 +20,7 @@ Add devkit-entities to dependencies in your game's manifest.json:
 Import to your project:
 ```
   import entities.Entity as Entity;
+  import entities.SATPhysics as SATPhysics;//if using SATPhysics as custom physics. Default: EntityPhysics
 ```
 
 ## Example
@@ -36,7 +38,15 @@ var Enemy = Class(Entity, function() {
 	};
 });
 ```
-
+Add `physics: SATPhysics` to opts param to create Entity:
+```
+		var opts = {
+			...
+			physics: SATPhysics,
+			isCircle: true,
+			...
+		}
+```
 ```
 	this.tick = function(dt) {
 		if(this.running !== true) return;

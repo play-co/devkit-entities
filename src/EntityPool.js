@@ -70,7 +70,10 @@ exports = Class(function() {
 		var entities = this.entities;
 		for (var i = this._freeIndex - 1; i >= 0; i--) {
 			var testEntity = entities[i];
-			var response = new SAT.Response();
+			var response = {a:{},b:{}};
+			if(entity.physics.name == "SATPhysics"){
+				response = new SAT.Response();
+			}
 			if (testEntity.collidesWith(entity, response)) {
 				response.a.entity = testEntity;
 				response.b.entity = entity;
@@ -114,7 +117,10 @@ exports = Class(function() {
 		var entities = this.entities;
 		for (var i = this._freeIndex - 1; i >= 0; i--) {
 			var testEntity = entities[i];
-			var response = new SAT.Response();
+			var response = {a:{},b:{}};
+			if(entity.physics.name == "SATPhysics"){
+				response = new SAT.Response();
+			}
 			if (testEntity.collidesWith(entity, response)) {
 				response.a.entity = testEntity;
 				response.b.entity = entity;
@@ -144,8 +150,13 @@ exports = Class(function() {
 			var iEntity = entities[i];
 			for (var j = pool._freeIndex - 1; j >= 0; j--) {
 				var jEntity = pool.entities[j];
-				var response = new SAT.Response();
+				var response = {a:{},b:{}};
+				if(entity.physics.name == "SATPhysics"){
+					response = new SAT.Response();
+				}
 				if (iEntity.collidesWith(jEntity, response)) {
+					response.a.entity = iEntity;
+					response.b.entity = jEntity;
 					fn.call(ctx, response);
 				}
 			}

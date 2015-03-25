@@ -1,5 +1,6 @@
  * Using SAT (https://github.com/jriecken/sat-js) to detect the collision.
  * Base on devkit-entities (https://github.com/gameclosure/devkit-entities#v0.2.5).
+ 
 ## Changelog
 
 - Adding rotate and setAnchor (pivot point) function on Entity

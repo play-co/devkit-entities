@@ -93,13 +93,15 @@
   // Rotate this vector (counter-clockwise) by the specified angle (in radians).
   /**
    * @param {number} angle The angle to rotate (in radians)
+   * @param {Vector} _pivot The pivot to rotate around it
    * @return {Vector} This for chaining.
    */
-  Vector.prototype['rotate'] = Vector.prototype.rotate = function (angle) {
-    var x = this['x'];
-    var y = this['y'];
-    this['x'] = x * Math.cos(angle) - y * Math.sin(angle);
-    this['y'] = x * Math.sin(angle) + y * Math.cos(angle);
+  Vector.prototype['rotate'] = Vector.prototype.rotate = function (angle, _pivot) {
+    var pivot = _pivot || new Vector(0, 0);
+    var x = this['x'] - pivot['x'];
+    var y = this['y'] - pivot['y'];
+    this['x'] = x * Math.cos(angle) - y * Math.sin(angle) + pivot['x'];
+    this['y'] = x * Math.sin(angle) + y * Math.cos(angle) + pivot['y'];
     return this;
   };
 
@@ -257,6 +259,7 @@
   function Circle(pos, r) {
     this['pos'] = pos || new Vector();
     this['r'] = r || 0;
+    this['pivot'] = new Vector();
   }
   SAT['Circle'] = Circle;
   
@@ -270,6 +273,27 @@
     var r = this['r'];
     var corner = this["pos"].clone().sub(new Vector(r, r));
     return new Box(corner, r*2, r*2).toPolygon();
+  };
+
+  /**
+   * @param {Vector} pivot The pivot point
+   * @return {Circle} This for chaining.
+   */
+  Circle.prototype['setPivot'] = Circle.prototype.setPivot = function(pivot) {
+    this['pivot'] = pivot;
+    return this;
+  };
+
+  // Rotates this Circle counter-clockwise around the origin of *its local coordinate system* (i.e. `pos`).
+  //
+  // Note: This changes the **original** points (so any `angle` will be applied on top of this rotation).
+  /**
+   * @param {number} angle The angle to rotate (in radians)
+   * @return {Circle} This for chaining.
+   */
+  Circle.prototype['rotate'] = Circle.prototype.rotate = function(angle) {
+    this['pos'].rotate(angle, this['pivot']);
+    return this;
   };
 
   // ## Polygon
@@ -295,6 +319,7 @@
     this['pos'] = pos || new Vector();
     this['angle'] = 0;
     this['offset'] = new Vector();
+    this['pivot'] = new Vector();
     this.setPoints(points || []);
   }
   SAT['Polygon'] = Polygon;
@@ -347,6 +372,17 @@
     return this;
   };
 
+  /**
+   * @param {Vector} pivot The pivot point.
+   * @return {Polygon} This for chaining.
+   */
+  Polygon.prototype['setPivot'] = Polygon.prototype.setPivot = function(pivot) {
+    var x = this['pos']['x'];
+    var y = this['pos']['y'];
+    this['pivot'] = new Vector(pivot["x"] - x, pivot["y"] - y);
+    return this;
+  };
+
   // Rotates this polygon counter-clockwise around the origin of *its local coordinate system* (i.e. `pos`).
   //
   // Note: This changes the **original** points (so any `angle` will be applied on top of this rotation).
@@ -358,7 +394,7 @@
     var points = this['points'];
     var len = points.length;
     for (var i = 0; i < len; i++) {
-      points[i].rotate(angle);
+      points[i].rotate(angle, this['pivot']);
     }
     this._recalc();
     return this;
@@ -409,6 +445,7 @@
     var points = this['points'];
     var offset = this['offset'];
     var angle = this['angle'];
+    var pivot = this['pivot'];
     var len = points.length;
     var i;
     for (i = 0; i < len; i++) {
@@ -416,7 +453,7 @@
       calcPoint.x += offset.x;
       calcPoint.y += offset.y;
       if (angle !== 0) {
-        calcPoint.rotate(angle);
+        calcPoint.rotate(angle, pivot);
       }
     }
     // Calculate the edges/normals

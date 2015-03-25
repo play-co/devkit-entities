@@ -164,12 +164,12 @@ exports = Class(function() {
 		this.rigidbody2d = null;
 		if(this.isCircle){
 			this.rigidbody2d = new SAT.Circle(
-				new SAT.Vector(this.x + this.hitBounds.x, this.y + this.hitBounds.y), 
-				this.hitBounds.r);
+				new SAT.Vector(this.x + this.hitBounds.x, this.y + this.hitBounds.y), this.hitBounds.r);
 		}else{
 			this.rigidbody2d = new SAT.Box(new SAT.Vector(this.x + this.hitBounds.x, this.y + this.hitBounds.y), 
 				this.hitBounds.w, this.hitBounds.h).toPolygon();
 		}
+		this.setAnchor(this.anchorX, this.anchorY);
 
 		this.view && this.resetView(config);
 	};
@@ -193,9 +193,7 @@ exports = Class(function() {
 
 	this.rotate = function(angle){
 		this.view.style.r += angle;
-		if(!this.isCircle){
-			this.rigidbody2d.rotate(angle);
-		}
+		this.rigidbody2d.rotate(angle);
 	}
 
 	this.setAnchor = function(x, y){
@@ -205,7 +203,7 @@ exports = Class(function() {
 			anchorX: x,
 			anchorY: y
 		});
-		this.rigidbody2d.setOffset(new SAT.Vector(x, y));
+		this.rigidbody2d.setPivot(new SAT.Vector(this.x + x, this.y + y));
 	}
 
 	this.update = function(dt) {

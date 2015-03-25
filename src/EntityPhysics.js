@@ -31,13 +31,13 @@ exports = {
 		entity.vy += dt * entity.ay;
 		entity.y += dt * entity.vy / 2;
 
-		if(entity.isCircle){
-			entity.rigidbody2d.pos.x = entity.x + entity.hitBounds.r;
-			entity.rigidbody2d.pos.y = entity.y + entity.hitBounds.r;
-		}else{
-			entity.rigidbody2d.pos.x = entity.x;
-			entity.rigidbody2d.pos.y = entity.y;
+		var dx = entity.xPrev - entity.x;
+		var dy = entity.yPrev - entity.y;
+		if(dx == 0 && dy == 0){
+			return;
 		}
+		entity.rigidbody2d.pos.x += dx;
+		entity.rigidbody2d.pos.y += dy;
 	},
 	/**
 	 * ~ REQUIRED for Entity

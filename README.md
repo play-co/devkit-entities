@@ -2,12 +2,13 @@
 
 Using SAT (https://github.com/jriecken/sat-js) to detect the collision.
 Base on devkit-entities (https://github.com/gameclosure/devkit-entities#v0.2.5).
-- Supporting rectangle with rotation
-- Adding more rotate and setAnchor
+
+- Adding rotate and setAnchor (pivot point) function on Entity
+- Supporting detect collision with rotation on any pivot
 - Changing response object on EntityPool
 
 ## Next features
-- Easy to change code to support polygon. Ex: Triangle.
+- Easy to change code to support polygon. Ex: Triangle,...
 
 ## Installation and Imports
 
@@ -42,6 +43,21 @@ Feel free to change the `v0.2.4` to a tag or branch of entities, then run `devki
 ```
 
 ## Example
+```
+var Enemy = Class(Entity, function() {
+	var sup = Entity.prototype;
+	this.name = "Item";
+	this.viewClass = SpriteView;
+	
+	
+	this.update = function(dt) {
+		sup.update.call(this, dt);
+		//this.setAnchor(5, 5);  rotating around (x, y) 
+		this.rotate(Math.PI / 80);
+	};
+});
+```
+
 ```
 	this.tick = function(dt) {
 		if(this.running !== true) return;
@@ -92,6 +108,9 @@ Each instance of a class that inherits `Entity` will have its own value for the 
     w - type: number - width, used only for rectangles
     h - type: number - height, used only for rectangles
 
+####Entity New Methods
+ * `setAnchor(x, y)` - Set (x, y) pivot point from origin position of entity. Ex: entity.x = 10, entity.y = 10, setAnchor(5, 5) causing rotate around (15, 15) point on xy axis.
+ * `rotate(radians)` - Rotating this entity around anchor point 
 
 #### Response Properties
 

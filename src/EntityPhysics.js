@@ -15,6 +15,7 @@ var COLLISION_OFFSET = 0.001;
  * developer to manage the time step of his/her game to prevent this behavior
  */
 exports = {
+	name: "EntityPhysics",
 	/**
 	 * ~ REQUIRED for Entity
 	 * ~ stepPosition updates an entity's position based on dt (delta time)

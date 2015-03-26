@@ -3,7 +3,7 @@ DevKit Entities Module
 
 `Entity` serves as a base class for game elements in DevKit. It provides functionality for coordinates in a game-space; circular and rectangular bounds for offsetting views and hitboxes; implicit view management; basic physics including velocity, acceleration, and collisions; and a lifecycle interface to easily facilitate pooling.
 
-This module includes the [Entity](https://github.com/gameclosure/devkit-entities/blob/master/src/Entity.js) base class, [EntityPhysics](https://github.com/gameclosure/devkit-entities/blob/master/src/EntityPhysics.js) as a default physics component, and [EntityPool](https://github.com/gameclosure/devkit-entities/blob/master/src/EntityPool.js) to efficiently recycle entities. Thanks to @tuanna222 for adding [SATPhysics](https://github.com/gameclosure/devkit-entities/blob/master/src/SATPhysics.js) based on [SAT.js](https://github.com/jriecken/sat-js) as an optional advanced physics implementation.
+This module includes the [Entity](https://github.com/gameclosure/devkit-entities/blob/master/src/Entity.js) base class, [EntityPhysics](https://github.com/gameclosure/devkit-entities/blob/master/src/EntityPhysics.js) as a default physics component, and [EntityPool](https://github.com/gameclosure/devkit-entities/blob/master/src/EntityPool.js) to efficiently recycle entities. Thanks to [@tuanna222](https://github.com/tuanna222) for adding [SATPhysics](https://github.com/gameclosure/devkit-entities/blob/master/src/SATPhysics.js) based on [SAT.js](https://github.com/jriecken/sat-js) as an optional advanced physics implementation.
 
 ## Installation and Imports
 
@@ -19,7 +19,7 @@ Once installed, you can import classes from this module like this:
 
 ## Entity.js
 
-### Inheriting Entity
+#### Inheriting Entity
 
 `Entity` is intended to be the base class of any game element that exists in a 2D game-space. Here's an example of what a `Bullet` class that inherits `Entity` might look like:
 ```
@@ -38,7 +38,7 @@ When overriding a function that exists in the `Entity` class, you almost always 
 
 It's also important to note the differences between **Prototype Properties** and **Instance Properties**. In the above example, `name` is a **Prototype Property** shared by all instances of class `Bullet`, while `damage` is an **Instance Property** that may vary from bullet to bullet.
 
-#### Instance Properties
+##### Instance Properties
 
 Each instance of a class that inherits `Entity` will have its own value for the following properties:
 
@@ -63,27 +63,27 @@ Each instance of a class that inherits `Entity` will have its own value for the 
  * `poolIndex` - type: `number` - the index of the entity in its pool, if it's being pooled; this is managed automatically and should be ignored
 
 
-#### Prototype Properties
+##### Prototype Properties
 
 These class-wide properties are shared by all instances of a given class:
 
  * `name` - type: `string` - aids in constructing a unique identifier for each instance of the class; useful for debugging
  * `viewClass` - type: `object` - defaults to `ImageView`; must either be `null` or a class constructor that inherits from `View`; this property determines what type of view to construct and attach to each instance of the class
 
-### Entity Lifecycle
+#### Entity Lifecycle
 
 The following functions determine how and when your entities live and die. You are encouraged to override these functions as needed, but you should almost always be sure to call the superclass function from within your overriden function, as described in the **Inheriting Entity** section above.
 
-#### `reset(x, y, config)`
+##### `reset(x, y, config)`
 When an `Entity` should appear, call its `reset` function to set its primary point within the game-space and to apply its config. When using `EntityPool`, the `reset` function gets called automatically by the pool's `obtain` function, which takes the same parameters. The `resetView` function gets called automatically by the `reset` function if the instance's `view` property is not `null`.
 
-#### `update(dt)`
+##### `update(dt)`
 While an `Entity` is active, call its `update` function once per tick and pass in the time elapsed since the last tick, `dt` (delta time). When using `EntityPool`, call the pool's `update` function, passing `dt` in the same way, and it will update all active entities within the pool. The `updateView` function gets called automatically by the `update` function if the instance's `view` property is not `null`.
 
-#### `release()`
+##### `release()`
 Finally, when the life of an `Entity` is over, call the `release` function to hide it and make it inactive. When using an `EntityPool`, this call will recycle it back into the pool automatically.
 
-### Entity Config
+#### Entity Config
 
 The third parameter of the `reset` function is a config object. When pooling entities, it's the third parameter of the pool's `obtain` function. Each configurable property has reasonable defaults, and if supplied an `image` property, the entity's view and hit bounds will default to the dimensions of the image asset. Here's an example config object for our hypothetical `Bullet` class:
 ```
@@ -106,7 +106,7 @@ The third parameter of the `reset` function is a config object. When pooling ent
 }
 ```
 
-### Entity Bounds
+#### Entity Bounds
 
 The view and hit bounds used by entities are objects with only 5 properties. They support both rectangles and circles for hit bounds, but it's important to note that view bounds are always rectangular because DevKit views are always rectangular. To match DevKit view usage, rectangular bounds' offsets determine the top-left corner. Circular bounds' offsets determine the center point. Each bounds object has the following properties:
 
@@ -144,7 +144,9 @@ var Bullet = Class(Entity, function() {
 });
 ```
 
-### Collision Response Properties
+#### Collision Response Properties
+
+The API for `SAT.js` is slightly different since it provides more collision information. The `collidesWith` function takes a `response` object as its second parameter, which gets populated by `SATPhysics`. These are the properties provided:
 
  * `a` - the first object in the collision
  * `a.entity` - the first `Entity` in the collision

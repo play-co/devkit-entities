@@ -236,6 +236,10 @@ exports = Class(function() {
 	this.release = function() {
 		this.pool && this.pool.release(this);
 		this.view && (this.view.style.visible = false);
+		if(this.physics.name == "SATPhysics"){
+			this.rigidbody2d = null;
+			delete this.rigidbody2d;
+		}
 	};
 
 	/**

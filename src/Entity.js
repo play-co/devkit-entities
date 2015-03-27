@@ -59,6 +59,10 @@ exports = Class(function() {
 		this.xPrev = 0;
 		this.yPrev = 0;
 
+		// anchor (pivot) point, offset from the primary point
+		this.anchorX = 0;
+		this.anchorY = 0;
+
 		// entities are either circles or rectangles
 		this.isCircle = false;
 
@@ -101,6 +105,9 @@ exports = Class(function() {
 
 		// physics component
 		this.physics = opts.physics || EntityPhysics;
+
+		// rigid body object used by SATPhysics only
+		this.rigidBody = null;
 
 		// EntityPool properties
 		this.pool = opts.pool || null;
@@ -149,6 +156,7 @@ exports = Class(function() {
 		this.ay = config.ay || 0;
 		this.isCircle = config.isCircle || false;
 		this.isAnchored = config.isAnchored || false;
+		this.physics = config.physics || this.physics;
 
 		this.collidedTop = false;
 		this.collidedRight = false;
@@ -157,6 +165,9 @@ exports = Class(function() {
 
 		applyBoundsFromConfig(config.hitBounds, this.hitBounds, config, 'hit');
 		applyBoundsFromConfig(config.viewBounds, this.viewBounds, config, 'view');
+
+		this.rigidBody = this.physics.getRigidBody(this);
+		this.setAnchor(config.anchorX, config.anchorY);
 
 		this.view && this.resetView(config);
 	};
@@ -178,6 +189,25 @@ exports = Class(function() {
 		}
 	};
 
+	this.rotate = function(dr) {
+		this.view.style.r += dr;
+		if (this.rigidBody && this.rigidBody.rotate) {
+			this.rigidBody.rotate(dr);
+	}
+	};
+
+	this.setAnchor = function(x, y){
+		this.anchorX = x || 0;
+		this.anchorY = y || 0;
+		if (this.view) {
+			this.view.style.anchorX = this.anchorX;
+			this.view.style.anchorY = this.anchorY;
+		}
+		if (this.rigidBody && this.rigidBody.setPivot) {
+			this.rigidBody.setPivot(this.x + x, this.y + y);
+		}
+	}
+
 	this.update = function(dt) {
 		this.xPrev = this.x;
 		this.yPrev = this.y;
@@ -188,13 +218,25 @@ exports = Class(function() {
 	this.updateView = function(dt) {
 		var s = this.view.style;
 		var b = this.viewBounds;
+		var xPrev = s.x;
+		var yPrev = s.y;
 		s.x = this.x + b.x;
 		s.y = this.y + b.y;
+		var dx = s.x - xPrev;
+		var dy = s.y - yPrev;
+		if(this.rigidBody){
+			this.rigidBody.pos.x += dx;
+			this.rigidBody.pos.y += dy;
+		}
 	};
 
 	this.release = function() {
 		this.pool && this.pool.release(this);
 		this.view && (this.view.style.visible = false);
+		if(this.rigidBody){
+			this.rigidBody = null;
+			delete this.rigidBody;
+		}
 	};
 
 	/**
@@ -214,21 +256,20 @@ exports = Class(function() {
 	 *         ~ returns the total distance moved by the two entities
 	 */
 
-	this.collidesWith = function(entity) {
-		return this.physics.collide(this, entity);
+	this.collidesWith = function(entity, response) {
+		var res = response || false;
+		return this.physics.collide(this, entity, res);
 	};
 
 	this.resolveCollidingStateWith = function(entity) {
 		var xPrev = this.x;
 		var yPrev = this.y;
 		var deltaDistance = this.physics.resolveCollidingState(this, entity);
-
 		// set directional collision flags based on change in position
 		this.collidedLeft = this.x > xPrev;
 		this.collidedRight = this.x < xPrev;
 		this.collidedTop = this.y > yPrev;
 		this.collidedBottom = this.y < yPrev;
-
 		return deltaDistance;
 	};
 

@@ -1,3 +1,5 @@
+import .SAT;
+
 var min = Math.min;
 var max = Math.max;
 var abs = Math.abs;
@@ -15,7 +17,7 @@ var COLLISION_OFFSET = 0.001;
  * developer to manage the time step of his/her game to prevent this behavior
  */
 exports = {
-	name: "EntityPhysics",
+	name: "SATPhysics",
 	/**
 	 * ~ REQUIRED for Entity
 	 * ~ stepPosition updates an entity's position based on dt (delta time)
@@ -31,78 +33,35 @@ exports = {
 		entity.vy += dt * entity.ay;
 		entity.y += dt * entity.vy / 2;
 	},
+	
 	/**
 	 * ~ REQUIRED for Entity
 	 * ~ collide defines how collisions behave and what data is returned
 	 * ~ by default, returns a bool, and only works with circles and rects
 	 */
-	collide: function(entity1, entity2) {
+	collide: function(entity1, entity2, response) {
 		if (entity1.isCircle) {
 			if (entity2.isCircle) {
-				return this.circleCollidesWithCircle(entity1, entity2);
+				return this.circleCollidesWithCircle(entity1, entity2, response);
 			} else {
-				return this.circleCollidesWithRect(entity1, entity2);
+				return this.circleCollidesWithRect(entity1, entity2, response);
 			}
 		} else {
 			if (entity2.isCircle) {
-				return this.circleCollidesWithRect(entity2, entity1);
+				return this.circleCollidesWithRect(entity2, entity1, response);
 			} else {
-				return this.rectCollidesWithRect(entity1, entity2);
+				return this.rectCollidesWithRect(entity1, entity2, response);
 			}
 		}
 	},
-	circleCollidesWithCircle: function(circ1, circ2) {
-		var x1 = circ1.getHitX();
-		var y1 = circ1.getHitY();
-		var r1 = circ1.getHitRadius();
-		var x2 = circ2.getHitX();
-		var y2 = circ2.getHitY();
-		var r2 = circ2.getHitRadius();
-
-		var dx = x2 - x1;
-		var dy = y2 - y1;
-		var distSqrd = dx * dx + dy * dy;
-		var distColl = r1 + r2;
-		var distCollSqrd = distColl * distColl;
-
-		return distSqrd <= distCollSqrd;
+	circleCollidesWithCircle: function(circ1, circ2, response) {
+		return SAT.testCircleCircle(circ1.rigidBody, circ2.rigidBody, response);
 	},
-	circleCollidesWithRect: function(circ, rect) {
-		var cx = circ.getHitX();
-		var cy = circ.getHitY();
-		var cr = circ.getHitRadius();
-		var rwHalf = rect.getHitWidth() / 2;
-		var rhHalf = rect.getHitHeight() / 2;
-		var rx = rect.getMinHitX() + rwHalf;
-		var ry = rect.getMinHitY() + rhHalf;
-
-		var dx = abs(cx - rx);
-		var dy = abs(cy - ry);
-		if (dx > rwHalf + cr || dy > rhHalf + cr) {
-			// far case: circle's center is too far from rect's center
-			return false;
-		} else if (dx <= rwHalf || dy <= rhHalf) {
-			// close case: circle's center is close enough to rect's center
-			return true;
-		} else {
-			// corner case: rect corner within a radius of the circle's center
-			var dcx = dx - rwHalf;
-			var dcy = dy - rhHalf;
-			var cornerDistSqrd = dcx * dcx + dcy * dcy;
-			return cornerDistSqrd <= cr * cr;
-		}
+	circleCollidesWithRect: function(circ, rect, response) {
+		return SAT.testCirclePolygon(circ.rigidBody, rect.rigidBody, response);
 	},
-	rectCollidesWithRect: function(rect1, rect2) {
-		var x1 = rect1.getMinHitX();
-		var y1 = rect1.getMinHitY();
-		var xf1 = rect1.getMaxHitX();
-		var yf1 = rect1.getMaxHitY();
-		var x2 = rect2.getMinHitX();
-		var y2 = rect2.getMinHitY();
-		var xf2 = rect2.getMaxHitX();
-		var yf2 = rect2.getMaxHitY();
-
-		return x1 <= xf2 && xf1 >= x2 && y1 <= yf2 && yf1 >= y2;
+	rectCollidesWithRect: function(rect1, rect2, response) {
+		return SAT.testPolygonPolygon(rect1.rigidBody, rect2.rigidBody, response);
 	},
 	/**
 	 * ~ REQUIRED for Entity
@@ -325,6 +284,12 @@ exports = {
 	 * ~ used by advanced physics implementations, like SATPhysics
 	 */
 	getRigidBody: function(entity) {
-		return null;
+		var vec = new SAT.Vector(entity.getHitX(), entity.getHitY());
+		if (entity.isCircle) {
+			return new SAT.Circle(vec, entity.getHitRadius());
+		} else {
+			var box = new SAT.Box(vec, entity.getHitWidth(), entity.getHitHeight());
+			return box.toPolygon();
+		}
 	}
 };

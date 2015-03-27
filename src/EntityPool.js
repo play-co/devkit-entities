@@ -1,4 +1,5 @@
 import .Entity;
+import .SAT;
 
 exports = Class(function() {
 	this.init = function(opts) {
@@ -65,39 +66,48 @@ exports = Class(function() {
 	 * return first from this pool to collide with entity
 	 */
 	this.getFirstCollidingEntity = function(entity) {
-		var collidingEntity = null;
+		var collidingResponse = null;
 		var entities = this.entities;
 		for (var i = this._freeIndex - 1; i >= 0; i--) {
 			var testEntity = entities[i];
-			if (testEntity.collidesWith(entity)) {
-				collidingEntity = testEntity;
+			var response = {a:{},b:{}};
+			if(entity.physics.name == "SATPhysics"){
+				response = new SAT.Response();
+			}
+			if (testEntity.collidesWith(entity, response)) {
+				response.a.entity = testEntity;
+				response.b.entity = entity;
+				collidingResponse = response;
 				break;
 			}
 		}
-		return collidingEntity;
+		return collidingResponse;
 	};
 
 	/**
-	 * return array from this pool that collide with entity
+	 * return response array from this pool that collide with entity
 	 */
 	this.getAllCollidingEntities = function(entity) {
-		var collidingEntities = [];
+		var collidingResponses = [];
 		var entities = this.entities;
 		for (var i = this._freeIndex - 1; i >= 0; i--) {
 			var testEntity = entities[i];
-			if (testEntity.collidesWith(entity)) {
-				collidingEntities.push(testEntity);
+			var response = new SAT.Response();
+			if (testEntity.collidesWith(entity, response)) {
+				response.a.entity = testEntity;
+				response.b.entity = entity;
+				collidingResponses.push(response);
 			}
 		}
-		return collidingEntities;
+		return collidingResponses;
 	};
 
 	/**
 	 * call a fn on the first from this pool to collide with entity
 	 */
 	this.onFirstCollision = function(entity, fn, ctx) {
-		var collidingEntity = this.getFirstCollidingEntity(entity);
-		collidingEntity && fn.call(ctx, collidingEntity);
+		var collidingResponse = this.getFirstCollidingEntity(entity);
+		collidingResponse && fn.call(ctx, collidingResponse);
 	};
 
 	/**
@@ -107,8 +117,14 @@ exports = Class(function() {
 		var entities = this.entities;
 		for (var i = this._freeIndex - 1; i >= 0; i--) {
 			var testEntity = entities[i];
-			if (testEntity.collidesWith(entity)) {
-				fn.call(ctx, testEntity);
+			var response = {a:{},b:{}};
+			if(entity.physics.name == "SATPhysics"){
+				response = new SAT.Response();
+			}
+			if (testEntity.collidesWith(entity, response)) {
+				response.a.entity = testEntity;
+				response.b.entity = entity;
+				fn.call(ctx, response);
 			}
 		}
 	};
@@ -120,8 +136,8 @@ exports = Class(function() {
 		var entities = this.entities;
 		for (var i = this._freeIndex - 1; i >= 0; i--) {
 			var testEntity = entities[i];
-			var collidingEntity = pool.getFirstCollidingEntity(testEntity);
-			collidingEntity && fn.call(ctx, testEntity, collidingEntity);
+			var collidingResponse = pool.getFirstCollidingEntity(testEntity);
+			collidingResponse && fn.call(ctx, collidingResponse);
 		}
 	};
 
@@ -134,8 +150,14 @@ exports = Class(function() {
 			var iEntity = entities[i];
 			for (var j = pool._freeIndex - 1; j >= 0; j--) {
 				var jEntity = pool.entities[j];
-				if (iEntity.collidesWith(jEntity)) {
-					fn.call(ctx, iEntity, jEntity);
+				var response = {a:{},b:{}};
+				if(entity.physics.name == "SATPhysics"){
+					response = new SAT.Response();
+				}
+				if (iEntity.collidesWith(jEntity, response)) {
+					response.a.entity = iEntity;
+					response.b.entity = jEntity;
+					fn.call(ctx, response);
 				}
 			}
 		}

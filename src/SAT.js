@@ -276,11 +276,11 @@
   };
 
   /**
-   * @param {Vector} pivot The pivot point
+   * @param {pivotX, pivotY} pivot The pivot point
    * @return {Circle} This for chaining.
    */
-  Circle.prototype['setPivot'] = Circle.prototype.setPivot = function(pivot) {
-    this['pivot'] = pivot;
+  Circle.prototype['setPivot'] = Circle.prototype.setPivot = function(pivotX, pivotY) {
+    this['pivot'] = new Vector(pivotX, pivotY);
     return this;
   };
 
@@ -373,13 +373,13 @@
   };
 
   /**
-   * @param {Vector} pivot The pivot point.
+   * @param {pivotX, pivotY} pivot The pivot point.
    * @return {Polygon} This for chaining.
    */
-  Polygon.prototype['setPivot'] = Polygon.prototype.setPivot = function(pivot) {
+  Polygon.prototype['setPivot'] = Polygon.prototype.setPivot = function(pivotX, pivotY) {
     var x = this['pos']['x'];
     var y = this['pos']['y'];
-    this['pivot'] = new Vector(pivot["x"] - x, pivot["y"] - y);
+    this['pivot'] = new Vector(pivotX - x, pivotY - y);
     return this;
   };
 

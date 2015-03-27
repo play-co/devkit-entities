@@ -319,5 +319,12 @@ exports = {
 
 		// one of these will always be 0, so this is also the delta distance
 		return dx + dy;
+	},
+	/**
+	 * ~ REQUIRED for Entity
+	 * ~ used by advanced physics implementations, like SATPhysics
+	 */
+	getRigidBody: function(entity) {
+		return null;
 	}
 };

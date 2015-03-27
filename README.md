@@ -112,7 +112,7 @@ The view and hit bounds used by entities are objects with only 5 properties. The
 
  * `x` - type: `number` - the x offset from the entity's primary point; for rectangles, this is the offset to the left-side, but for circles, this is the offset to the center
  * `y` - type: `number` - the y offset from the entity's primary point; for rectangles, this is the offset to the top-side, but for circles, this is the offset to the center
- * `r` - type: `number` - radius, used only for circles by default; can be used for rotation by rectangles and other polygons (`SATPhysics` only)
+ * `r` - type: `number` - radius, used only for circles by default
  * `w` - type: `number` - width, used only for rectangles
  * `h` - type: `number` - height, used only for rectangles
 

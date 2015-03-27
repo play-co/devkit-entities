@@ -264,6 +264,21 @@ exports = Class(function() {
 		return this.physics.collide(this, entity, res);
 	};
 
+	this.resolveCollidingStateWith = function(entity) {
+		if(this.physics.name == "SATPhysics"){
+			return false;
+		}
+		var xPrev = this.x;
+		var yPrev = this.y;
+		var deltaDistance = this.physics.resolveCollidingState(this, entity);
+		// set directional collision flags based on change in position
+		this.collidedLeft = this.x > xPrev;
+		this.collidedRight = this.x < xPrev;
+		this.collidedTop = this.y > yPrev;
+		this.collidedBottom = this.y < yPrev;
+		return deltaDistance;
+	};
+
 	/**
 	 * Entity Hit Bounds Getters
 	 */

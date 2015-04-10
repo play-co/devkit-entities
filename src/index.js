@@ -4,8 +4,8 @@ import .EntityPhysics;
 import .SATPhysics;
 
 exports = {
-	Entity: Entity,
-	EntityPool: EntityPool,
-	EntityPhysics: EntityPhysics,
-	SATPhysics: SATPhysics
+  Entity: Entity,
+  EntityPool: EntityPool,
+  EntityPhysics: EntityPhysics,
+  SATPhysics: SATPhysics
 };

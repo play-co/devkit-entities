@@ -23,14 +23,14 @@ Once installed, you can import classes from this module like this:
 
 `Entity` is intended to be the base class of any game element that exists in a 2D game-space. Here's an example of what a `Bullet` class that inherits `Entity` might look like:
 ```
-var Bullet = Class(Entity, function() {
-    var sup = Entity.prototype;
-    this.name = "Bullet";
+var Bullet = Class(Entity, function () {
+  var sup = Entity.prototype;
+  this.name = "Bullet";
 
-    this.init = function(opts) {
-        sup.init.call(this, opts);
-        this.damage = 1;
-    };
+  this.init = function (opts) {
+    sup.init.call(this, opts);
+    this.damage = 1;
+  };
 });
 ```
 
@@ -88,21 +88,21 @@ Finally, when the life of an `Entity` is over, call the `release` function to hi
 The third parameter of the `reset` function is a config object. When pooling entities, it's the third parameter of the pool's `obtain` function. Each configurable property has reasonable defaults, and if supplied an `image` property, the entity's view and hit bounds will default to the dimensions of the image asset. Here's an example config object for our hypothetical `Bullet` class:
 ```
 {
-    isCircle: true,
-    vx: 0,
-    vy: -1.25,
-    hitBounds: {
-        x: 0,
-        y: 0,
-        r: BULLET_SIZE / 2
-    },
-    viewBounds: {
-        x: -BULLET_SIZE / 2,
-        y: -BULLET_SIZE / 2,
-        w: BULLET_SIZE,
-        h: BULLET_SIZE
-    },
-    image: "resources/images/game/shapeCircle.png"
+  isCircle: true,
+  vx: 0,
+  vy: -1.25,
+  hitBounds: {
+    x: 0,
+    y: 0,
+    r: BULLET_SIZE / 2
+  },
+  viewBounds: {
+    x: -BULLET_SIZE / 2,
+    y: -BULLET_SIZE / 2,
+    w: BULLET_SIZE,
+    h: BULLET_SIZE
+  },
+  image: "resources/images/game/shapeCircle.png"
 }
 ```
 
@@ -132,15 +132,15 @@ Creating entities with `SATPhysics`:
 ```
 import entities.SATPhysics as SATPhysics;
 
-var Bullet = Class(Entity, function() {
-    var sup = Entity.prototype;
-    this.name = "Bullet";
+var Bullet = Class(Entity, function () {
+  var sup = Entity.prototype;
+  this.name = "Bullet";
 
-    this.init = function(opts) {
-        opts.physics = SATPhysics;
-        sup.init.call(this, opts);
-        this.damage = 1;
-    };
+  this.init = function (opts) {
+    opts.physics = SATPhysics;
+    sup.init.call(this, opts);
+    this.damage = 1;
+  };
 });
 ```
 

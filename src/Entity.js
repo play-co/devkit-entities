@@ -33,7 +33,7 @@ exports = Class(function () {
   /**
    * Entity Lifecycle Interface
    * ~ reset, update, release
-   *   ~ reset is called when an entity becomes active in your game
+   *   ~ reset is called when an entity becomes active
    *   ~ update is called once each tick on each active entity
    *   ~ release makes an entity inactive and hides it
    */

@@ -3,11 +3,6 @@ import .EntityPhysics;
 
 exports = Class(function () {
   /**
-   * REQUIRED API
-   */
-
-
-  /**
    * ~ REQUIRED
    * ~ init is the constructor for each model instance
    */
@@ -15,18 +10,12 @@ exports = Class(function () {
     this.entity = opts.entity;
     this.physics = opts.physics || EntityPhysics;
 
-    // points
     this.position = defaults.getPoint();
     this.previous = defaults.getPoint();
-
-    // vectors
     this.velocity = defaults.getVector();
     this.acceleration = defaults.getVector();
-
-    // hit bounds
     this.hitBounds = defaults.getBounds();
 
-    // other flags
     this.isActive = false;
     this.isCircle = false;
     this.isFixed = false;
@@ -34,7 +23,7 @@ exports = Class(function () {
 
   /**
    * ~ REQUIRED
-   * ~ reset is called when an Entity becomes active in a game
+   * ~ reset is called when an entity becomes active
    */
   this.reset = function (opts) {
     opts = opts || {};
@@ -68,7 +57,7 @@ exports = Class(function () {
 
   /**
    * ~ REQUIRED
-   * ~ update is called each tick while an Entity is active in a game
+   * ~ update is called each tick while an entity is active
    */
   this.update = function (dt) {
     this.previous.x = this.position.x;
@@ -100,7 +89,7 @@ exports = Class(function () {
   /**
    * ~ REQUIRED
    * ~ resolveCollisionWith guarantees that two models are not colliding
-   *  by pushing them apart
+   *   by pushing them apart
    * ~ entities with isFixed = true are never moved
    * ~ returns total distance moved to separate the objects
    */
@@ -119,12 +108,6 @@ exports = Class(function () {
       }
     }
   };
-
-
-  /**
-   * CUSTOM API
-   */
-
 
   /**
    * ~ validate warns if a model is improperly configured or broken
@@ -145,7 +128,15 @@ exports = Class(function () {
     return valid;
   };
 
-  this.getX = this.getLeftX = this.getMinX = function () {
+  this.getX = function() {
+    return this.position.x;
+  };
+
+  this.getY = function() {
+    return this.position.y;
+  };
+
+  this.getHitX = this.getLeftX = this.getMinX = function () {
     return this.position.x + this.hitBounds.x;
   };
 
@@ -153,7 +144,7 @@ exports = Class(function () {
     return this.getX() + this.getWidth();
   };
 
-  this.getY = this.getTopY = this.getMinY = function () {
+  this.getHitY = this.getTopY = this.getMinY = function () {
     return this.position.y + this.hitBounds.y;
   };
 
@@ -161,15 +152,15 @@ exports = Class(function () {
     return this.getY() + this.getHeight();
   };
 
-  this.getRadius = function () {
+  this.getRadius = this.getHitRadius = function () {
     return this.hitBounds.radius;
   };
 
-  this.getWidth = function () {
+  this.getWidth = this.getHitWidth = function () {
     return this.hitBounds.width;
   };
 
-  this.getHeight = function () {
+  this.getHeight = this.getHitHeight = function () {
     return this.hitBounds.height;
   };
 });

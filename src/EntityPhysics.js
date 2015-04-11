@@ -8,22 +8,17 @@ var COLLISION_OFFSET = 0.001;
 
 /**
  * IMPORTANT NOTES:
- * ~ all required functions to interface with Entity are labeled
  * ~ by default, collisions support circles and axis-aligned rectangles only
  * ~ these are NOT continuous collision detection algorithms, meaning a large
- *  value of dt could cause entities to pass through each other - it's up to the
- *  developer to manage the time step of his/her game to prevent this behavior
+ *   value of dt could cause entities to pass through each other - it's up to the
+ *   developer to manage the time step of his/her game to prevent this behavior
  */
 exports = Class(function () {
-  /**
-   * REQUIRED FUNCTIONS FOR PHYSICS
-   */
-
   /**
    * ~ REQUIRED
    * ~ step updates a model's position based on dt (delta time) and physics
    * ~ velocity is added half before update and half after, which helps
-   *  mitigate lag spikes, for smoother, more frame-independent movements
+   *   mitigate lag spikes, for smoother, more frame-independent movements
    */
   this.step = function (model, dt) {
     var p = model.position;
@@ -38,10 +33,6 @@ exports = Class(function () {
     v.y += dt * a.y;
     p.y += dt * v.y / 2;
   };
-
-  /**
-   * CUSTOM FUNCTIONS FOR THIS IMPLEMENTATION OF PHYSICS
-   */
 
   this.circleCollidesWithCircle = function (circ1, circ2) {
     var x1 = circ1.getHitX();
@@ -141,7 +132,7 @@ exports = Class(function () {
   /**
    * ~ resolveCollidingCircleRect forces apart a circle and rect
    * ~ good default collision behavior for landing on a platforms vs.
-   *  hitting the side (missing the platform)
+   *   hitting the side (missing the platform)
    */
   this.resolveCollidingCircleRect = function (circ, rect) {
     var cx = circ.getHitX();
@@ -204,7 +195,7 @@ exports = Class(function () {
   /**
    * ~ resolveCollidingRects forces two rects apart, but only in one direction
    * ~ good default collision behavior for landing on a platforms vs.
-   *  hitting the side (missing the platform)
+   *   hitting the side (missing the platform)
    */
   this.resolveCollidingRects = function (rect1, rect2) {
     var x1 = rect1.getMinHitX();

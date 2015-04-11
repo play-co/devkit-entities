@@ -99,12 +99,12 @@ exports = Class(function () {
 
   /**
    * ~ REQUIRED
-   * ~ resolveCollidingStateWith guarantees that two models are not colliding
+   * ~ resolveCollisionWith guarantees that two models are not colliding
    *  by pushing them apart
    * ~ entities with isFixed = true are never moved
    * ~ returns total distance moved to separate the objects
    */
-  this.resolveCollidingStateWith = function (model) {
+  this.resolveCollisionWith = function (model) {
     if (this.isCircle) {
       if (model.isCircle) {
         return this.physics.resolveCollidingCircles(this, model);

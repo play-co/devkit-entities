@@ -103,6 +103,80 @@ exports = {
 
 		return x1 <= xf2 && xf1 >= x2 && y1 <= yf2 && yf1 >= y2;
 	},
+
+	/**
+	 * ~ REQUIRED for Entity
+	 * ~ insideOf is used to determine if one entity is fully contained by another
+	 * ~ by default, returns a bool, and only works with circles and rects
+	 */
+	insideOf: function(entity1, entity2) {
+		if (entity1.isCircle) {
+			if (entity2.isCircle) {
+				return this.circleInsideOfCircle(entity1, entity2);
+			} else {
+				return this.circleInsideOfRect(entity1, entity2);
+			}
+		} else {
+			if (entity2.isCircle) {
+				return this.circleInsideOfRect(entity2, entity1);
+			} else {
+				return this.rectInsideOfRect(entity1, entity2);
+			}
+		}
+	},
+	circleInsideOfCircle: function(circ1, circ2) {
+		var x1 = circ1.getHitX();
+		var y1 = circ1.getHitY();
+		var r1 = circ1.getHitRadius();
+		var x2 = circ2.getHitX();
+		var y2 = circ2.getHitY();
+		var r2 = circ2.getHitRadius();
+
+		var dx = x2 - x1;
+		var dy = y2 - y1;
+
+		var dist = sqrt(dx * dx + dy * dy);
+
+		return dist <= (r2 - r1);
+	},
+	circleInsideOfRect: function(circ, rect) {
+		var cx = circ.getHitX();
+		var cy = circ.getHitY();
+		var cr = circ.getHitRadius();
+
+		var origHitBounds = circ.hitBounds;
+		circ.hitBounds = {
+			x: cx - circ.x - cr,
+			y: cy - circ.y - cr,
+			w: 2 * cr,
+			h: 2 * cr
+		};
+
+		var result = this.rectInsideOfRect(circ, rect);
+		circ.hitBounds = origHitBounds;
+
+		return result;
+	},
+	rectInsideOfRect: function(rect1, rect2) {
+		var l = rect1.getMinHitX();
+		var r = rect1.getMaxHitX();
+		var t = rect1.getMinHitY();
+		var b = rect1.getMaxHitY();
+		// Check each point
+		return pointInRect({x: l, y: t}, rect2)
+				|| pointInRect({x: r, y: y}, rect2)
+				|| pointInRect({x: r, y: b}, rect2)
+				|| pointInRect({x: l, y: b}, rect2);
+	},
+	pointInsideOfRect: function(pt, rect) {
+		var x = rect.getMinHitX();
+		var y = rect.getMinHitY();
+		var xf = rect.getMaxHitX();
+		var yf = rect.getMaxHitY();
+
+		return pt.x >= x && pt.x <= xf && pt.y >= y && pt.y <= yf;
+	},
+
 	/**
 	 * ~ REQUIRED for Entity
 	 * ~ resolveCollidingState uses hit bounds to guarantee that two entities

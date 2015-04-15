@@ -218,6 +218,10 @@ exports = Class(function() {
 		return this.physics.collide(this, entity);
 	};
 
+	this.insideOf = function(entity) {
+		return this.physics.insideOf(this, entity);
+	};
+
 	this.resolveCollidingStateWith = function(entity) {
 		var xPrev = this.x;
 		var yPrev = this.y;

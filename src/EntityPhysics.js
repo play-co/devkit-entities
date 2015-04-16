@@ -163,10 +163,10 @@ exports = {
 		var t = rect1.getMinHitY();
 		var b = rect1.getMaxHitY();
 		// Check each point
-		return pointInRect({x: l, y: t}, rect2)
-				|| pointInRect({x: r, y: y}, rect2)
-				|| pointInRect({x: r, y: b}, rect2)
-				|| pointInRect({x: l, y: b}, rect2);
+		return this.pointInsideOfRect({x: l, y: t}, rect2)
+				&& this.pointInsideOfRect({x: r, y: t}, rect2)
+				&& this.pointInsideOfRect({x: r, y: b}, rect2)
+				&& this.pointInsideOfRect({x: l, y: b}, rect2);
 	},
 	pointInsideOfRect: function(pt, rect) {
 		var x = rect.getMinHitX();

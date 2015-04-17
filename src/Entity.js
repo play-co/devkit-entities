@@ -193,7 +193,7 @@ exports = Class(function() {
 		this.view.style.r += dr;
 		if (this.rigidBody && this.rigidBody.rotate) {
 			this.rigidBody.rotate(dr);
-	}
+		}
 	};
 
 	this.setAnchor = function(x, y){

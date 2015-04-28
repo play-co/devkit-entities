@@ -1,5 +1,4 @@
-import .defaults;
-import .EntityPhysics;
+import .physics;
 
 exports = Class(function () {
   /**
@@ -8,17 +7,16 @@ exports = Class(function () {
    */
   this.init = function (opts) {
     this.entity = opts.entity;
-    this.physics = opts.physics || EntityPhysics;
+    this.physics = opts.physics || physics;
 
-    this.position = defaults.getPoint();
-    this.previous = defaults.getPoint();
-    this.velocity = defaults.getVector();
-    this.acceleration = defaults.getVector();
-    this.hitBounds = defaults.getBounds();
+    this.position = this.physics.getPoint();
+    this.previous = this.physics.getPoint();
+    this.velocity = this.physics.getVector();
+    this.acceleration = this.physics.getVector();
+    this.hitBounds = this.physics.getBounds();
 
-    this.isActive = false;
-    this.isCircle = false;
-    this.isFixed = false;
+    this.circle = false;
+    this.fixed = false;
   };
 
   /**
@@ -41,16 +39,15 @@ exports = Class(function () {
     this.acceleration.x = acceleration.x || 0;
     this.acceleration.y = acceleration.y || 0;
 
-    var hitBounds = opts.hitBounds || defaults.getBounds(opts);
+    var hitBounds = opts.hitBounds || this.physics.getBounds(opts);
     this.hitBounds.x = hitBounds.x || 0;
     this.hitBounds.y = hitBounds.y || 0;
     this.hitBounds.radius = hitBounds.radius || 0;
     this.hitBounds.width = hitBounds.width || 0;
     this.hitBounds.height = hitBounds.height || 0;
 
-    this.isActive = true;
-    this.isCircle = opts.isCircle || false;
-    this.isFixed = opts.isFixed || false;
+    this.circle = opts.circle || false;
+    this.fixed = opts.fixed || false;
 
     return this.validate();
   };
@@ -71,14 +68,14 @@ exports = Class(function () {
    * ~ by default, only works with circles and axis-aligned rectangles
    */
   this.collidesWith = function (model) {
-    if (this.isCircle) {
-      if (model.isCircle) {
+    if (this.circle) {
+      if (model.circle) {
         return this.physics.circleCollidesWithCircle(this, model);
       } else {
         return this.physics.circleCollidesWithRect(this, model);
       }
     } else {
-      if (model.isCircle) {
+      if (model.circle) {
         return this.physics.circleCollidesWithRect(model, this);
       } else {
         return this.physics.rectCollidesWithRect(this, model);
@@ -90,18 +87,18 @@ exports = Class(function () {
    * ~ REQUIRED
    * ~ resolveCollisionWith guarantees that two models are not colliding
    *   by pushing them apart
-   * ~ entities with isFixed = true are never moved
+   * ~ entities with fixed = true are never moved
    * ~ returns total distance moved to separate the objects
    */
   this.resolveCollisionWith = function (model) {
-    if (this.isCircle) {
-      if (model.isCircle) {
+    if (this.circle) {
+      if (model.circle) {
         return this.physics.resolveCollidingCircles(this, model);
       } else {
         return this.physics.resolveCollidingCircleRect(this, model);
       }
     } else {
-      if (model.isCircle) {
+      if (model.circle) {
         return this.physics.resolveCollidingCircleRect(model, this);
       } else {
         return this.physics.resolveCollidingRects(this, model);
@@ -114,7 +111,7 @@ exports = Class(function () {
    */
   this.validate = function () {
     var valid = true;
-    if (this.isCircle) {
+    if (this.circle) {
       if (this.hitBounds.radius <= 0) {
         logger.warn("Invalid hit radius:", this.entity.uid, this.hitBounds);
         valid = false;
@@ -136,31 +133,32 @@ exports = Class(function () {
     return this.position.y;
   };
 
-  this.getHitX = this.getLeftX = this.getMinX = function () {
+  this.getMinHitX = function () {
     return this.position.x + this.hitBounds.x;
   };
 
-  this.getRightX = this.getMaxX = function () {
-    return this.getX() + this.getWidth();
+  this.getMaxHitX = function () {
+    return this.position.x + this.hitBounds.x + this.hitBounds.width;
   };
 
-  this.getHitY = this.getTopY = this.getMinY = function () {
+  this.getMinHitY = function () {
     return this.position.y + this.hitBounds.y;
   };
 
-  this.getBottomY = this.getMaxY = function () {
-    return this.getY() + this.getHeight();
+  this.getMaxHitY = function () {
+    return this.position.y + this.hitBounds.y + this.hitBounds.height;
   };
 
-  this.getRadius = this.getHitRadius = function () {
-    return this.hitBounds.radius;
-  };
-
-  this.getWidth = this.getHitWidth = function () {
+  this.getHitWidth = function () {
     return this.hitBounds.width;
   };
 
-  this.getHeight = this.getHitHeight = function () {
+  this.getHitHeight = function () {
     return this.hitBounds.height;
   };
+
+  this.getHitRadius = function () {
+    return this.hitBounds.radius;
+  };
+
 });

@@ -1,3 +1,8 @@
+import math.geom.Point as Point;
+import math.geom.Vec2D as Vec2D;
+import ui.resource.loader as loader;
+var _imageMap = loader.getMap();
+
 var min = Math.min;
 var max = Math.max;
 var abs = Math.abs;
@@ -13,14 +18,14 @@ var COLLISION_OFFSET = 0.001;
  *   value of dt could cause entities to pass through each other - it's up to the
  *   developer to manage the time step of his/her game to prevent this behavior
  */
-exports = Class(function () {
+exports = {
   /**
    * ~ REQUIRED
    * ~ step updates a model's position based on dt (delta time) and physics
    * ~ velocity is added half before update and half after, which helps
    *   mitigate lag spikes, for smoother, more frame-independent movements
    */
-  this.step = function (model, dt) {
+  step: function (model, dt) {
     var p = model.position;
     var v = model.velocity;
     var a = model.acceleration;
@@ -32,14 +37,14 @@ exports = Class(function () {
     p.y += dt * v.y / 2;
     v.y += dt * a.y;
     p.y += dt * v.y / 2;
-  };
+  },
 
-  this.circleCollidesWithCircle = function (circ1, circ2) {
-    var x1 = circ1.getHitX();
-    var y1 = circ1.getHitY();
+  circleCollidesWithCircle: function (circ1, circ2) {
+    var x1 = circ1.getMinHitX();
+    var y1 = circ1.getMinHitY();
     var r1 = circ1.getHitRadius();
-    var x2 = circ2.getHitX();
-    var y2 = circ2.getHitY();
+    var x2 = circ2.getMinHitX();
+    var y2 = circ2.getMinHitY();
     var r2 = circ2.getHitRadius();
     var dx = x2 - x1;
     var dy = y2 - y1;
@@ -47,11 +52,11 @@ exports = Class(function () {
     var distColl = r1 + r2;
     var distCollSqrd = distColl * distColl;
     return distSqrd <= distCollSqrd;
-  };
+  },
 
-  this.circleCollidesWithRect = function (circ, rect) {
-    var cx = circ.getHitX();
-    var cy = circ.getHitY();
+  circleCollidesWithRect: function (circ, rect) {
+    var cx = circ.getMinHitX();
+    var cy = circ.getMinHitY();
     var cr = circ.getHitRadius();
     var rwHalf = rect.getHitWidth() / 2;
     var rhHalf = rect.getHitHeight() / 2;
@@ -72,9 +77,9 @@ exports = Class(function () {
       var cornerDistSqrd = dcx * dcx + dcy * dcy;
       return cornerDistSqrd <= cr * cr;
     }
-  };
+  },
 
-  this.rectCollidesWithRect = function (rect1, rect2) {
+  rectCollidesWithRect: function (rect1, rect2) {
     var x1 = rect1.getMinHitX();
     var y1 = rect1.getMinHitY();
     var xf1 = rect1.getMaxHitX();
@@ -84,18 +89,18 @@ exports = Class(function () {
     var xf2 = rect2.getMaxHitX();
     var yf2 = rect2.getMaxHitY();
     return x1 <= xf2 && xf1 >= x2 && y1 <= yf2 && yf1 >= y2;
-  };
+  },
 
   /**
    * ~ resolveCollidingCircles forces two circles apart based on their centers
    */
-  this.resolveCollidingCircles = function (circ1, circ2) {
-    var x1 = circ1.getHitX();
-    var y1 = circ1.getHitY();
+  resolveCollidingCircles: function (circ1, circ2) {
+    var x1 = circ1.getMinHitX();
+    var y1 = circ1.getMinHitY();
     var r1 = circ1.getHitRadius();
     var mult1 = 0.5;
-    var x2 = circ2.getHitX();
-    var y2 = circ2.getHitY();
+    var x2 = circ2.getMinHitX();
+    var y2 = circ2.getMinHitY();
     var r2 = circ2.getHitRadius();
     var mult2 = 0.5;
     var dx = x2 - x1;
@@ -111,13 +116,13 @@ exports = Class(function () {
 
     var dd = distColl - dist;
 
-    // anchored entities cannot be moved by physics
-    if (circ1.isFixed && circ2.isFixed) {
+    // fixed entities cannot be moved by physics
+    if (circ1.fixed && circ2.fixed) {
       dd = 0;
-    } else if (circ1.isFixed) {
+    } else if (circ1.fixed) {
       mult1 = 0;
       mult2 = 1;
-    } else if (circ2.isFixed) {
+    } else if (circ2.fixed) {
       mult1 = 1;
       mult2 = 0;
     }
@@ -127,16 +132,16 @@ exports = Class(function () {
     circ2.x += mult2 * dd * (dx / dist);
     circ2.y += mult2 * dd * (dy / dist);
     return dd;
-  };
+  },
 
   /**
    * ~ resolveCollidingCircleRect forces apart a circle and rect
    * ~ good default collision behavior for landing on a platforms vs.
    *   hitting the side (missing the platform)
    */
-  this.resolveCollidingCircleRect = function (circ, rect) {
-    var cx = circ.getHitX();
-    var cy = circ.getHitY();
+  resolveCollidingCircleRect: function (circ, rect) {
+    var cx = circ.getMinHitX();
+    var cy = circ.getMinHitY();
     var cr = circ.getHitRadius();
     var rwHalf = rect.getHitWidth() / 2;
     var rhHalf = rect.getHitHeight() / 2;
@@ -144,10 +149,8 @@ exports = Class(function () {
     var ry = rect.getMinHitY() + rhHalf;
     var dx = abs(cx - rx);
     var dy = abs(cy - ry);
-    if (dx > rwHalf + cr || dy > rhHalf + cr
-      || (circ.isFixed && rect.isFixed))
-    {
-      // far case: circle's center too far or both entities are anchored
+    if (dx > rwHalf + cr || dy > rhHalf + cr || (circ.fixed && rect.fixed)) {
+      // far case: circle's center too far or both entities are fixed
       return 0;
     } else if (dx <= rwHalf || dy <= rhHalf) {
       // close case: treat the circle like another rect, then resolve
@@ -175,11 +178,11 @@ exports = Class(function () {
       var distColl = cr + COLLISION_OFFSET;
       var dd = distColl - dist;
 
-      // anchored entities cannot be moved by physics
-      if (circ.isFixed) {
+      // fixed entities cannot be moved by physics
+      if (circ.fixed) {
         mult1 = 0;
         mult2 = 1;
-      } else if (rect.isFixed) {
+      } else if (rect.fixed) {
         mult1 = 1;
         mult2 = 0;
       }
@@ -190,14 +193,14 @@ exports = Class(function () {
       rect.y += mult2 * dd * (dy / dist);
       return dd;
     }
-  };
+  },
 
   /**
    * ~ resolveCollidingRects forces two rects apart, but only in one direction
    * ~ good default collision behavior for landing on a platforms vs.
    *   hitting the side (missing the platform)
    */
-  this.resolveCollidingRects = function (rect1, rect2) {
+  resolveCollidingRects: function (rect1, rect2) {
     var x1 = rect1.getMinHitX();
     var y1 = rect1.getMinHitY();
     var w1 = rect1.getHitWidth();
@@ -253,14 +256,14 @@ exports = Class(function () {
       dy = 0;
     }
 
-    // anchored entities cannot be moved by physics
-    if (rect1.isFixed && rect2.isFixed) {
+    // fixed entities cannot be moved by physics
+    if (rect1.fixed && rect2.fixed) {
       dx = 0;
       dy = 0;
-    } else if (rect1.isFixed) {
+    } else if (rect1.fixed) {
       mult1 = 0;
       mult2 = 1;
-    } else if (rect2.isFixed) {
+    } else if (rect2.fixed) {
       mult1 = 1;
       mult2 = 0;
     }
@@ -278,5 +281,63 @@ exports = Class(function () {
 
     // one of these will always be 0, so this is also the delta distance
     return dx + dy;
-  };
-});
+  },
+
+  /**
+   * returns a new point
+   */
+  getPoint: function (x, y) {
+    return new Point({
+      x: x || 0,
+      y: y || 0
+    });
+  },
+
+  /**
+   * returns a new vector
+   */
+  getVector: function (x, y) {
+    return new Vec2D({
+      x: x || 0,
+      y: y || 0
+    });
+  },
+
+  /**
+   * returns a hit bounds object with defaults based on image or sprite url
+   */
+  getBounds: function (config) {
+    var bounds = {
+      x: 0,
+      y: 0,
+      radius: 0,
+      width: 0,
+      height: 0
+    };
+
+    // default bounds to image or sprite frame size if available from config
+    if (config) {
+      var img = config.image;
+      var url = config.url;
+      if (!img && url) {
+        // support SpriteViews by finding the first animation match for url
+        for (var prop in _imageMap) {
+          if (prop.indexOf(url) >= 0) {
+            img = prop;
+            break;
+          }
+        }
+      }
+
+      var map = _imageMap[img];
+      if (map) {
+        bounds.width = map.w + map.marginLeft + map.marginRight;
+        bounds.height = map.h + map.marginTop + map.marginBottom;
+        bounds.radius = (bounds.width + bounds.height) / 4;
+      }
+    }
+
+    return bounds;
+  }
+
+};

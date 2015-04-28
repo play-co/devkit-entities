@@ -4,86 +4,62 @@ import ui.SpriteView as SpriteView;
 // entities module image path (for showing hit bounds)
 var IMG_PATH = "addons/devkit-entities/images/";
 
-exports = Class(SpriteView, function (supr) {
+exports = Class(SpriteView, function () {
+  var supr = SpriteView.prototype;
 
   this.init = function (opts) {
-    this.updateHasAnimationFlag(opts);
-    if (!this.hasAnimations) {
-      opts.image = opts.url;
-    }
-    supr(this, "init", arguments);
-  };
+    opts.tag = opts.tag || this.uid;
+    supr.init.call(this, opts);
 
-  this.resetAllAnimations = function (opts) {
-    this.updateHasAnimationFlag(opts);
-    // Only reset animations if we're actually animated
-    if (this.hasAnimations) {
-      supr(this, "resetAllAnimations", arguments);
-      this.setImage(this._animations[opts.defaultAnimation].frames[0]);
-    } else {
-      this.setImage(opts.url);
-    }
-  };
-
-  this.startAnimation = function (name, opts) {
-    // Only start animation if we're actually animated
-    if (this.hasAnimations && this._animations[name]) {
-      supr(this, "startAnimation", arguments);
-    }
-  };
-
-  this.updateHasAnimationFlag = function (opts) {
-    // Safeguard flag to allow a SpriteView to act as a normal ImageView
-    this.hasAnimations = SpriteView.allAnimations[opts.url] !== undefined;
+    this.entity = opts.entity;
   };
 
   this.reset = function (opts) {
-    var v = this.view;
-    var s = v.style;
-    var b = this.viewBounds;
-    s.x = this.x + b.x;
-    s.y = this.y + b.y;
+    var s = this.style;
+    var m = this.entity.model;
+    var b = opts.viewBounds || m.physics.getBounds(opts);
+    s.x = m.getX();
+    s.y = m.getY();
+    s.offsetX = opts.offsetX || s.offsetX || 0;
+    s.offsetY = opts.offsetY || s.offsetY || 0;
+    s.width = opts.width || b.width || s.width;
+    s.height = opts.height || b.height || s.height;
     s.zIndex = opts.zIndex !== void 0 ? opts.zIndex : s.zIndex;
     s.visible = true;
 
     // setImage is expensive, so only call it if we have to
     var image = opts.image;
-    if (image && v.setImage && v.currImage !== image) {
-      v.setImage(image);
-      v.currImage = image;
+    if (image && this.setImage && this.currImage !== image) {
+      this.setImage(image);
+      this.currImage = image;
     }
   };
 
   this.update = function (dt) {
-    var s = this.view.style;
-    var b = this.viewBounds;
-    var xPrev = s.x;
-    var yPrev = s.y;
-    s.x = this.x + b.x;
-    s.y = this.y + b.y;
-    if(this.model.name == "SATPhysics"){
-      this.model.updatePosition(this, s.x - xPrev, s.y - yPrev);
-    }
+    var s = this.style;
+    var m = this.entity.model;
+    s.x = m.getX();
+    s.y = m.getY();
   };
 
-  /**
-   * Entity View Dimensions
-   */
-
-  this.getX = this.getLeftX = this.getMinX = function () {
-    return this.style.x + this.style.offsetX;
+  this.getMinX = function () {
+    var s = this.style;
+    return s.x + s.offsetX;
   };
 
-  this.getRightX = this.getMaxX = function () {
-    return this.getX() + this.style.width;
+  this.getMaxX = function () {
+    var s = this.style;
+    return s.x + s.offsetX + s.width;
   };
 
-  this.getY = this.getTopY = this.getMinY = function () {
-    return this.style.y + this.style.offsetY;
+  this.getMinY = function () {
+    var s = this.style;
+    return s.y + s.offsetY;
   };
 
-  this.getBottomY = this.getMaxY = function () {
-    return this.getY() + this.style.height;
+  this.getMaxY = function () {
+    var s = this.style;
+    return s.y + s.offsetY + s.height;
   };
 
   this.getWidth = function () {
@@ -100,24 +76,27 @@ exports = Class(SpriteView, function (supr) {
 
   this.showHitBounds = function () {
     if (!this.hitBoundsView) {
-      this.hitBoundsView = new ImageView({ parent: this.view });
+      this.hitBoundsView = new ImageView({ parent: this });
     } else {
       this.hitBoundsView.style.visible = true;
     }
 
+    var s = this.style;
+    var m = this.entity.model;
     var hbvs = this.hitBoundsView.style;
-    if (this.isCircle) {
+    if (m.circle) {
+      var r = m.getHitRadius();
+      hbvs.x = -s.offsetX - r;
+      hbvs.y = -s.offsetY - r;
+      hbvs.width = 2 * r;
+      hbvs.height = 2 * r;
       this.hitBoundsView.setImage(IMG_PATH + "shapeCircle.png");
-      hbvs.x = -this.viewBounds.x + this.hitBounds.x - this.hitBounds.r;
-      hbvs.y = -this.viewBounds.y + this.hitBounds.y - this.hitBounds.r;
-      hbvs.width = 2 * this.hitBounds.r;
-      hbvs.height = 2 * this.hitBounds.r;
     } else {
+      hbvs.x = -s.offsetX + m.getMinHitX();
+      hbvs.y = -s.offsetY + m.getMinHitY();
+      hbvs.width = m.getHitWidth();
+      hbvs.height = m.getHitHeight();
       this.hitBoundsView.setImage(IMG_PATH + "shapeRect.png");
-      hbvs.x = -this.viewBounds.x + this.hitBounds.x;
-      hbvs.y = -this.viewBounds.y + this.hitBounds.y;
-      hbvs.width = this.hitBounds.w;
-      hbvs.height = this.hitBounds.h;
     }
   };
 

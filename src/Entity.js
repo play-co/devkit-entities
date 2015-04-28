@@ -20,10 +20,16 @@ exports = Class(function () {
     opts = opts || {};
     opts.entity = this;
 
+    // unique identifier for each entity instance
     this.uid = this.name + _uid++;
 
+    // models are required
     this.model = new this.modelClass(opts);
-    this.view = new this.viewClass(opts);
+    // views are optional
+    this.view = this.viewClass ? new this.viewClass(opts) : null;
+
+    // this flag indicates whether an entity is alive or dead
+    this.active = false;
 
     // ignore these, passed automatically from EntityPool
     this.pool = opts.pool || null;
@@ -32,48 +38,26 @@ exports = Class(function () {
 
   /**
    * Entity Lifecycle Interface
-   * ~ reset, update, release
+   * ~ reset, update, destroy
    *   ~ reset is called when an entity becomes active
    *   ~ update is called once each tick on each active entity
-   *   ~ release makes an entity inactive and hides it
+   *   ~ destroy makes an entity inactive, hiding and releasing it, if possible
    */
   this.reset = function (opts) {
     this.model.reset(opts);
-    this.view.reset(opts);
+    this.view && this.view.reset(opts);
+    this.active = true;
   };
 
   this.update = function (dt) {
     this.model.update(dt);
-    this.view.update(dt);
+    this.view && this.view.update(dt);
   };
 
-  this.release = function () {
+  this.destroy = function () {
     this.pool && this.pool.release(this);
-    this.view.style.visible = false;
+    this.view && (this.view.style.visible = false);
+    this.active = false;
   };
 
-  /**
-   * Entity-Model-Physics Interface
-   * ~ collidesWith, resolveCollidingStateWith
-   *   ~ collidesWith returns whether or not two entities are overlapping
-   *   ~ resolveCollisionWith pushes two overlapping entities apart
-   */
-  this.collidesWith = function (entity) {
-    return this.model.collidesWith(entity.model);
-  };
-
-  this.resolveCollisionWith = function (entity) {
-    return this.model.resolveCollisionWith(entity.model);
-  };
-
-  /**
-   * Debugging Utilities
-   */
-  this.showHitBounds = function () {
-    this.view && this.view.showHitBounds();
-  };
-
-  this.hideHitBounds = function () {
-    this.view && this.view.hideHitBounds();
-  };
 });

@@ -40,11 +40,11 @@ exports = {
   },
 
   circleCollidesWithCircle: function (circ1, circ2) {
-    var x1 = circ1.getMinHitX();
-    var y1 = circ1.getMinHitY();
+    var x1 = circ1.getHitX();
+    var y1 = circ1.getHitY();
     var r1 = circ1.getHitRadius();
-    var x2 = circ2.getMinHitX();
-    var y2 = circ2.getMinHitY();
+    var x2 = circ2.getHitX();
+    var y2 = circ2.getHitY();
     var r2 = circ2.getHitRadius();
     var dx = x2 - x1;
     var dy = y2 - y1;
@@ -55,13 +55,13 @@ exports = {
   },
 
   circleCollidesWithRect: function (circ, rect) {
-    var cx = circ.getMinHitX();
-    var cy = circ.getMinHitY();
+    var cx = circ.getHitX();
+    var cy = circ.getHitY();
     var cr = circ.getHitRadius();
     var rwHalf = rect.getHitWidth() / 2;
     var rhHalf = rect.getHitHeight() / 2;
-    var rx = rect.getMinHitX() + rwHalf;
-    var ry = rect.getMinHitY() + rhHalf;
+    var rx = rect.getHitX() + rwHalf;
+    var ry = rect.getHitY() + rhHalf;
     var dx = abs(cx - rx);
     var dy = abs(cy - ry);
     if (dx > rwHalf + cr || dy > rhHalf + cr) {
@@ -80,14 +80,14 @@ exports = {
   },
 
   rectCollidesWithRect: function (rect1, rect2) {
-    var x1 = rect1.getMinHitX();
-    var y1 = rect1.getMinHitY();
-    var xf1 = rect1.getMaxHitX();
-    var yf1 = rect1.getMaxHitY();
-    var x2 = rect2.getMinHitX();
-    var y2 = rect2.getMinHitY();
-    var xf2 = rect2.getMaxHitX();
-    var yf2 = rect2.getMaxHitY();
+    var x1 = rect1.getHitX();
+    var y1 = rect1.getHitY();
+    var xf1 = x1 + rect1.getHitWidth();
+    var yf1 = y1 + rect1.getHitHeight();
+    var x2 = rect2.getHitX();
+    var y2 = rect2.getHitY();
+    var xf2 = x2 + rect2.getHitWidth();
+    var yf2 = y2 + rect2.getHitHeight();
     return x1 <= xf2 && xf1 >= x2 && y1 <= yf2 && yf1 >= y2;
   },
 
@@ -95,12 +95,12 @@ exports = {
    * ~ resolveCollidingCircles forces two circles apart based on their centers
    */
   resolveCollidingCircles: function (circ1, circ2) {
-    var x1 = circ1.getMinHitX();
-    var y1 = circ1.getMinHitY();
+    var x1 = circ1.getHitX();
+    var y1 = circ1.getHitY();
     var r1 = circ1.getHitRadius();
     var mult1 = 0.5;
-    var x2 = circ2.getMinHitX();
-    var y2 = circ2.getMinHitY();
+    var x2 = circ2.getHitX();
+    var y2 = circ2.getHitY();
     var r2 = circ2.getHitRadius();
     var mult2 = 0.5;
     var dx = x2 - x1;
@@ -140,13 +140,13 @@ exports = {
    *   hitting the side (missing the platform)
    */
   resolveCollidingCircleRect: function (circ, rect) {
-    var cx = circ.getMinHitX();
-    var cy = circ.getMinHitY();
+    var cx = circ.getHitX();
+    var cy = circ.getHitY();
     var cr = circ.getHitRadius();
     var rwHalf = rect.getHitWidth() / 2;
     var rhHalf = rect.getHitHeight() / 2;
-    var rx = rect.getMinHitX() + rwHalf;
-    var ry = rect.getMinHitY() + rhHalf;
+    var rx = rect.getHitX() + rwHalf;
+    var ry = rect.getHitY() + rhHalf;
     var dx = abs(cx - rx);
     var dy = abs(cy - ry);
     if (dx > rwHalf + cr || dy > rhHalf + cr || (circ.fixed && rect.fixed)) {
@@ -201,19 +201,19 @@ exports = {
    *   hitting the side (missing the platform)
    */
   resolveCollidingRects: function (rect1, rect2) {
-    var x1 = rect1.getMinHitX();
-    var y1 = rect1.getMinHitY();
+    var x1 = rect1.getHitX();
+    var y1 = rect1.getHitY();
     var w1 = rect1.getHitWidth();
     var h1 = rect1.getHitHeight();
-    var xf1 = rect1.getMaxHitX();
-    var yf1 = rect1.getMaxHitY();
+    var xf1 = x1 + w1;
+    var yf1 = y1 + h1;
     var mult1 = 0.5;
-    var x2 = rect2.getMinHitX();
-    var y2 = rect2.getMinHitY();
+    var x2 = rect2.getHitX();
+    var y2 = rect2.getHitY();
     var w2 = rect2.getHitWidth();
     var h2 = rect2.getHitHeight();
-    var xf2 = rect2.getMaxHitX();
-    var yf2 = rect2.getMaxHitY();
+    var xf2 = x2 + w2;
+    var yf2 = y2 + h2;
     var mult2 = 0.5;
 
     // find shallowest collision overlap, positive value means no overlap
@@ -281,6 +281,94 @@ exports = {
 
     // one of these will always be 0, so this is also the delta distance
     return dx + dy;
+  },
+
+  /**
+   * ~ circleInsideCircle returns true if circ1 is fully contained in circ2
+   */
+  circleInsideCircle: function (circ1, circ2) {
+    var x1 = circ1.getHitX();
+    var y1 = circ1.getHitY();
+    var r1 = circ1.getHitRadius();
+    var x2 = circ2.getHitX();
+    var y2 = circ2.getHitY();
+    var r2 = circ2.getHitRadius();
+    var dx = x2 - x1;
+    var dy = y2 - y1;
+    var dist = sqrt(dx * dx + dy * dy);
+    return dist <= (r2 - r1);
+  },
+
+  /**
+   * ~ circleInsideRect returns true if circ is fully contained in rect
+   */
+  circleInsideRect: function (circ, rect) {
+    var cx = circ.getHitX();
+    var cy = circ.getHitY();
+    var cr = circ.getHitRadius();
+    var origHitBounds = circ.hitBounds;
+    circ.hitBounds = {
+      x: cx - circ.x - cr,
+      y: cy - circ.y - cr,
+      w: 2 * cr,
+      h: 2 * cr
+    };
+
+    var result = this.rectInsideRect(circ, rect);
+    circ.hitBounds = origHitBounds;
+    return result;
+  },
+
+  /**
+   * ~ rectInsideCircle returns true if rect is fully contained in circ
+   */
+  rectInsideCircle: function (rect, circ) {
+    var l = rect.getHitX();
+    var r = l + rect.getHitWidth();
+    var t = rect.getHitY();
+    var b = t + rect.getHitHeight();
+    return this.pointInsideCircle({ x: l, y: t }, circ)
+        && this.pointInsideCircle({ x: r, y: t }, circ)
+        && this.pointInsideCircle({ x: r, y: b }, circ)
+        && this.pointInsideCircle({ x: l, y: b }, circ);
+  },
+
+  /**
+   * ~ rectInsideRect returns true if rect1 is fully contained in rect2
+   */
+  rectInsideRect: function (rect1, rect2) {
+    var l = rect1.getHitX();
+    var r = l + rect1.getHitWidth();
+    var t = rect1.getHitY();
+    var b = t + rect1.getHitHeight();
+    return this.pointInsideRect({ x: l, y: t }, rect2)
+        && this.pointInsideRect({ x: r, y: t }, rect2)
+        && this.pointInsideRect({ x: r, y: b }, rect2)
+        && this.pointInsideRect({ x: l, y: b }, rect2);
+  },
+
+  /**
+   * ~ pointInsideRect returns true if pt is contained in rect
+   */
+  pointInsideRect: function (pt, rect) {
+    var x = rect.getHitX();
+    var y = rect.getHitY();
+    var xf = x + rect.getHitWidth();
+    var yf = y + rect.getHitHeight();
+    return pt.x >= x && pt.x <= xf && pt.y >= y && pt.y <= yf;
+  },
+
+  /**
+   * ~ pointInsideCircle returns true if pt is contained in circ
+   */
+  pointInsideCircle: function (pt, circ) {
+    var x = circ.getHitX();
+    var y = circ.getHitY();
+    var r = circ.getHitRadius();
+    var dx = pt.x - x;
+    var dy = pt.y - y;
+    var dist = sqrt(dx * dx + dy * dy);
+    return dist <= r;
   },
 
   /**

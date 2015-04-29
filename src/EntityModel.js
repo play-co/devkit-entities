@@ -107,6 +107,27 @@ exports = Class(function () {
   };
 
   /**
+   * ~ REQUIRED
+   * ~ isInside is used to determine if one entity is fully contained by another
+   * ~ by default, returns a bool, and only works with circles and rects
+   */
+  this.isInside = function (model) {
+    if (this.circle) {
+      if (model.circle) {
+        return this.physics.circleInsideCircle(this, model);
+      } else {
+        return this.physics.circleInsideRect(this, model);
+      }
+    } else {
+      if (model.circle) {
+        return this.physics.rectInsideCircle(this, model);
+      } else {
+        return this.physics.rectInsideRect(this, model);
+      }
+    }
+  };
+
+  /**
    * ~ validate warns if a model is improperly configured or broken
    */
   this.validate = function () {
@@ -133,20 +154,12 @@ exports = Class(function () {
     return this.position.y;
   };
 
-  this.getMinHitX = function () {
+  this.getHitX = function () {
     return this.position.x + this.hitBounds.x;
   };
 
-  this.getMaxHitX = function () {
-    return this.position.x + this.hitBounds.x + this.hitBounds.width;
-  };
-
-  this.getMinHitY = function () {
+  this.getHitY = function () {
     return this.position.y + this.hitBounds.y;
-  };
-
-  this.getMaxHitY = function () {
-    return this.position.y + this.hitBounds.y + this.hitBounds.height;
   };
 
   this.getHitWidth = function () {

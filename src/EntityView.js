@@ -8,10 +8,16 @@ exports = Class(SpriteView, function () {
   var supr = SpriteView.prototype;
 
   this.init = function (opts) {
-    opts.tag = opts.tag || this.uid;
-    supr.init.call(this, opts);
-
+    opts.autoSize = true;
+    opts.tag = opts.tag || opts.entity.uid;
     this.entity = opts.entity;
+
+    this.validateSprite(opts);
+    if (!this.isSprite) {
+      opts.image = opts.image || opts.url;
+    }
+
+    supr.init.call(this, opts);
   };
 
   this.reset = function (opts) {
@@ -68,6 +74,31 @@ exports = Class(SpriteView, function () {
 
   this.getHeight = function () {
     return this.style.height;
+  };
+
+  /**
+   * SpriteView Extensions
+   */
+
+  this.resetAllAnimations = function (opts) {
+    this.validateSprite(opts);
+
+    if (this.isSprite) {
+      supr.resetAllAnimations.call(this, opts);
+      this.setImage(this._animations[opts.defaultAnimation].frames[0]);
+    } else {
+      this.setImage(opts.image || opts.url);
+    }
+  };
+
+  this.startAnimation = function (name, opts) {
+    if (this.isSprite && this._animations[name]) {
+      supr.startAnimation.call(this, name, opts);
+    }
+  };
+
+  this.validateSprite = function(opts) {
+    this.isSprite = !!SpriteView.allAnimations[opts.url];
   };
 
   /**

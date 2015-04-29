@@ -1,7 +1,7 @@
 import .Entity;
-import .SAT;
 
 exports = Class(function () {
+
   this.init = function (opts) {
     opts = opts || {};
 
@@ -17,7 +17,11 @@ exports = Class(function () {
     this._logCreation = initCount > 0;
   };
 
-  this.obtain = function (x, y, config) {
+  /**
+   * Primary Pool API
+   */
+
+  this.obtain = function (opts) {
     var entity = null;
     var entities = this.entities;
     if (this._freeIndex < entities.length) {
@@ -25,8 +29,9 @@ exports = Class(function () {
     } else {
       entity = this._create();
     }
+
     this._freeIndex++;
-    entity.reset(x, y, config);
+    entity.reset(opts);
     return entity;
   };
 
@@ -62,102 +67,102 @@ exports = Class(function () {
     }
   };
 
+  this._create = function () {
+    var entities = this.entities;
+    var entity = new this._ctor({
+      superview: this._superview,
+      visible: false,
+      pool: this,
+      poolIndex: entities.length
+    });
+    entities.push(entity);
+    this._logCreation && logger.warn("Entity creation:", entity.uid);
+    return entity;
+  };
+
   /**
-   * return first from this pool to collide with entity
+   * Pool Utilities and Wrappers
+   */
+
+  /**
+   * getFirstCollidingEntity
+   *  ~ returns first from this pool to collide with entity
    */
   this.getFirstCollidingEntity = function (entity) {
-    var collidingResponse = null;
     var entities = this.entities;
     for (var i = this._freeIndex - 1; i >= 0; i--) {
-      var testEntity = entities[i];
-      var response = {a:{},b:{}};
-      if(entity.physics.name == "SATPhysics"){
-        response = new SAT.Response();
-      }
-      if (testEntity.collidesWith(entity, response)) {
-        response.a.entity = testEntity;
-        response.b.entity = entity;
-        collidingResponse = response;
-        break;
+      var test = entities[i];
+      if (test.model.collidesWith(entity.model)) {
+        return test;
       }
     }
-    return collidingResponse;
   };
 
   /**
-   * return response array from this pool that collide with entity
+   * getAllCollidingEntities
+   *  ~ return array of entities from this pool that collide with entity
    */
   this.getAllCollidingEntities = function (entity) {
-    var collidingResponses = [];
     var entities = this.entities;
+    var hits = [];
     for (var i = this._freeIndex - 1; i >= 0; i--) {
-      var testEntity = entities[i];
-      var response = new SAT.Response();
-      if (testEntity.collidesWith(entity, response)) {
-        response.a.entity = testEntity;
-        response.b.entity = entity;
-        collidingResponses.push(response);
+      var test = entities[i];
+      if (test.model.collidesWith(entity.model)) {
+        hits.push(test);
       }
     }
-    return collidingResponses;
+    return hits;
   };
 
   /**
-   * call a fn on the first from this pool to collide with entity
+   * onFirstCollision
+   *  ~ call a fn on the first entity from this pool that collides with entity
    */
   this.onFirstCollision = function (entity, fn, ctx) {
-    var collidingResponse = this.getFirstCollidingEntity(entity);
-    collidingResponse && fn.call(ctx, collidingResponse);
+    var hit = this.getFirstCollidingEntity(entity);
+    hit && fn.call(ctx, hit);
   };
 
   /**
-   * call a fn on all from this pool to collide with entity
+   * onAllCollisions
+   *  ~ call a fn on all entities from this pool that collide with entity
    */
   this.onAllCollisions = function (entity, fn, ctx) {
     var entities = this.entities;
     for (var i = this._freeIndex - 1; i >= 0; i--) {
-      var testEntity = entities[i];
-      var response = {a:{},b:{}};
-      if(entity.physics.name == "SATPhysics"){
-        response = new SAT.Response();
-      }
-      if (testEntity.collidesWith(entity, response)) {
-        response.a.entity = testEntity;
-        response.b.entity = entity;
-        fn.call(ctx, response);
+      var test = entities[i];
+      if (test.model.collidesWith(entity.model)) {
+        fn.call(ctx, test);
       }
     }
   };
 
   /**
-   * call a fn for each first collision with another pool's entity
+   * onFirstPoolCollisions
+   *  ~ call a fn for each first collision with another pool's entity
    */
   this.onFirstPoolCollisions = function (pool, fn, ctx) {
     var entities = this.entities;
     for (var i = this._freeIndex - 1; i >= 0; i--) {
-      var testEntity = entities[i];
-      var collidingResponse = pool.getFirstCollidingEntity(testEntity);
-      collidingResponse && fn.call(ctx, collidingResponse);
+      var test = entities[i];
+      var hit = pool.getFirstCollidingEntity(test);
+      hit && fn.call(ctx, test, hit);
     }
   };
 
   /**
-   * call a fn for all collisions with another pool's entities
+   * onAllPoolCollisions
+   *  ~ call a fn for all collisions with another pool's entities
    */
   this.onAllPoolCollisions = function (pool, fn, ctx) {
-    var entities = this.entities;
+    var entities1 = this.entities;
+    var entities2 = pool.entities;
     for (var i = this._freeIndex - 1; i >= 0; i--) {
-      var iEntity = entities[i];
+      var test1 = entities1[i];
       for (var j = pool._freeIndex - 1; j >= 0; j--) {
-        var jEntity = pool.entities[j];
-        var response = {a:{},b:{}};
-        if(entity.physics.name == "SATPhysics"){
-          response = new SAT.Response();
-        }
-        if (iEntity.collidesWith(jEntity, response)) {
-          response.a.entity = iEntity;
-          response.b.entity = jEntity;
-          fn.call(ctx, response);
+        var test2 = entities2[j];
+        if (test1.model.collidesWith(test2.model)) {
+          fn.call(ctx, test1, test2);
         }
       }
     }
@@ -178,16 +183,4 @@ exports = Class(function () {
     }
   };
 
-  this._create = function () {
-    var entities = this.entities;
-    var entity = new this._ctor({
-      superview: this._superview,
-      visible: false,
-      pool: this,
-      poolIndex: entities.length
-    });
-    entities.push(entity);
-    this._logCreation && logger.warn("Entity creation:", entity.uid);
-    return entity;
-  };
 });

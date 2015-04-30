@@ -34,11 +34,6 @@ exports = Class(SpriteView, function () {
     entity.getViewMaxX = bind(view, 'getMaxX');
     entity.getViewMinY = bind(view, 'getMinY');
     entity.getViewMaxY = bind(view, 'getMaxY');
-    entity.getViewWidth = bind(view, 'getWidth');
-    entity.getViewHeight = bind(view, 'getHeight');
-    entity.isVisible = bind(view, 'isVisible');
-    entity.showHitBounds = bind(view, 'showHitBounds');
-    entity.hideHitBounds = bind(view, 'hideHitBounds');
   };
 
   this.reset = function (opts) {

@@ -69,26 +69,6 @@ exports = Class(function () {
       get: function () { return model.acceleration.y; },
       set: function (value) { model.acceleration.y = value; }
     });
-
-    // expose useful model functions
-    entity.collidesWith = bind(model, 'collidesWith');
-    entity.resolveCollisionWith = bind(model, 'resolveCollisionWith');
-    entity.isInside = bind(model, 'isInside');
-    entity.getX = bind(model, 'getX');
-    entity.getY = bind(model, 'getY');
-    entity.getPreviousX = bind(model, 'getPreviousX');
-    entity.getPreviousY = bind(model, 'getPreviousY');
-    entity.getVelocityX = bind(model, 'getVelocityX');
-    entity.getVelocityY = bind(model, 'getVelocityY');
-    entity.getAccelerationX = bind(model, 'getAccelerationX');
-    entity.getAccelerationY = bind(model, 'getAccelerationY');
-    entity.getHitX = bind(model, 'getHitX');
-    entity.getHitY = bind(model, 'getHitY');
-    entity.getHitWidth = bind(model, 'getHitWidth');
-    entity.getHitHeight = bind(model, 'getHitHeight');
-    entity.getHitRadius = bind(model, 'getHitRadius');
-    entity.isCircle = bind(model, 'isCircle');
-    entity.isFixed = bind(model, 'isFixed');
   };
 
   /**

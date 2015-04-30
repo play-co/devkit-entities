@@ -23,17 +23,15 @@ exports = Class(function () {
     // unique identifier for each entity instance
     this.uid = this.name + _uid++;
 
-    // models are required
     this.model = new this.modelClass(opts);
-    // views are optional
-    this.view = this.viewClass ? new this.viewClass(opts) : null;
+    this.view = new this.viewClass(opts);
 
     // this flag indicates whether an entity is alive or dead
     this.active = false;
 
     // ignore these, passed automatically from EntityPool
-    this.pool = opts.pool || null;
-    this.poolIndex = opts.poolIndex || 0;
+    this._pool = opts.pool || null;
+    this._poolIndex = opts.poolIndex || 0;
   };
 
   /**
@@ -45,18 +43,18 @@ exports = Class(function () {
    */
   this.reset = function (opts) {
     this.model.reset(opts);
-    this.view && this.view.reset(opts);
+    this.view.reset(opts);
     this.active = true;
   };
 
   this.update = function (dt) {
     this.model.update(dt);
-    this.view && this.view.update(dt);
+    this.view.update(dt);
   };
 
   this.destroy = function () {
-    this.pool && this.pool.release(this);
-    this.view && (this.view.style.visible = false);
+    this._pool && this._pool.release(this);
+    this.view.style.visible = false;
     this.active = false;
   };
 

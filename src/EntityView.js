@@ -152,8 +152,8 @@ exports = Class(SpriteView, function () {
       hbvs.height = 2 * r;
       this.hitBoundsView.setImage(IMG_PATH + "shapeCircle.png");
     } else {
-      hbvs.x = -s.offsetX + m.getMinHitX();
-      hbvs.y = -s.offsetY + m.getMinHitY();
+      hbvs.x = -s.offsetX + m.getHitX();
+      hbvs.y = -s.offsetY + m.getHitY();
       hbvs.width = m.getHitWidth();
       hbvs.height = m.getHitHeight();
       this.hitBoundsView.setImage(IMG_PATH + "shapeRect.png");

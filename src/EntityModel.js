@@ -78,6 +78,10 @@ exports = Class(function () {
     entity.getY = bind(model, 'getY');
     entity.getPreviousX = bind(model, 'getPreviousX');
     entity.getPreviousY = bind(model, 'getPreviousY');
+    entity.getVelocityX = bind(model, 'getVelocityX');
+    entity.getVelocityY = bind(model, 'getVelocityY');
+    entity.getAccelerationX = bind(model, 'getAccelerationX');
+    entity.getAccelerationY = bind(model, 'getAccelerationY');
     entity.getHitX = bind(model, 'getHitX');
     entity.getHitY = bind(model, 'getHitY');
     entity.getHitWidth = bind(model, 'getHitWidth');
@@ -220,6 +224,10 @@ exports = Class(function () {
     return valid;
   };
 
+  /**
+   * Getters
+   */
+
   this.getX = function () {
     return this.position.x;
   };
@@ -234,6 +242,22 @@ exports = Class(function () {
 
   this.getPreviousY = function () {
     return this.previous.y;
+  };
+
+  this.getVelocityX = function () {
+    return this.velocity.x;
+  };
+
+  this.getVelocityY = function () {
+    return this.velocity.y;
+  };
+
+  this.getAccelerationX = function () {
+    return this.acceleration.x;
+  };
+
+  this.getAccelerationY = function () {
+    return this.acceleration.y;
   };
 
   this.getHitX = function () {

@@ -17,6 +17,72 @@ exports = Class(function () {
 
     this.circle = false;
     this.fixed = false;
+
+    this._bindEntity(this.entity);
+  };
+
+  /**
+   * ~ _bindEntity modifies the entity instance for convenient access to model
+   *   properties and behavior
+   */
+  this._bindEntity = function (entity) {
+    var model = this;
+
+    // expose x position
+    Object.defineProperty(entity, 'x', {
+      enumerable: true,
+      get: function () { return model.position.x; },
+      set: function (value) { model.position.x = value; }
+    });
+
+    // expose y position
+    Object.defineProperty(entity, 'y', {
+      enumerable: true,
+      get: function () { return model.position.y; },
+      set: function (value) { model.position.y = value; }
+    });
+
+    // expose x velocity
+    Object.defineProperty(entity, 'vx', {
+      enumerable: true,
+      get: function () { return model.velocity.x; },
+      set: function (value) { model.velocity.x = value; }
+    });
+
+    // expose y velocity
+    Object.defineProperty(entity, 'vy', {
+      enumerable: true,
+      get: function () { return model.velocity.y; },
+      set: function (value) { model.velocity.y = value; }
+    });
+
+    // expose x acceleration
+    Object.defineProperty(entity, 'ax', {
+      enumerable: true,
+      get: function () { return model.acceleration.x; },
+      set: function (value) { model.acceleration.x = value; }
+    });
+
+    // expose y acceleration
+    Object.defineProperty(entity, 'ay', {
+      enumerable: true,
+      get: function () { return model.acceleration.y; },
+      set: function (value) { model.acceleration.y = value; }
+    });
+
+    // expose useful model functions
+    entity.collidesWith = bind(model, 'collidesWith');
+    entity.resolveCollisionWith = bind(model, 'resolveCollisionWith');
+    entity.isInside = bind(model, 'isInside');
+    entity.getX = bind(model, 'getX');
+    entity.getY = bind(model, 'getY');
+    entity.getPreviousX = bind(model, 'getPreviousX');
+    entity.getPreviousY = bind(model, 'getPreviousY');
+    entity.getHitX = bind(model, 'getHitX');
+    entity.getHitY = bind(model, 'getHitY');
+    entity.getHitWidth = bind(model, 'getHitWidth');
+    entity.getHitHeight = bind(model, 'getHitHeight');
+    entity.getHitRadius = bind(model, 'getHitRadius');
   };
 
   /**
@@ -27,17 +93,17 @@ exports = Class(function () {
     opts = opts || {};
     var x = opts.x || 0;
     var y = opts.y || 0;
+    var vx = opts.vx || 0;
+    var vy = opts.vy || 0;
+    var ax = opts.ax || 0;
+    var ay = opts.ay || 0;
 
     this.position.x = this.previous.x = x;
     this.position.y = this.previous.y = y;
-
-    var velocity = opts.velocity || {};
-    this.velocity.x = velocity.x || 0;
-    this.velocity.y = velocity.y || 0;
-
-    var acceleration = opts.acceleration || {};
-    this.acceleration.x = acceleration.x || 0;
-    this.acceleration.y = acceleration.y || 0;
+    this.velocity.x = vx;
+    this.velocity.y = vy;
+    this.acceleration.x = ax;
+    this.acceleration.y = ay;
 
     var hitBounds = opts.hitBounds || this.physics.getBounds(opts);
     this.hitBounds.x = hitBounds.x || 0;
@@ -68,6 +134,8 @@ exports = Class(function () {
    * ~ by default, only works with circles and axis-aligned rectangles
    */
   this.collidesWith = function (model) {
+    model = model.model || model;
+
     if (this.circle) {
       if (model.circle) {
         return this.physics.circleCollidesWithCircle(this, model);
@@ -91,6 +159,8 @@ exports = Class(function () {
    * ~ returns total distance moved to separate the objects
    */
   this.resolveCollisionWith = function (model) {
+    model = model.model || model;
+
     if (this.circle) {
       if (model.circle) {
         return this.physics.resolveCollidingCircles(this, model);
@@ -112,6 +182,8 @@ exports = Class(function () {
    * ~ by default, returns a bool, and only works with circles and rects
    */
   this.isInside = function (model) {
+    model = model.model || model;
+
     if (this.circle) {
       if (model.circle) {
         return this.physics.circleInsideCircle(this, model);
@@ -146,12 +218,20 @@ exports = Class(function () {
     return valid;
   };
 
-  this.getX = function() {
+  this.getX = function () {
     return this.position.x;
   };
 
-  this.getY = function() {
+  this.getY = function () {
     return this.position.y;
+  };
+
+  this.getPreviousX = function () {
+    return this.previous.x;
+  };
+
+  this.getPreviousY = function () {
+    return this.previous.y;
   };
 
   this.getHitX = function () {

@@ -83,6 +83,8 @@ exports = Class(function () {
     entity.getHitWidth = bind(model, 'getHitWidth');
     entity.getHitHeight = bind(model, 'getHitHeight');
     entity.getHitRadius = bind(model, 'getHitRadius');
+    entity.isCircle = bind(model, 'isCircle');
+    entity.isFixed = bind(model, 'isFixed');
   };
 
   /**
@@ -252,6 +254,14 @@ exports = Class(function () {
 
   this.getHitRadius = function () {
     return this.hitBounds.radius;
+  };
+
+  this.isCircle = function () {
+    return this.circle;
+  };
+
+  this.isFixed = function () {
+    return this.fixed;
   };
 
 });

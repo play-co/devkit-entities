@@ -17,7 +17,28 @@ exports = Class(SpriteView, function () {
       opts.image = opts.image || opts.url;
     }
 
+    this._bindEntity(this.entity);
+
     supr.init.call(this, opts);
+  };
+
+  /**
+   * ~ _bindEntity modifies the entity instance for convenient access to view
+   *   properties and behavior
+   */
+  this._bindEntity = function (entity) {
+    var view = this;
+
+    // expose useful view functions
+    entity.getViewMinX = bind(view, 'getMinX');
+    entity.getViewMaxX = bind(view, 'getMaxX');
+    entity.getViewMinY = bind(view, 'getMinY');
+    entity.getViewMaxY = bind(view, 'getMaxY');
+    entity.getViewWidth = bind(view, 'getWidth');
+    entity.getViewHeight = bind(view, 'getHeight');
+    entity.isVisible = bind(view, 'isVisible');
+    entity.showHitBounds = bind(view, 'showHitBounds');
+    entity.hideHitBounds = bind(view, 'hideHitBounds');
   };
 
   this.reset = function (opts) {
@@ -48,34 +69,6 @@ exports = Class(SpriteView, function () {
     s.y = m.getY();
   };
 
-  this.getMinX = function () {
-    var s = this.style;
-    return s.x + s.offsetX;
-  };
-
-  this.getMaxX = function () {
-    var s = this.style;
-    return s.x + s.offsetX + s.width;
-  };
-
-  this.getMinY = function () {
-    var s = this.style;
-    return s.y + s.offsetY;
-  };
-
-  this.getMaxY = function () {
-    var s = this.style;
-    return s.y + s.offsetY + s.height;
-  };
-
-  this.getWidth = function () {
-    return this.style.width;
-  };
-
-  this.getHeight = function () {
-    return this.style.height;
-  };
-
   /**
    * SpriteView Extensions
    */
@@ -99,6 +92,42 @@ exports = Class(SpriteView, function () {
 
   this.validateSprite = function(opts) {
     this.isSprite = !!SpriteView.allAnimations[opts.url];
+  };
+
+  /**
+   * Getters
+   */
+
+  this.getMinX = function () {
+   var s = this.style;
+   return s.x + s.offsetX;
+  };
+
+  this.getMaxX = function () {
+   var s = this.style;
+   return s.x + s.offsetX + s.width;
+  };
+
+  this.getMinY = function () {
+   var s = this.style;
+   return s.y + s.offsetY;
+  };
+
+  this.getMaxY = function () {
+   var s = this.style;
+   return s.y + s.offsetY + s.height;
+  };
+
+  this.getWidth = function () {
+   return this.style.width;
+  };
+
+  this.getHeight = function () {
+   return this.style.height;
+  };
+
+  this.isVisible = function () {
+    return this.style.visible;
   };
 
   /**

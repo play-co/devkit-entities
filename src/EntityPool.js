@@ -36,15 +36,15 @@ exports = Class(function () {
   };
 
   this.release = function (entity) {
-    var currIndex = entity.poolIndex;
+    var currIndex = entity._poolIndex;
     if (currIndex < this._freeIndex) {
       var entities = this.entities;
       var lastIndex = this._freeIndex - 1;
       var temp = entities[lastIndex];
       entities[currIndex] = temp;
       entities[lastIndex] = entity;
-      temp.poolIndex = currIndex;
-      entity.poolIndex = lastIndex;
+      temp._poolIndex = currIndex;
+      entity._poolIndex = lastIndex;
       this._freeIndex = lastIndex;
     }
   };
@@ -63,7 +63,7 @@ exports = Class(function () {
   this.releaseAll = function () {
     var entities = this.entities;
     for (var i = this._freeIndex - 1; i >= 0; i--) {
-      entities[i].release();
+      entities[i].destroy();
     }
   };
 

@@ -39,6 +39,78 @@ exports = {
     p.y += dt * v.y / 2;
   },
 
+  /**
+   * ~ collide defines how collisions are detected
+   * ~ by default, only works with circles and axis-aligned rectangles
+   */
+  collide: function (model1, model2) {
+    model1 = model1.model || model1;
+    model2 = model2.model || model2;
+
+    if (model1.circle) {
+      if (model2.circle) {
+        return this.circleCollidesWithCircle(model1, model2);
+      } else {
+        return this.circleCollidesWithRect(model1, model2);
+      }
+    } else {
+      if (model2.circle) {
+        return this.circleCollidesWithRect(model2, model1);
+      } else {
+        return this.rectCollidesWithRect(model1, model2);
+      }
+    }
+  },
+
+  /**
+   * ~ resolveCollision guarantees that two models are not colliding
+   *   by pushing them apart
+   * ~ entities with fixed = true are never moved
+   * ~ returns total distance moved to separate the objects
+   */
+  resolveCollision: function (model1, model2) {
+    model1 = model1.model || model1;
+    model2 = model2.model || model2;
+
+    if (model1.circle) {
+      if (model2.circle) {
+        return this.resolveCollidingCircles(model1, model2);
+      } else {
+        return this.resolveCollidingCircleRect(model1, model2);
+      }
+    } else {
+      if (model2.circle) {
+        return this.resolveCollidingCircleRect(model2, model1);
+      } else {
+        return this.resolveCollidingRects(model1, model2);
+      }
+    }
+  },
+
+  /**
+   * ~ REQUIRED
+   * ~ isInside is used to determine if one entity is fully contained by another
+   * ~ by default, returns a bool, and only works with circles and rects
+   */
+  isInside: function (model1, model2) {
+    model1 = model1.model || model1;
+    model2 = model2.model || model2;
+
+    if (model1.circle) {
+      if (model2.circle) {
+        return this.circleInsideCircle(model1, model2);
+      } else {
+        return this.circleInsideRect(model1, model2);
+      }
+    } else {
+      if (model2.circle) {
+        return this.rectInsideCircle(model1, model2);
+      } else {
+        return this.rectInsideRect(model1, model2);
+      }
+    }
+  },
+
   circleCollidesWithCircle: function (circ1, circ2) {
     var x1 = circ1.getHitX();
     var y1 = circ1.getHitY();

@@ -34,6 +34,8 @@ exports = Class(SpriteView, function () {
     entity.getViewMaxX = bind(view, 'getMaxX');
     entity.getViewMinY = bind(view, 'getMinY');
     entity.getViewMaxY = bind(view, 'getMaxY');
+    entity.getViewWidth = bind(view, 'getWidth');
+    entity.getViewHeight = bind(view, 'getHeight');
   };
 
   this.reset = function (opts) {
@@ -44,17 +46,20 @@ exports = Class(SpriteView, function () {
     s.y = m.getY();
     s.offsetX = opts.offsetX || s.offsetX || 0;
     s.offsetY = opts.offsetY || s.offsetY || 0;
+    s.anchorX = opts.anchorX || s.anchorX || 0;
+    s.anchorY = opts.anchorY || s.anchorY || 0;
     s.width = opts.width || b.width || s.width;
     s.height = opts.height || b.height || s.height;
     s.zIndex = opts.zIndex !== void 0 ? opts.zIndex : s.zIndex;
     s.visible = true;
 
     // setImage is expensive, so only call it if we have to
-    var image = opts.image;
-    if (image && this.setImage && this.currImage !== image) {
-      this.setImage(image);
-      this.currImage = image;
-    }
+    // var image = opts.image;
+    // if (image && this.setImage && this.currImage !== image) {
+    //   this.setImage(image);
+    //   this.currImage = image;
+    // }
+    this.resetAllAnimations(opts);
   };
 
   this.update = function (dt) {

@@ -120,21 +120,7 @@ exports = Class(function () {
    * ~ by default, only works with circles and axis-aligned rectangles
    */
   this.collidesWith = function (model) {
-    model = model.model || model;
-
-    if (this.circle) {
-      if (model.circle) {
-        return this.physics.circleCollidesWithCircle(this, model);
-      } else {
-        return this.physics.circleCollidesWithRect(this, model);
-      }
-    } else {
-      if (model.circle) {
-        return this.physics.circleCollidesWithRect(model, this);
-      } else {
-        return this.physics.rectCollidesWithRect(this, model);
-      }
-    }
+    return this.physics.collide(this, model);
   };
 
   /**
@@ -145,21 +131,7 @@ exports = Class(function () {
    * ~ returns total distance moved to separate the objects
    */
   this.resolveCollisionWith = function (model) {
-    model = model.model || model;
-
-    if (this.circle) {
-      if (model.circle) {
-        return this.physics.resolveCollidingCircles(this, model);
-      } else {
-        return this.physics.resolveCollidingCircleRect(this, model);
-      }
-    } else {
-      if (model.circle) {
-        return this.physics.resolveCollidingCircleRect(model, this);
-      } else {
-        return this.physics.resolveCollidingRects(this, model);
-      }
-    }
+    return this.physics.resolveCollision(this, model);
   };
 
   /**
@@ -168,21 +140,7 @@ exports = Class(function () {
    * ~ by default, returns a bool, and only works with circles and rects
    */
   this.isInside = function (model) {
-    model = model.model || model;
-
-    if (this.circle) {
-      if (model.circle) {
-        return this.physics.circleInsideCircle(this, model);
-      } else {
-        return this.physics.circleInsideRect(this, model);
-      }
-    } else {
-      if (model.circle) {
-        return this.physics.rectInsideCircle(this, model);
-      } else {
-        return this.physics.rectInsideRect(this, model);
-      }
-    }
+    return this.physics.isInside(this, model);
   };
 
   /**

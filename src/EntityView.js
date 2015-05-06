@@ -17,25 +17,7 @@ exports = Class(SpriteView, function () {
       opts.image = opts.image || opts.url;
     }
 
-    this._bindEntity(this.entity);
-
     supr.init.call(this, opts);
-  };
-
-  /**
-   * ~ _bindEntity modifies the entity instance for convenient access to view
-   *   properties and behavior
-   */
-  this._bindEntity = function (entity) {
-    var view = this;
-
-    // expose useful view functions
-    entity.getViewMinX = bind(view, 'getMinX');
-    entity.getViewMaxX = bind(view, 'getMaxX');
-    entity.getViewMinY = bind(view, 'getMinY');
-    entity.getViewMaxY = bind(view, 'getMaxY');
-    entity.getViewWidth = bind(view, 'getWidth');
-    entity.getViewHeight = bind(view, 'getHeight');
   };
 
   this.reset = function (opts) {
@@ -53,12 +35,6 @@ exports = Class(SpriteView, function () {
     s.zIndex = opts.zIndex !== void 0 ? opts.zIndex : s.zIndex;
     s.visible = true;
 
-    // setImage is expensive, so only call it if we have to
-    // var image = opts.image;
-    // if (image && this.setImage && this.currImage !== image) {
-    //   this.setImage(image);
-    //   this.currImage = image;
-    // }
     this.resetAllAnimations(opts);
   };
 
@@ -80,7 +56,12 @@ exports = Class(SpriteView, function () {
       supr.resetAllAnimations.call(this, opts);
       this.setImage(this._animations[opts.defaultAnimation].frames[0]);
     } else {
-      this.setImage(opts.image || opts.url);
+      // setImage is expensive, so only call it if we have to
+      var image = opts.image || opts.url;
+      if (image && this.setImage && this.currImage !== image) {
+        this.setImage(image);
+        this.currImage = image;
+      }
     }
   };
 

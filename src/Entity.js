@@ -58,4 +58,81 @@ exports = Class(function () {
     this.active = false;
   };
 
+  /**
+   * Public API Extensions
+   * ~ properties and functions exposed for ease of use from the model and view
+   */
+
+  // expose x position
+  Object.defineProperty(this, 'x', {
+   enumerable: true,
+   get: function () { return this.model.getX(); },
+   set: function (value) { this.model.setX(value); }
+  });
+
+  // expose y position
+  Object.defineProperty(this, 'y', {
+   enumerable: true,
+   get: function () { return this.model.getY(); },
+   set: function (value) { this.model.setY(value); }
+  });
+
+  // expose x velocity
+  Object.defineProperty(this, 'vx', {
+   enumerable: true,
+   get: function () { return this.model.getVelocityX(); },
+   set: function (value) { this.model.setVelocityX(value); }
+  });
+
+  // expose y velocity
+  Object.defineProperty(this, 'vy', {
+   enumerable: true,
+   get: function () { return this.model.getVelocityY(); },
+   set: function (value) { this.model.setVelocityY(value); }
+  });
+
+  // expose x acceleration
+  Object.defineProperty(this, 'ax', {
+   enumerable: true,
+   get: function () { return this.model.getAccelerationX(); },
+   set: function (value) { this.model.setAccelerationX(value); }
+  });
+
+  // expose y acceleration
+  Object.defineProperty(this, 'ay', {
+   enumerable: true,
+   get: function () { return this.model.getAccelerationY(); },
+   set: function (value) { this.model.setAccelerationY(value); }
+  });
+
+  // expose left-most x-coordinate of the view
+  this.getViewMinX = function () {
+    return (this.view && this.view.getMinX()) || 0;
+  };
+
+  // expose right-most x-coordinate of the view
+  this.getViewMaxX = function () {
+    return (this.view && this.view.getMaxX()) || 0;
+  };
+
+  // expose top-most y-coordinate of the view
+  this.getViewMinY = function () {
+    return (this.view && this.view.getMinY()) || 0;
+  };
+
+  // expose bottom-most y-coordinate of the view
+  this.getViewMaxY = function () {
+    return (this.view && this.view.getMaxY()) || 0;
+  };
+
+  // expose the view width
+  this.getViewWidth = function () {
+    return (this.view && this.view.getWidth()) || 0;
+  };
+
+  // expose the view height
+  this.getViewHeight = function () {
+    return (this.view && this.view.getHeight()) || 0;
+  };
+
 });

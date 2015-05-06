@@ -17,58 +17,6 @@ exports = Class(function () {
 
     this.circle = false;
     this.fixed = false;
-
-    this._bindEntity(this.entity);
-  };
-
-  /**
-   * ~ _bindEntity modifies the entity instance for convenient access to model
-   *   properties and behavior
-   */
-  this._bindEntity = function (entity) {
-    var model = this;
-
-    // expose x position
-    Object.defineProperty(entity, 'x', {
-      enumerable: true,
-      get: function () { return model.position.x; },
-      set: function (value) { model.position.x = value; }
-    });
-
-    // expose y position
-    Object.defineProperty(entity, 'y', {
-      enumerable: true,
-      get: function () { return model.position.y; },
-      set: function (value) { model.position.y = value; }
-    });
-
-    // expose x velocity
-    Object.defineProperty(entity, 'vx', {
-      enumerable: true,
-      get: function () { return model.velocity.x; },
-      set: function (value) { model.velocity.x = value; }
-    });
-
-    // expose y velocity
-    Object.defineProperty(entity, 'vy', {
-      enumerable: true,
-      get: function () { return model.velocity.y; },
-      set: function (value) { model.velocity.y = value; }
-    });
-
-    // expose x acceleration
-    Object.defineProperty(entity, 'ax', {
-      enumerable: true,
-      get: function () { return model.acceleration.x; },
-      set: function (value) { model.acceleration.x = value; }
-    });
-
-    // expose y acceleration
-    Object.defineProperty(entity, 'ay', {
-      enumerable: true,
-      get: function () { return model.acceleration.y; },
-      set: function (value) { model.acceleration.y = value; }
-    });
   };
 
   /**
@@ -174,6 +122,14 @@ exports = Class(function () {
     return this.position.y;
   };
 
+  this.setX = function (value) {
+    this.position.x = value;
+  };
+
+  this.setY = function (value) {
+    this.position.y = value;
+  };
+
   this.getPreviousX = function () {
     return this.previous.x;
   };
@@ -190,12 +146,28 @@ exports = Class(function () {
     return this.velocity.y;
   };
 
+  this.setVelocityX = function (value) {
+    this.velocity.x = value;
+  };
+
+  this.setVelocityY = function (value) {
+    this.velocity.y = value;
+  };
+
   this.getAccelerationX = function () {
     return this.acceleration.x;
   };
 
   this.getAccelerationY = function () {
     return this.acceleration.y;
+  };
+
+  this.setAccelerationX = function (value) {
+    this.acceleration.x = value;
+  };
+
+  this.setAccelerationY = function (value) {
+    this.acceleration.y = value;
   };
 
   this.getHitX = function () {

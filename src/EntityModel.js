@@ -9,10 +9,10 @@ exports = Class(function () {
     this.entity = opts.entity;
     this.physics = opts.physics || physics;
 
-    this.shape = this.physics.getShape();
-    this.previous = this.physics.getPoint();
-    this.velocity = this.physics.getVector();
-    this.acceleration = this.physics.getVector();
+    this.shape = this.physics.shapeFactory.getShape();
+    this.previous = new Point({ x: 0, y: 0 });
+    this.velocity = new Vec2D({ x: 0, y: 0 });
+    this.acceleration = new Vec2D({ x: 0, y: 0 });
   };
 
   /**
@@ -26,7 +26,7 @@ exports = Class(function () {
     var ax = opts.ax || 0;
     var ay = opts.ay || 0;
 
-    this.shape = this.physics.getShape(opts);
+    this.shape = this.physics.shapeFactory.getShape(opts);
     this.shape.fixed = opts.fixed || false;
     this.previous.x = this.shape.x;
     this.previous.y = this.shape.y;

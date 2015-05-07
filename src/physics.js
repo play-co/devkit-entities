@@ -4,7 +4,6 @@ import ui.resource.loader as loader;
 var _imageMap = loader.getMap();
 
 import .shapes.Shape as Shape;
-import .shapes.Line as Line;
 import .shapes.Rect as Rect;
 import .shapes.Circle as Circle;
 
@@ -15,6 +14,40 @@ var sqrt = Math.sqrt;
 
 // this value helps resolve colliding state between entities
 var COLLISION_OFFSET = 0.001;
+
+// shape-to-function maps
+var SHAPE_COLLIDE_MAP = {
+  Rect: {
+    Rect: "rectCollidesWithRect",
+    Circle: "rectCollidesWithCircle"
+  },
+  Circle: {
+    Rect: "circleCollidesWithRect",
+    Circle: "circleCollidesWithCircle"
+  }
+};
+
+var SHAPE_RESOLVE_MAP = {
+  Rect: {
+    Rect: "resolveCollidingRects",
+    Circle: "resolveCollidingRectCircle"
+  },
+  Circle: {
+    Rect: "resolveCollidingCircleRect",
+    Circle: "resolveCollidingCircles"
+  }
+};
+
+var SHAPE_INSIDE_MAP = {
+  Rect: {
+    Rect: "rectInsideRect",
+    Circle: "rectInsideCircle"
+  },
+  Circle: {
+    Rect: "circleInsideRect",
+    Circle: "circleInsideCircle"
+  }
+};
 
 /**
  * IMPORTANT NOTES:
@@ -31,17 +64,25 @@ exports = {
    *   mitigate lag spikes, for smoother, more frame-independent movements
    */
   step: function (model, dt) {
-    var p = model.position;
-    var v = model.velocity;
-    var a = model.acceleration;
+    var x = model.getX();
+    var y = model.getY();
+    var vx = model.getVelocityX();
+    var vy = model.getVelocityY();
+    var ax = model.getAccelerationX();
+    var ay = model.getAccelerationY();
 
-    p.x += dt * v.x / 2;
-    v.x += dt * a.x;
-    p.x += dt * v.x / 2;
+    x += dt * vx / 2;
+    vx += dt * ax;
+    x += dt * vx / 2;
 
-    p.y += dt * v.y / 2;
-    v.y += dt * a.y;
-    p.y += dt * v.y / 2;
+    y += dt * vy / 2;
+    vy += dt * ay;
+    y += dt * vy / 2;
+
+    model.setX(x);
+    model.setY(y);
+    model.setVelocityX(vx);
+    model.setVelocityY(vy);
   },
 
   /**
@@ -49,47 +90,45 @@ exports = {
    * ~ by default, only works with circles and axis-aligned rectangles
    */
   collide: function (model1, model2) {
-    model1 = model1.model || model1;
-    model2 = model2.model || model2;
-
-    if (model1.circle) {
-      if (model2.circle) {
-        return this.circleCollidesWithCircle(model1, model2);
-      } else {
-        return this.circleCollidesWithRect(model1, model2);
-      }
-    } else {
-      if (model2.circle) {
-        return this.circleCollidesWithRect(model2, model1);
-      } else {
-        return this.rectCollidesWithRect(model1, model2);
-      }
+    var fn = null;
+    var colliding = false;
+    var shape1 = (model1.model || model1).getShape();
+    var shape2 = (model2.model || model2).getShape();
+    var map = SHAPE_COLLIDE_MAP[shape1.name];
+    if (map) {
+      fn = map[shape2.name];
     }
+
+    if (fn) {
+      colliding = this[fn](shape1, shape2);
+    } else {
+      logger.warn("Collide function not found for:", shape1, shape2);
+    }
+    return colliding;
   },
 
   /**
    * ~ resolveCollision guarantees that two models are not colliding
    *   by pushing them apart
-   * ~ entities with fixed = true are never moved
+   * ~ shapes with fixed = true are never moved
    * ~ returns total distance moved to separate the objects
    */
   resolveCollision: function (model1, model2) {
-    model1 = model1.model || model1;
-    model2 = model2.model || model2;
-
-    if (model1.circle) {
-      if (model2.circle) {
-        return this.resolveCollidingCircles(model1, model2);
-      } else {
-        return this.resolveCollidingCircleRect(model1, model2);
-      }
-    } else {
-      if (model2.circle) {
-        return this.resolveCollidingCircleRect(model2, model1);
-      } else {
-        return this.resolveCollidingRects(model1, model2);
-      }
+    var fn = null;
+    var deltaDistance = 0;
+    var shape1 = (model1.model || model1).getShape();
+    var shape2 = (model2.model || model2).getShape();
+    var map = SHAPE_RESOLVE_MAP[shape1.name];
+    if (map) {
+      fn = map[shape2.name];
     }
+
+    if (fn) {
+      deltaDistance = this[fn](shape1, shape2);
+    } else {
+      logger.warn("Resolve collision function not found for:", shape1, shape2);
+    }
+    return deltaDistance;
   },
 
   /**
@@ -98,31 +137,30 @@ exports = {
    * ~ by default, returns a bool, and only works with circles and rects
    */
   isInside: function (model1, model2) {
-    model1 = model1.model || model1;
-    model2 = model2.model || model2;
-
-    if (model1.circle) {
-      if (model2.circle) {
-        return this.circleInsideCircle(model1, model2);
-      } else {
-        return this.circleInsideRect(model1, model2);
-      }
-    } else {
-      if (model2.circle) {
-        return this.rectInsideCircle(model1, model2);
-      } else {
-        return this.rectInsideRect(model1, model2);
-      }
+    var fn = null;
+    var inside = false;
+    var shape1 = (model1.model || model1).getShape();
+    var shape2 = (model2.model || model2).getShape();
+    var map = SHAPE_INSIDE_MAP[shape1.name];
+    if (map) {
+      fn = map[shape2.name];
     }
+
+    if (fn) {
+      inside = this[fn](shape1, shape2);
+    } else {
+      logger.warn("Inside function not found for:", shape1, shape2);
+    }
+    return inside;
   },
 
   circleCollidesWithCircle: function (circ1, circ2) {
-    var x1 = circ1.getHitX();
-    var y1 = circ1.getHitY();
-    var r1 = circ1.getHitRadius();
-    var x2 = circ2.getHitX();
-    var y2 = circ2.getHitY();
-    var r2 = circ2.getHitRadius();
+    var x1 = circ1.x;
+    var y1 = circ1.y;
+    var r1 = circ1.radius;
+    var x2 = circ2.x;
+    var y2 = circ2.y;
+    var r2 = circ2.radius;
     var dx = x2 - x1;
     var dy = y2 - y1;
     var distSqrd = dx * dx + dy * dy;
@@ -132,13 +170,13 @@ exports = {
   },
 
   circleCollidesWithRect: function (circ, rect) {
-    var cx = circ.getHitX();
-    var cy = circ.getHitY();
-    var cr = circ.getHitRadius();
-    var rwHalf = rect.getHitWidth() / 2;
-    var rhHalf = rect.getHitHeight() / 2;
-    var rx = rect.getHitX() + rwHalf;
-    var ry = rect.getHitY() + rhHalf;
+    var cx = circ.x;
+    var cy = circ.y;
+    var cr = circ.radius;
+    var rwHalf = rect.width / 2;
+    var rhHalf = rect.height / 2;
+    var rx = rect.x + rwHalf;
+    var ry = rect.y + rhHalf;
     var dx = abs(cx - rx);
     var dy = abs(cy - ry);
     if (dx > rwHalf + cr || dy > rhHalf + cr) {
@@ -156,15 +194,19 @@ exports = {
     }
   },
 
+  rectCollidesWithCircle: function (rect, circ) {
+    return this.circleCollidesWithRect(circ, rect);
+  },
+
   rectCollidesWithRect: function (rect1, rect2) {
-    var x1 = rect1.getHitX();
-    var y1 = rect1.getHitY();
-    var xf1 = x1 + rect1.getHitWidth();
-    var yf1 = y1 + rect1.getHitHeight();
-    var x2 = rect2.getHitX();
-    var y2 = rect2.getHitY();
-    var xf2 = x2 + rect2.getHitWidth();
-    var yf2 = y2 + rect2.getHitHeight();
+    var x1 = rect1.x;
+    var y1 = rect1.y;
+    var xf1 = x1 + rect1.width;
+    var yf1 = y1 + rect1.height;
+    var x2 = rect2.x;
+    var y2 = rect2.y;
+    var xf2 = x2 + rect2.width;
+    var yf2 = y2 + rect2.height;
     return x1 <= xf2 && xf1 >= x2 && y1 <= yf2 && yf1 >= y2;
   },
 
@@ -172,13 +214,13 @@ exports = {
    * ~ resolveCollidingCircles forces two circles apart based on their centers
    */
   resolveCollidingCircles: function (circ1, circ2) {
-    var x1 = circ1.getHitX();
-    var y1 = circ1.getHitY();
-    var r1 = circ1.getHitRadius();
+    var x1 = circ1.x;
+    var y1 = circ1.y;
+    var r1 = circ1.radius;
     var mult1 = 0.5;
-    var x2 = circ2.getHitX();
-    var y2 = circ2.getHitY();
-    var r2 = circ2.getHitRadius();
+    var x2 = circ2.x;
+    var y2 = circ2.y;
+    var r2 = circ2.radius;
     var mult2 = 0.5;
     var dx = x2 - x1;
     var dy = y2 - y1;
@@ -217,13 +259,13 @@ exports = {
    *   hitting the side (missing the platform)
    */
   resolveCollidingCircleRect: function (circ, rect) {
-    var cx = circ.getHitX();
-    var cy = circ.getHitY();
-    var cr = circ.getHitRadius();
-    var rwHalf = rect.getHitWidth() / 2;
-    var rhHalf = rect.getHitHeight() / 2;
-    var rx = rect.getHitX() + rwHalf;
-    var ry = rect.getHitY() + rhHalf;
+    var cx = circ.x;
+    var cy = circ.y;
+    var cr = circ.radius;
+    var rwHalf = rect.width / 2;
+    var rhHalf = rect.height / 2;
+    var rx = rect.x + rwHalf;
+    var ry = rect.y + rhHalf;
     var dx = abs(cx - rx);
     var dy = abs(cy - ry);
     if (dx > rwHalf + cr || dy > rhHalf + cr || (circ.fixed && rect.fixed)) {
@@ -272,23 +314,27 @@ exports = {
     }
   },
 
+  resolveCollidingRectCircle: function (rect, circ) {
+    return resolveCollidingCircleRect(circ, rect);
+  },
+
   /**
    * ~ resolveCollidingRects forces two rects apart, but only in one direction
    * ~ good default collision behavior for landing on a platforms vs.
    *   hitting the side (missing the platform)
    */
   resolveCollidingRects: function (rect1, rect2) {
-    var x1 = rect1.getHitX();
-    var y1 = rect1.getHitY();
-    var w1 = rect1.getHitWidth();
-    var h1 = rect1.getHitHeight();
+    var x1 = rect1.x;
+    var y1 = rect1.y;
+    var w1 = rect1.width;
+    var h1 = rect1.height;
     var xf1 = x1 + w1;
     var yf1 = y1 + h1;
     var mult1 = 0.5;
-    var x2 = rect2.getHitX();
-    var y2 = rect2.getHitY();
-    var w2 = rect2.getHitWidth();
-    var h2 = rect2.getHitHeight();
+    var x2 = rect2.x;
+    var y2 = rect2.y;
+    var w2 = rect2.width;
+    var h2 = rect2.height;
     var xf2 = x2 + w2;
     var yf2 = y2 + h2;
     var mult2 = 0.5;
@@ -364,12 +410,12 @@ exports = {
    * ~ circleInsideCircle returns true if circ1 is fully contained in circ2
    */
   circleInsideCircle: function (circ1, circ2) {
-    var x1 = circ1.getHitX();
-    var y1 = circ1.getHitY();
-    var r1 = circ1.getHitRadius();
-    var x2 = circ2.getHitX();
-    var y2 = circ2.getHitY();
-    var r2 = circ2.getHitRadius();
+    var x1 = circ1.x;
+    var y1 = circ1.y;
+    var r1 = circ1.radius;
+    var x2 = circ2.x;
+    var y2 = circ2.y;
+    var r2 = circ2.radius;
     var dx = x2 - x1;
     var dy = y2 - y1;
     var dist = sqrt(dx * dx + dy * dy);
@@ -380,9 +426,9 @@ exports = {
    * ~ circleInsideRect returns true if circ is fully contained in rect
    */
   circleInsideRect: function (circ, rect) {
-    var cx = circ.getHitX();
-    var cy = circ.getHitY();
-    var cr = circ.getHitRadius();
+    var cx = circ.x;
+    var cy = circ.y;
+    var cr = circ.radius;
     var origHitBounds = circ.hitBounds;
     circ.hitBounds = {
       x: cx - circ.x - cr,
@@ -400,10 +446,10 @@ exports = {
    * ~ rectInsideCircle returns true if rect is fully contained in circ
    */
   rectInsideCircle: function (rect, circ) {
-    var l = rect.getHitX();
-    var r = l + rect.getHitWidth();
-    var t = rect.getHitY();
-    var b = t + rect.getHitHeight();
+    var l = rect.x;
+    var r = l + rect.width;
+    var t = rect.y;
+    var b = t + rect.height;
     return this.pointInsideCircle({ x: l, y: t }, circ)
         && this.pointInsideCircle({ x: r, y: t }, circ)
         && this.pointInsideCircle({ x: r, y: b }, circ)
@@ -414,10 +460,10 @@ exports = {
    * ~ rectInsideRect returns true if rect1 is fully contained in rect2
    */
   rectInsideRect: function (rect1, rect2) {
-    var l = rect1.getHitX();
-    var r = l + rect1.getHitWidth();
-    var t = rect1.getHitY();
-    var b = t + rect1.getHitHeight();
+    var l = rect1.x;
+    var r = l + rect1.width;
+    var t = rect1.y;
+    var b = t + rect1.height;
     return this.pointInsideRect({ x: l, y: t }, rect2)
         && this.pointInsideRect({ x: r, y: t }, rect2)
         && this.pointInsideRect({ x: r, y: b }, rect2)
@@ -428,10 +474,10 @@ exports = {
    * ~ pointInsideRect returns true if pt is contained in rect
    */
   pointInsideRect: function (pt, rect) {
-    var x = rect.getHitX();
-    var y = rect.getHitY();
-    var xf = x + rect.getHitWidth();
-    var yf = y + rect.getHitHeight();
+    var x = rect.x;
+    var y = rect.y;
+    var xf = x + rect.width;
+    var yf = y + rect.height;
     return pt.x >= x && pt.x <= xf && pt.y >= y && pt.y <= yf;
   },
 
@@ -439,9 +485,9 @@ exports = {
    * ~ pointInsideCircle returns true if pt is contained in circ
    */
   pointInsideCircle: function (pt, circ) {
-    var x = circ.getHitX();
-    var y = circ.getHitY();
-    var r = circ.getHitRadius();
+    var x = circ.x;
+    var y = circ.y;
+    var r = circ.radius;
     var dx = pt.x - x;
     var dy = pt.y - y;
     var dist = sqrt(dx * dx + dy * dy);
@@ -472,10 +518,15 @@ exports = {
    * returns a new shape
    */
   getShape: function (opts) {
+    if (opts
+      && opts.radius === undefined
+      && (opts.width === undefined || opts.height === undefined))
+    {
+      this.applyDefaultBounds(opts);
+    }
+
     if (opts && opts.radius !== undefined) {
       return new Circle(opts);
-    } else if (opts && (opts.x2 !== undefined || opts.y2 !== undefined)) {
-      return new Line(opts);
     } else if (opts) {
       return new Rect(opts);
     } else {
@@ -486,19 +537,11 @@ exports = {
   /**
    * returns a hit bounds object with defaults based on image or sprite url
    */
-  getBounds: function (config) {
-    var bounds = {
-      x: 0,
-      y: 0,
-      radius: 0,
-      width: 0,
-      height: 0
-    };
-
-    // default bounds to image or sprite frame size if available from config
-    if (config) {
-      var img = config.image;
-      var url = config.url;
+  applyDefaultBounds: function (opts) {
+    // default bounds to image or sprite frame size if available from opts
+    if (opts) {
+      var img = opts.image;
+      var url = opts.url;
       if (!img && url) {
         // support SpriteViews by finding the first animation match for url
         for (var prop in _imageMap) {
@@ -511,13 +554,13 @@ exports = {
 
       var map = _imageMap[img];
       if (map) {
-        bounds.width = map.w + map.marginLeft + map.marginRight;
-        bounds.height = map.h + map.marginTop + map.marginBottom;
-        bounds.radius = (bounds.width + bounds.height) / 4;
+        opts.width = opts.width || (map.w + map.marginLeft + map.marginRight);
+        opts.height = opts.height || (map.h + map.marginTop + map.marginBottom);
+        opts.radius = opts.radius || (opts.width + opts.height) / 4;
       }
     }
 
-    return bounds;
+    return opts;
   }
 
 };

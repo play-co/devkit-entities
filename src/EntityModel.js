@@ -13,8 +13,6 @@ exports = Class(function () {
     this.previous = this.physics.getPoint();
     this.velocity = this.physics.getVector();
     this.acceleration = this.physics.getVector();
-
-    this.fixed = false;
   };
 
   /**
@@ -29,14 +27,13 @@ exports = Class(function () {
     var ay = opts.ay || 0;
 
     this.shape = this.physics.getShape(opts);
+    this.shape.fixed = opts.fixed || false;
     this.previous.x = this.shape.x;
     this.previous.y = this.shape.y;
     this.velocity.x = vx;
     this.velocity.y = vy;
     this.acceleration.x = ax;
     this.acceleration.y = ay;
-
-    this.fixed = opts.fixed || false;
 
     return this.validate();
   };
@@ -64,7 +61,7 @@ exports = Class(function () {
    * ~ REQUIRED
    * ~ resolveCollisionWith guarantees that two models are not colliding
    *   by pushing them apart
-   * ~ entities with fixed = true are never moved
+   * ~ shapes with fixed = true are never moved
    * ~ returns total distance moved to separate the objects
    */
   this.resolveCollisionWith = function (model) {
@@ -161,10 +158,6 @@ exports = Class(function () {
 
   this.setAccelerationY = function (value) {
     this.acceleration.y = value;
-  };
-
-  this.isFixed = function () {
-    return this.fixed;
   };
 
 });

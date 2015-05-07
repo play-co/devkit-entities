@@ -28,6 +28,12 @@ exports = Class(Shape, function () {
     });
   };
 
+  this.contains = function (x, y) {
+    var xf = this.x + this.width;
+    var yf = this.y + this.height;
+    return x >= this.x && x <= xf && y >= this.y && y <= yf;
+  };
+
   this.getRandomPoint = function () {
     return {
       x: this.x + random() * this.width,

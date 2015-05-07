@@ -411,10 +411,10 @@ exports = {
     var r = l + rect.width;
     var t = rect.y;
     var b = t + rect.height;
-    return this.pointInsideCircle({ x: l, y: t }, circ)
-        && this.pointInsideCircle({ x: r, y: t }, circ)
-        && this.pointInsideCircle({ x: r, y: b }, circ)
-        && this.pointInsideCircle({ x: l, y: b }, circ);
+    return circ.contains(l, t)
+        && circ.contains(r, t)
+        && circ.contains(r, b)
+        && circ.contains(l, b);
   },
 
   /**
@@ -425,34 +425,10 @@ exports = {
     var r = l + rect1.width;
     var t = rect1.y;
     var b = t + rect1.height;
-    return this.pointInsideRect({ x: l, y: t }, rect2)
-        && this.pointInsideRect({ x: r, y: t }, rect2)
-        && this.pointInsideRect({ x: r, y: b }, rect2)
-        && this.pointInsideRect({ x: l, y: b }, rect2);
-  },
-
-  /**
-   * ~ pointInsideRect returns true if pt is contained in rect
-   */
-  pointInsideRect: function (pt, rect) {
-    var x = rect.x;
-    var y = rect.y;
-    var xf = x + rect.width;
-    var yf = y + rect.height;
-    return pt.x >= x && pt.x <= xf && pt.y >= y && pt.y <= yf;
-  },
-
-  /**
-   * ~ pointInsideCircle returns true if pt is contained in circ
-   */
-  pointInsideCircle: function (pt, circ) {
-    var x = circ.x;
-    var y = circ.y;
-    var r = circ.radius;
-    var dx = pt.x - x;
-    var dy = pt.y - y;
-    var dist = sqrt(dx * dx + dy * dy);
-    return dist <= r;
+    return rect2.contains(l, t)
+        && rect2.contains(r, t)
+        && rect2.contains(r, b)
+        && rect2.contains(l, b);
   }
 
 };

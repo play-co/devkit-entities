@@ -31,6 +31,13 @@ exports = Class(Shape, function () {
     });
   };
 
+  this.contains = function(x, y) {
+    var dx = x - this.x;
+    var dy = y - this.y;
+    var dist = sqrt(dx * dx + dy * dy);
+    return dist <= this.radius;
+  };
+
   this.getRandomPoint = function () {
     var angle = random() * TAU;
     var radius = random() * this.radius;

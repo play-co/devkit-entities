@@ -23,6 +23,10 @@ exports = Class(function () {
     });
   };
 
+  this.contains = function(x, y) {
+    return x === this.x && y === this.y;
+  };
+
   this.getRandomPoint = function () {
     return {
       x: this.x,
@@ -40,6 +44,7 @@ Shape Interface
 - bounds: read-only object w minX, minY, maxX, maxY properties
 - center: read-only object w x and y properties
 - getRandomPoint: returns a random point within the shape
+- contains: returns if arg x and y are on the shape
 
 Shape Interface (Maybe TODO)
 - translate

@@ -30,6 +30,24 @@ exports = Class(Shape, function () {
     });
   };
 
+  // TODO: test to see if this works
+  this.contains = function(x, y) {
+    // if this is vertical
+    if (this.x === this.x2) {
+      return x === this.x
+          && y >= Math.min(this.y, this.y2)
+          && y <= Math.max(this.y, this.y2);
+    }
+    // if this is horizonal
+    if (this.y === this.y2) {
+      return y === this.y
+          && x >= Math.min(this.x, this.x2)
+          && x <= Math.max(this.x, this.x2);
+    }
+    // match the gradients
+    return (this.x - x) * (this.y - y) === (x - this.x2) * (y - this.y2);
+  };
+
   this.getRandomPoint = function () {
     var dx = this.x2 - this.x;
     var dy = this.y2 - this.y;

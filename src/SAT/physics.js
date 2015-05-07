@@ -19,29 +19,29 @@ var COLLISION_OFFSET = 0.001;
 exports = {
   name: "SATPhysics",
 
-    // anchor (pivot) point, offset from the primary point
-    this.anchorX = 0;
-    this.anchorY = 0;
+  // anchor (pivot) point, offset from the primary point
+  this.anchorX = 0;
+  this.anchorY = 0;
 
-    this.rotate = function (dr) {
-      this.view.style.r += dr;
-      if (this.rigidBody && this.rigidBody.rotate) {
-        this.rigidBody.rotate(dr);
-      }
-    };
-
-    this.setAnchor = function (x, y) {
-      this.anchorX = x || 0;
-      this.anchorY = y || 0;
-      if (this.view) {
-        this.view.style.anchorX = this.anchorX;
-        this.view.style.anchorY = this.anchorY;
-      }
-      if (this.rigidBody && this.rigidBody.setPivot) {
-        this.rigidBody.setPivot(new SAT.Vector(this.x + x, this.y + y));
-      }
+  this.rotate = function (dr) {
+    this.view.style.r += dr;
+    if (this.rigidBody && this.rigidBody.rotate) {
+      this.rigidBody.rotate(dr);
     }
-  
+  };
+
+  this.setAnchor = function (x, y) {
+    this.anchorX = x || 0;
+    this.anchorY = y || 0;
+    if (this.view) {
+      this.view.style.anchorX = this.anchorX;
+      this.view.style.anchorY = this.anchorY;
+    }
+    if (this.rigidBody && this.rigidBody.setPivot) {
+      this.rigidBody.setPivot(new SAT.Vector(this.x + x, this.y + y));
+    }
+  }
+
   /**
    * ~ REQUIRED for Entity
    * ~ stepPosition updates an entity's position based on dt (delta time)
@@ -65,6 +65,7 @@ exports = {
     entity.rigidbody2d.pos.x += dx;
     entity.rigidbody2d.pos.y += dy;
   },
+
   /**
    * ~ REQUIRED for Entity
    * ~ collide defines how collisions behave and what data is returned
@@ -85,15 +86,19 @@ exports = {
       }
     }
   },
+
   circleCollidesWithCircle: function (circ1, circ2, response) {
     return SAT.testCircleCircle(circ1.rigidbody2d, circ2.rigidbody2d, response);
   },
+
   circleCollidesWithRect: function (circ, rect, response) {
     return SAT.testCirclePolygon(circ.rigidbody2d, rect.rigidbody2d, response);
   },
+
   rectCollidesWithRect: function (rect1, rect2, response) {
     return SAT.testPolygonPolygon(rect1.rigidbody2d, rect2.rigidbody2d, response);
   },
+
   /**
    * ~ REQUIRED for Entity
    * ~ resolveCollidingState uses hit bounds to guarantee that two entities
@@ -116,6 +121,7 @@ exports = {
       }
     }
   },
+
   /**
    * ~ resolveCollidingCircles forces two circles apart based on their centers
    */
@@ -160,6 +166,7 @@ exports = {
 
     return dd;
   },
+
   /**
    * ~ resolveCollidingCircleRect forces apart a circle and rect
    * ~ good default collision behavior for landing on a platforms vs.
@@ -223,6 +230,7 @@ exports = {
       return dd;
     }
   },
+
   /**
    * ~ resolveCollidingRects forces two rects apart, but only in one direction
    * ~ good default collision behavior for landing on a platforms vs.
@@ -310,6 +318,7 @@ exports = {
     // one of these will always be 0, so this is also the delta distance
     return dx + dy;
   },
+
   /**
    * ~ REQUIRED for Entity
    * ~ used by advanced physics implementations, like SATPhysics

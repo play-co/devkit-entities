@@ -3,6 +3,11 @@ import math.geom.Vec2D as Vec2D;
 import ui.resource.loader as loader;
 var _imageMap = loader.getMap();
 
+import .shapes.Shape as Shape;
+import .shapes.Line as Line;
+import .shapes.Rect as Rect;
+import .shapes.Circle as Circle;
+
 var min = Math.min;
 var max = Math.max;
 var abs = Math.abs;
@@ -461,6 +466,21 @@ exports = {
       x: x || 0,
       y: y || 0
     });
+  },
+
+  /**
+   * returns a new shape
+   */
+  getShape: function (opts) {
+    if (opts && opts.radius !== undefined) {
+      return new Circle(opts);
+    } else if (opts && (opts.x2 !== undefined || opts.y2 !== undefined)) {
+      return new Line(opts);
+    } else if (opts) {
+      return new Rect(opts);
+    } else {
+      return new Shape();
+    }
   },
 
   /**

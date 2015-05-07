@@ -65,44 +65,44 @@ exports = Class(function () {
 
   // expose x position
   Object.defineProperty(this, 'x', {
-   enumerable: true,
-   get: function () { return this.model.getX(); },
-   set: function (value) { this.model.setX(value); }
+    enumerable: true,
+    get: function () { return this.model.getX(); },
+    set: function (value) { this.model.setX(value); }
   });
 
   // expose y position
   Object.defineProperty(this, 'y', {
-   enumerable: true,
-   get: function () { return this.model.getY(); },
-   set: function (value) { this.model.setY(value); }
+    enumerable: true,
+    get: function () { return this.model.getY(); },
+    set: function (value) { this.model.setY(value); }
   });
 
   // expose x velocity
   Object.defineProperty(this, 'vx', {
-   enumerable: true,
-   get: function () { return this.model.getVelocityX(); },
-   set: function (value) { this.model.setVelocityX(value); }
+    enumerable: true,
+    get: function () { return this.model.getVelocityX(); },
+    set: function (value) { this.model.setVelocityX(value); }
   });
 
   // expose y velocity
   Object.defineProperty(this, 'vy', {
-   enumerable: true,
-   get: function () { return this.model.getVelocityY(); },
-   set: function (value) { this.model.setVelocityY(value); }
+    enumerable: true,
+    get: function () { return this.model.getVelocityY(); },
+    set: function (value) { this.model.setVelocityY(value); }
   });
 
   // expose x acceleration
   Object.defineProperty(this, 'ax', {
-   enumerable: true,
-   get: function () { return this.model.getAccelerationX(); },
-   set: function (value) { this.model.setAccelerationX(value); }
+    enumerable: true,
+    get: function () { return this.model.getAccelerationX(); },
+    set: function (value) { this.model.setAccelerationX(value); }
   });
 
   // expose y acceleration
   Object.defineProperty(this, 'ay', {
-   enumerable: true,
-   get: function () { return this.model.getAccelerationY(); },
-   set: function (value) { this.model.setAccelerationY(value); }
+    enumerable: true,
+    get: function () { return this.model.getAccelerationY(); },
+    set: function (value) { this.model.setAccelerationY(value); }
   });
 
   // expose left-most x-coordinate of the view

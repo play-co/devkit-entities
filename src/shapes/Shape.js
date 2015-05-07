@@ -45,6 +45,5 @@ Shape Interface (Maybe TODO)
 - translate
 - rotate
 - scale
-- collidesWith: could look up physics fns based on shape names
 
 */

@@ -76,40 +76,40 @@ exports = Class(SpriteView, function () {
   };
 
   /**
-   * Getters
+   * Helpers
    */
 
-  this.getMinX = function () {
+  utils.addReadOnlyProperty(this, 'minX', function () {
    var s = this.style;
    return s.x + s.offsetX;
-  };
+  });
 
-  this.getMaxX = function () {
+  utils.addReadOnlyProperty(this, 'maxX', function () {
    var s = this.style;
    return s.x + s.offsetX + s.width;
-  };
+  });
 
-  this.getMinY = function () {
+  utils.addReadOnlyProperty(this, 'minY', function () {
    var s = this.style;
    return s.y + s.offsetY;
-  };
+  });
 
-  this.getMaxY = function () {
+  utils.addReadOnlyProperty(this, 'maxY', function () {
    var s = this.style;
    return s.y + s.offsetY + s.height;
-  };
+  });
 
-  this.getWidth = function () {
+  utils.addReadOnlyProperty(this, 'width', function () {
    return this.style.width;
-  };
+  });
 
-  this.getHeight = function () {
+  utils.addReadOnlyProperty(this, 'height', function () {
    return this.style.height;
-  };
+  });
 
-  this.isVisible = function () {
+  utils.addReadOnlyProperty(this, 'visible', function () {
     return this.style.visible;
-  };
+  });
 
   /**
    * Debugging Utilities

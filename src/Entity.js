@@ -106,33 +106,33 @@ exports = Class(function () {
   });
 
   // expose left-most x-coordinate of the view
-  this.getViewMinX = function () {
+  utils.addReadOnlyProperty(this, 'viewMinX', function () {
     return (this.view && this.view.getMinX()) || 0;
-  };
+  });
 
   // expose right-most x-coordinate of the view
-  this.getViewMaxX = function () {
+  utils.addReadOnlyProperty(this, 'viewMaxX', function () {
     return (this.view && this.view.getMaxX()) || 0;
-  };
+  });
 
   // expose top-most y-coordinate of the view
-  this.getViewMinY = function () {
+  utils.addReadOnlyProperty(this, 'viewMinY', function () {
     return (this.view && this.view.getMinY()) || 0;
-  };
+  });
 
   // expose bottom-most y-coordinate of the view
-  this.getViewMaxY = function () {
+  utils.addReadOnlyProperty(this, 'viewMaxY', function () {
     return (this.view && this.view.getMaxY()) || 0;
-  };
+  });
 
   // expose the view width
-  this.getViewWidth = function () {
+  utils.addReadOnlyProperty(this, 'viewWidth', function () {
     return (this.view && this.view.getWidth()) || 0;
-  };
+  });
 
   // expose the view height
-  this.getViewHeight = function () {
+  utils.addReadOnlyProperty(this, 'viewHeight', function () {
     return (this.view && this.view.getHeight()) || 0;
-  };
+  });
 
 });

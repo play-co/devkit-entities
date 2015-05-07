@@ -97,67 +97,51 @@ exports = Class(function () {
   };
 
   /**
-   * Getters
+   * Helpers
    */
 
-  this.getShape = function () {
-   return this.shape;
-  };
+  Object.defineProperty(this, 'x', {
+    enumerable: true,
+    get: function () { return this.shape.x; },
+    set: function (value) { this.shape.x = value; }
+  });
 
-  this.getX = function () {
-    return this.shape.x;
-  };
+  Object.defineProperty(this, 'y', {
+    enumerable: true,
+    get: function () { return this.shape.y; },
+    set: function (value) { this.shape.y = value; }
+  });
 
-  this.getY = function () {
-    return this.shape.y;
-  };
+  utils.addReadOnlyProperty(this, 'previousX', function () {
+    get: function () { return this.previous.x; }
+  });
 
-  this.setX = function (value) {
-    this.shape.x = value;
-  };
+  utils.addReadOnlyProperty(this, 'previousY', function () {
+    get: function () { return this.previous.y; }
+  });
 
-  this.setY = function (value) {
-    this.shape.y = value;
-  };
+  Object.defineProperty(this, 'velocityX', {
+    enumerable: true,
+    get: function () { return this.velocity.x; },
+    set: function (value) { this.velocity.x = value; }
+  });
 
-  this.getPreviousX = function () {
-    return this.previous.x;
-  };
+  Object.defineProperty(this, 'velocityY', {
+    enumerable: true,
+    get: function () { return this.velocity.y; },
+    set: function (value) { this.velocity.y = value; }
+  });
 
-  this.getPreviousY = function () {
-    return this.previous.y;
-  };
+  Object.defineProperty(this, 'accelerationX', {
+    enumerable: true,
+    get: function () { return this.acceleration.x; },
+    set: function (value) { this.acceleration.x = value; }
+  });
 
-  this.getVelocityX = function () {
-    return this.velocity.x;
-  };
-
-  this.getVelocityY = function () {
-    return this.velocity.y;
-  };
-
-  this.setVelocityX = function (value) {
-    this.velocity.x = value;
-  };
-
-  this.setVelocityY = function (value) {
-    this.velocity.y = value;
-  };
-
-  this.getAccelerationX = function () {
-    return this.acceleration.x;
-  };
-
-  this.getAccelerationY = function () {
-    return this.acceleration.y;
-  };
-
-  this.setAccelerationX = function (value) {
-    this.acceleration.x = value;
-  };
-
-  this.setAccelerationY = function (value) {
-    this.acceleration.y = value;
-  };
+  Object.defineProperty(this, 'accelerationY', {
+    enumerable: true,
+    get: function () { return this.acceleration.y; },
+    set: function (value) { this.acceleration.y = value; }
+  });
 
 });

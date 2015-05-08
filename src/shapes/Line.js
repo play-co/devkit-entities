@@ -5,17 +5,27 @@ var min = Math.min;
 var max = Math.max;
 var random = Math.random;
 
-/**
- * Line Class - inherits Shape
- */
-exports = Class(Shape, function () {
+exports = Class(Shape, function (supr) {
   this.name = "Line";
 
+  /**
+    * Must define either {@link x2}, {@link y2}, or both.
+    * @class Line
+    * @extends Shape
+    * @arg {Object} [opts]
+    * @arg {number} [opts.x2]
+    * @arg {number} [opts.y2]
+    */
   this.init = function (opts) {
-    this.x = opts.x || 0;
-    this.y = opts.y || 0;
-    this.x2 = opts.x2 || 0;
-    this.y2 = opts.y2 || 0;
+    opts = opts || {};
+    supr(this, 'init', [opts]);
+
+    /** The endpoint for this line
+        @var {number} Shape#x2 */
+    this.x2 = (opts.x2 !== undefined) ? opts.x2 : this.x;
+    /** The endpoint for this line
+        @var {number} Shape#y2 */
+    this.y2 = (opts.y2 !== undefined) ? opts.y2 : this.y;
 
     utils.addReadOnlyObject(this, 'bounds', {
       minX: function () { return min(this.x, this.x2); },
@@ -51,9 +61,10 @@ exports = Class(Shape, function () {
   this.getRandomPoint = function () {
     var dx = this.x2 - this.x;
     var dy = this.y2 - this.y;
+    var rand = random();
     return {
-      x: this.x + random() * dx,
-      y: this.y + random() * dy
+      x: this.x + rand * dx,
+      y: this.y + rand * dy
     };
   };
 });

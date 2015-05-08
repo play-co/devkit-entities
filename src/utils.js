@@ -6,6 +6,7 @@ exports = {
   addReadOnlyProperty: function (ctx, name, getter) {
     Object.defineProperty(ctx, name, {
       enumerable: true,
+      configurable: true,
       get: getter,
       set: function () {
         var ctxName = this.name ? this.name + " " : "";

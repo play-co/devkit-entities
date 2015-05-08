@@ -1,6 +1,8 @@
 import ui.ImageView as ImageView;
 import ui.SpriteView as SpriteView;
 
+import .utils;
+
 // entities module image path (for showing hit bounds)
 var IMG_PATH = "addons/devkit-entities/images/";
 

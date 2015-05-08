@@ -4,23 +4,28 @@ var _imageMap = loader.getMap();
 import math.geom.Point as Point;
 import math.geom.Vec2D as Vec2D;
 
+import .Shape;
+import .Rect;
+import .Circle;
+
 exports = Class(function () {
   /**
    * returns a new shape
    */
   this.getShape = function (opts) {
-    if (opts
-        && opts.radius === undefined
+    if (!opts) {
+      return new Shape();
+    }
+
+    if (opts.radius === undefined
         && (opts.width === undefined || opts.height === undefined)) {
       this.applyDefaultBounds(opts);
     }
 
-    if (opts && opts.radius !== undefined) {
+    if (opts.radius !== undefined) {
       return new Circle(opts);
-    } else if (opts) {
-      return new Rect(opts);
     } else {
-      return new Shape();
+      return new Rect(opts);
     }
   };
 

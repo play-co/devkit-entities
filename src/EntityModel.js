@@ -1,4 +1,5 @@
 import .physics;
+import .utils;
 
 exports = Class(function () {
   this.name = "EntityModel";
@@ -28,10 +29,12 @@ exports = Class(function () {
     var ax = opts.ax || 0;
     var ay = opts.ay || 0;
 
-    this._shape = this._physics.shapeFactory.getShape(opts);
+    this._shape = this._physics.shapeFactory.getShape(opts.hitBounds || opts);
     this._shape.fixed = opts.fixed || false;
-    this._previous.x = this._shape.x;
-    this._previous.y = this._shape.y;
+
+    this._previous.x = this._shape.x = opts.x !== undefined ? opts.x : this._shape.x;
+    this._previous.y = this._shape.y = opts.y !== undefined ? opts.y : this._shape.y;
+
     this._velocity.x = vx;
     this._velocity.y = vy;
     this._acceleration.x = ax;
@@ -103,7 +106,7 @@ exports = Class(function () {
    * ~ properties exposed for ease of use
    */
 
-  // expose x position   
+  // expose x position
   Object.defineProperty(this, 'x', {
     enumerable: true,
     get: function () { return this._shape.x; },

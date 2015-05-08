@@ -4,6 +4,8 @@ import .shapes.collisionHelper as collisionHelper;
 var Physics = Class(function () {
 
   this.init = function (opts) {
+    opts = opts || {};
+
     this.shapeFactory = opts.shapeFactory || new ShapeFactory();
   };
 
@@ -36,15 +38,24 @@ var Physics = Class(function () {
   };
 
   this.collide = function (entity1, entity2) {
-    return collisionHelper.collide(entity1.shape, entity2.shape);
+    return collisionHelper.collide(
+        (entity1.shape || entity1),
+        (entity2.shape || entity2)
+      );
   };
 
   this.resolveCollision = function (entity1, entity2) {
-    return collisionHelper.resolveCollision(entity1.shape, entity2.shape);
+    return collisionHelper.resolveCollision(
+        (entity1.shape || entity1),
+        (entity2.shape || entity2)
+      );
   };
 
   this.isInside = function (entity1, entity2) {
-    return collisionHelper.isInside(entity1.shape, entity2.shape);
+    return collisionHelper.isInside(
+        (entity1.shape || entity1),
+        (entity2.shape || entity2)
+      );
   };
 
 });

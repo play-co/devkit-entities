@@ -7,12 +7,14 @@ var IMG_PATH = "addons/devkit-entities/images/";
 exports = Class(SpriteView, function () {
   var supr = SpriteView.prototype;
 
+  this.name = "EntityView";
+
   this.init = function (opts) {
     opts.autoSize = true;
     opts.tag = opts.tag || opts.entity.uid;
-    this.entity = opts.entity;
+    this._entity = opts.entity;
 
-    this.validateSprite(opts);
+    this._validateSprite(opts);
     if (!this.isSprite) {
       opts.image = opts.image || opts.url;
     }
@@ -22,10 +24,10 @@ exports = Class(SpriteView, function () {
 
   this.reset = function (opts) {
     var s = this.style;
-    var m = this.entity.model;
-    var b = opts.viewBounds || m.physics.shapeFactory.applyDefaultBounds(opts);
-    s.x = m.getX();
-    s.y = m.getY();
+    var m = this._entity.model;
+    var b = opts.viewBounds || m._physics.shapeFactory.applyDefaultBounds(opts);
+    s.x = m.x;
+    s.y = m.y;
     s.offsetX = opts.offsetX || s.offsetX || 0;
     s.offsetY = opts.offsetY || s.offsetY || 0;
     s.anchorX = opts.anchorX || s.anchorX || 0;
@@ -40,9 +42,9 @@ exports = Class(SpriteView, function () {
 
   this.update = function (dt) {
     var s = this.style;
-    var m = this.entity.model;
-    s.x = m.getX();
-    s.y = m.getY();
+    var m = this._entity.model;
+    s.x = m.x;
+    s.y = m.y;
   };
 
   /**
@@ -50,7 +52,7 @@ exports = Class(SpriteView, function () {
    */
 
   this.resetAllAnimations = function (opts) {
-    this.validateSprite(opts);
+    this._validateSprite(opts);
 
     if (this.isSprite) {
       supr.resetAllAnimations.call(this, opts);
@@ -58,9 +60,9 @@ exports = Class(SpriteView, function () {
     } else {
       // setImage is expensive, so only call it if we have to
       var image = opts.image || opts.url;
-      if (image && this.setImage && this.currImage !== image) {
+      if (image && this.setImage && this._currImage !== image) {
         this.setImage(image);
-        this.currImage = image;
+        this._currImage = image;
       }
     }
   };
@@ -71,7 +73,7 @@ exports = Class(SpriteView, function () {
     }
   };
 
-  this.validateSprite = function(opts) {
+  this._validateSprite = function(opts) {
     this.isSprite = !!SpriteView.allAnimations[opts.url];
   };
 
@@ -99,16 +101,22 @@ exports = Class(SpriteView, function () {
    return s.y + s.offsetY + s.height;
   });
 
-  utils.addReadOnlyProperty(this, 'width', function () {
-   return this.style.width;
+  Object.defineProperty(this, 'width', {
+    enumerable: true,
+    get: function () { return this.style.width; },
+    set: function (value) { this.style.width = value; }
   });
 
-  utils.addReadOnlyProperty(this, 'height', function () {
-   return this.style.height;
+  Object.defineProperty(this, 'height', {
+    enumerable: true,
+    get: function () { return this.style.height; },
+    set: function (value) { this.style.height = value; }
   });
 
-  utils.addReadOnlyProperty(this, 'visible', function () {
-    return this.style.visible;
+  Object.defineProperty(this, 'visible', {
+    enumerable: true,
+    get: function () { return this.style.visible; },
+    set: function (value) { this.style.visible = value; }
   });
 
   /**
@@ -123,20 +131,21 @@ exports = Class(SpriteView, function () {
     }
 
     var s = this.style;
-    var m = this.entity.model;
+    var m = this._entity.model;
+    var shape = m.shape;
     var hbvs = this.hitBoundsView.style;
-    if (m.circle) {
-      var r = m.getHitRadius();
+    if (shape.radius !== undefined) {
+      var r = shape.radius;
       hbvs.x = -s.offsetX - r;
       hbvs.y = -s.offsetY - r;
       hbvs.width = 2 * r;
       hbvs.height = 2 * r;
       this.hitBoundsView.setImage(IMG_PATH + "shapeCircle.png");
     } else {
-      hbvs.x = -s.offsetX + m.getHitX();
-      hbvs.y = -s.offsetY + m.getHitY();
-      hbvs.width = m.getHitWidth();
-      hbvs.height = m.getHitHeight();
+      hbvs.x = -s.offsetX + shape.x;
+      hbvs.y = -s.offsetY + shape.y;
+      hbvs.width = shape.width;
+      hbvs.height = shape.height;
       this.hitBoundsView.setImage(IMG_PATH + "shapeRect.png");
     }
   };

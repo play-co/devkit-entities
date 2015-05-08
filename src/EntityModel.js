@@ -1,18 +1,20 @@
 import .physics;
 
 exports = Class(function () {
+  this.name = "EntityModel";
+
   /**
    * ~ REQUIRED
    * ~ init is the constructor for each model instance
    */
   this.init = function (opts) {
-    this.entity = opts.entity;
-    this.physics = opts.physics || physics;
+    this._entity = opts.entity;
+    this._physics = opts.physics || physics;
 
-    this.shape = this.physics.shapeFactory.getShape();
-    this.previous = new Point({ x: 0, y: 0 });
-    this.velocity = new Vec2D({ x: 0, y: 0 });
-    this.acceleration = new Vec2D({ x: 0, y: 0 });
+    this._shape = this._physics.shapeFactory.getShape();
+    this._previous = { x: 0, y: 0 };
+    this._velocity = { x: 0, y: 0 };
+    this._acceleration = { x: 0, y: 0 };
   };
 
   /**
@@ -26,16 +28,16 @@ exports = Class(function () {
     var ax = opts.ax || 0;
     var ay = opts.ay || 0;
 
-    this.shape = this.physics.shapeFactory.getShape(opts);
-    this.shape.fixed = opts.fixed || false;
-    this.previous.x = this.shape.x;
-    this.previous.y = this.shape.y;
-    this.velocity.x = vx;
-    this.velocity.y = vy;
-    this.acceleration.x = ax;
-    this.acceleration.y = ay;
+    this._shape = this._physics.shapeFactory.getShape(opts);
+    this._shape.fixed = opts.fixed || false;
+    this._previous.x = this._shape.x;
+    this._previous.y = this._shape.y;
+    this._velocity.x = vx;
+    this._velocity.y = vy;
+    this._acceleration.x = ax;
+    this._acceleration.y = ay;
 
-    return this.validate();
+    return this._validate();
   };
 
   /**
@@ -43,9 +45,9 @@ exports = Class(function () {
    * ~ update is called each tick while an entity is active
    */
   this.update = function (dt) {
-    this.previous.x = this.shape.x;
-    this.previous.y = this.shape.y;
-    this.physics.step(this, dt);
+    this._previous.x = this._shape.x;
+    this._previous.y = this._shape.y;
+    this._physics.step(this, dt);
   };
 
   /**
@@ -54,7 +56,7 @@ exports = Class(function () {
    * ~ by default, only works with circles and axis-aligned rectangles
    */
   this.collidesWith = function (model) {
-    return this.physics.collide(this, model);
+    return this._physics.collide(this, model);
   };
 
   /**
@@ -65,7 +67,7 @@ exports = Class(function () {
    * ~ returns total distance moved to separate the objects
    */
   this.resolveCollisionWith = function (model) {
-    return this.physics.resolveCollision(this, model);
+    return this._physics.resolveCollision(this, model);
   };
 
   /**
@@ -74,22 +76,22 @@ exports = Class(function () {
    * ~ by default, returns a bool, and only works with circles and rects
    */
   this.isInside = function (model) {
-    return this.physics.isInside(this, model);
+    return this._physics.isInside(this, model);
   };
 
   /**
-   * ~ validate warns if a model is improperly configured or broken
+   * ~ _validate warns if a model is improperly configured or broken
    */
-  this.validate = function () {
+  this._validate = function () {
     var valid = true;
-    if (this.shape.radius !== undefined) {
-      if (this.shape.radius <= 0) {
-        logger.warn("Invalid circle radius:", this.entity.uid, this.shape);
+    if (this._shape.radius !== undefined) {
+      if (this._shape.radius <= 0) {
+        logger.warn("Invalid circle radius:", this._entity.uid, this._shape);
         valid = false;
       }
-    } else if (this.shape.width !== undefined) {
-      if (this.shape.width <= 0 || this.shape.height <= 0) {
-        logger.warn("Invalid rect dimensions:", this.entity.uid, this.shape);
+    } else if (this._shape.width !== undefined) {
+      if (this._shape.width <= 0 || this._shape.height <= 0) {
+        logger.warn("Invalid rect dimensions:", this._entity.uid, this._shape);
         valid = false;
       }
     }
@@ -97,51 +99,65 @@ exports = Class(function () {
   };
 
   /**
-   * Helpers
+   * Public API Extensions
+   * ~ properties exposed for ease of use
    */
 
+  // expose x position   
   Object.defineProperty(this, 'x', {
     enumerable: true,
-    get: function () { return this.shape.x; },
-    set: function (value) { this.shape.x = value; }
+    get: function () { return this._shape.x; },
+    set: function (value) { this._shape.x = value; }
   });
 
+  // expose y position
   Object.defineProperty(this, 'y', {
     enumerable: true,
-    get: function () { return this.shape.y; },
-    set: function (value) { this.shape.y = value; }
+    get: function () { return this._shape.y; },
+    set: function (value) { this._shape.y = value; }
   });
 
+  // expose read-only previous x position
   utils.addReadOnlyProperty(this, 'previousX', function () {
-    get: function () { return this.previous.x; }
+    return this._previous.x;
   });
 
+  // expose read-only previous y position
   utils.addReadOnlyProperty(this, 'previousY', function () {
-    get: function () { return this.previous.y; }
+    return this._previous.y;
   });
 
-  Object.defineProperty(this, 'velocityX', {
+  // expose x velocity
+  Object.defineProperty(this, 'vx', {
     enumerable: true,
-    get: function () { return this.velocity.x; },
-    set: function (value) { this.velocity.x = value; }
+    get: function () { return this._velocity.x; },
+    set: function (value) { this._velocity.x = value; }
   });
 
-  Object.defineProperty(this, 'velocityY', {
+  // expose y velocity
+  Object.defineProperty(this, 'vy', {
     enumerable: true,
-    get: function () { return this.velocity.y; },
-    set: function (value) { this.velocity.y = value; }
+    get: function () { return this._velocity.y; },
+    set: function (value) { this._velocity.y = value; }
   });
 
-  Object.defineProperty(this, 'accelerationX', {
+  // expose x acceleration
+  Object.defineProperty(this, 'ax', {
     enumerable: true,
-    get: function () { return this.acceleration.x; },
-    set: function (value) { this.acceleration.x = value; }
+    get: function () { return this._acceleration.x; },
+    set: function (value) { this._acceleration.x = value; }
   });
 
-  Object.defineProperty(this, 'accelerationY', {
+  // expose y acceleration
+  Object.defineProperty(this, 'ay', {
     enumerable: true,
-    get: function () { return this.acceleration.y; },
-    set: function (value) { this.acceleration.y = value; }
+    get: function () { return this._acceleration.y; },
+    set: function (value) { this._acceleration.y = value; }
+  });
+
+  // expose read-only shape
+  utils.addReadOnlyProperty(this, 'shape', function () {
+    return this._shape;
   });
 
 });

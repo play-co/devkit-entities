@@ -29,9 +29,8 @@ exports = Class(Shape, function () {
   };
 
   this.contains = function (x, y) {
-    var xf = this.x + this.width;
-    var yf = this.y + this.height;
-    return x >= this.x && x <= xf && y >= this.y && y <= yf;
+    return x >= this.left && x <= this.right
+      && y >= this.top && y <= this.bottom;
   };
 
   this.getRandomPoint = function () {

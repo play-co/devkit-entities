@@ -3,7 +3,7 @@ import .shapes.collisionHelper as collisionHelper;
 
 var Physics = Class(function () {
 
-  this.init = function(opts) {
+  this.init = function (opts) {
     this.shapeFactory = opts.shapeFactory || new ShapeFactory();
   };
 
@@ -14,12 +14,12 @@ var Physics = Class(function () {
    *   mitigate lag spikes, for smoother, more frame-independent movements
    */
   this.step = function (model, dt) {
-    var x = model.getX();
-    var y = model.getY();
-    var vx = model.getVelocityX();
-    var vy = model.getVelocityY();
-    var ax = model.getAccelerationX();
-    var ay = model.getAccelerationY();
+    var x = model.x;
+    var y = model.y;
+    var vx = model.vx;
+    var vy = model.vy;
+    var ax = model.ax;
+    var ay = model.ay;
 
     x += dt * vx / 2;
     vx += dt * ax;
@@ -29,28 +29,22 @@ var Physics = Class(function () {
     vy += dt * ay;
     y += dt * vy / 2;
 
-    model.setX(x);
-    model.setY(y);
-    model.setVelocityX(vx);
-    model.setVelocityY(vy);
+    model.x = x;
+    model.y = y;
+    model.vx = vx;
+    model.vy = vy;
   };
 
-  this.collide = function(entity1, entity2) {
-    var shape1 = (entity1.model || entity1).getShape();
-    var shape2 = (entity2.model || entity2).getShape();
-    return collisionHelper.collide(shape1, shape2);
+  this.collide = function (entity1, entity2) {
+    return collisionHelper.collide(entity1.shape, entity2.shape);
   };
 
-  this.resolveCollision = function(entity1, entity2) {
-    var shape1 = (entity1.model || entity1).getShape();
-    var shape2 = (entity2.model || entity2).getShape();
-    return collisionHelper.resolveCollision(shape1, shape2);
+  this.resolveCollision = function (entity1, entity2) {
+    return collisionHelper.resolveCollision(entity1.shape, entity2.shape);
   };
 
-  this.isInside = function(entity1, entity2) {
-    var shape1 = (entity1.model || entity1).getShape();
-    var shape2 = (entity2.model || entity2).getShape();
-    return collisionHelper.isInside(shape1, shape2);
+  this.isInside = function (entity1, entity2) {
+    return collisionHelper.isInside(entity1.shape, entity2.shape);
   };
 
 });

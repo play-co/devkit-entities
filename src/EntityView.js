@@ -25,6 +25,8 @@ exports = Class(SpriteView, function () {
   };
 
   this.reset = function (opts) {
+    this.resetAllAnimations(opts);
+
     var s = this.style;
     var m = this._entity.model;
     var b = opts.viewBounds || m._physics.shapeFactory.applyDefaultBounds(opts);
@@ -38,8 +40,6 @@ exports = Class(SpriteView, function () {
     s.height = opts.height || b.height || s.height;
     s.zIndex = opts.zIndex !== void 0 ? opts.zIndex : s.zIndex;
     s.visible = true;
-
-    this.resetAllAnimations(opts);
   };
 
   this.update = function (dt) {

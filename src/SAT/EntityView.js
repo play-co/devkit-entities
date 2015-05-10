@@ -7,7 +7,10 @@ exports = Class(EntityView, function(supr) {
 
     if (this.debugDraw) {
       ctx.save();
+      // Un offset
       ctx.translate(-this.style.offsetX, -this.style.offsetY);
+      // Un scale
+      ctx.scale(1 / this.style.scale, 1 / this.style.scale);
 
       // Draw debug lines
       var verts = this._entity.model.shape.calcPoints;

@@ -17,6 +17,14 @@ exports = Class(function () {
     /** @var {number} Shape#y */
     this.y = opts.y || 0;
 
+    this.offsetX = opts.offsetX || 0;
+    this.offsetY = opts.offsetY || 0;
+
+    utils.addReadOnlyProperty(this, 'adjX', function() { return this.x + this.offsetX; });
+    utils.addReadOnlyProperty(this, 'adjY', function() { return this.y + this.offsetY; });
+
+    // TODO: make the bounds properties on the shape, nothing is really gained from having
+    //         one more dot in the way
     /**
      * @var {Object} Shape#bounds
      * @property {Number} minX
@@ -26,10 +34,10 @@ exports = Class(function () {
      * @readOnly
      */
     utils.addReadOnlyObject(this, 'bounds', {
-      minX: function () { return this.x; },
-      minY: function () { return this.y; },
-      maxX: function () { return this.x; },
-      maxY: function () { return this.y; }
+      minX: function () { return this.adjX; },
+      minY: function () { return this.adjY; },
+      maxX: function () { return this.adjX; },
+      maxY: function () { return this.adjY; }
     });
 
     /**
@@ -39,8 +47,8 @@ exports = Class(function () {
      * @readOnly
      */
     utils.addReadOnlyObject(this, 'center', {
-      x: function () { return this.x; },
-      y: function () { return this.y; }
+      x: function () { return this.adjX; },
+      y: function () { return this.adjY; }
     });
   };
 
@@ -52,7 +60,7 @@ exports = Class(function () {
     * @returns {Boolean} result
     */
   this.contains = function(x, y) {
-    return x === this.x && y === this.y;
+    return x === this.adjX && y === this.adjY;
   };
 
   /**
@@ -63,8 +71,8 @@ exports = Class(function () {
     */
   this.getRandomPoint = function () {
     return {
-      x: this.x,
-      y: this.y
+      x: this.adjX,
+      y: this.adjY
     };
   };
 

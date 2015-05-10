@@ -6,13 +6,12 @@ import .utils;
 // entities module image path (for showing hit bounds)
 var IMG_PATH = "addons/devkit-entities/images/";
 
-exports = Class(SpriteView, function () {
-  var supr = SpriteView.prototype;
+exports = Class(SpriteView, function (supr) {
+  var superPrototype = SpriteView.prototype;
 
   this.name = "EntityView";
 
   this.init = function (opts) {
-    opts.autoSize = true;
     opts.tag = opts.tag || opts.entity.uid;
     this._entity = opts.entity;
 
@@ -21,7 +20,7 @@ exports = Class(SpriteView, function () {
       opts.image = opts.image || opts.url;
     }
 
-    supr.init.call(this, opts);
+    superPrototype.init.call(this, opts);
   };
 
   this.reset = function (opts) {
@@ -36,8 +35,13 @@ exports = Class(SpriteView, function () {
     s.offsetY = opts.offsetY || s.offsetY || 0;
     s.anchorX = opts.anchorX || s.anchorX || 0;
     s.anchorY = opts.anchorY || s.anchorY || 0;
-    s.width = opts.width || b.width || s.width;
-    s.height = opts.height || b.height || s.height;
+
+    s.autoSize = opts.autoSize !== undefined ? opts.autoSize : (!opts.width && !opts.height);
+    if (!s.autoSize) {
+      s.width = opts.width || b.width || s.width;
+      s.height = opts.height || b.height || s.height;
+    }
+
     s.zIndex = opts.zIndex !== void 0 ? opts.zIndex : s.zIndex;
     s.visible = true;
   };
@@ -57,7 +61,7 @@ exports = Class(SpriteView, function () {
     this._validateSprite(opts);
 
     if (this.isSprite) {
-      supr.resetAllAnimations.call(this, opts);
+      superPrototype.resetAllAnimations.call(this, opts);
       this.setImage(this._animations[opts.defaultAnimation].frames[0]);
     } else {
       // setImage is expensive, so only call it if we have to
@@ -71,7 +75,7 @@ exports = Class(SpriteView, function () {
 
   this.startAnimation = function (name, opts) {
     if (this.isSprite && this._animations[name]) {
-      supr.startAnimation.call(this, name, opts);
+      superPrototype.startAnimation.call(this, name, opts);
     }
   };
 
@@ -155,6 +159,31 @@ exports = Class(SpriteView, function () {
   this.hideHitBounds = function () {
     if (this.hitBoundsView) {
       this.hitBoundsView.style.visible = false;
+    }
+  };
+
+  this.render = function (ctx) {
+    supr(this, 'render', [ctx]);
+
+    if (this.debugDraw) {
+      ctx.save();
+      // Un offset
+      ctx.translate(-this.style.x-this.style.offsetX, -this.style.y-this.style.offsetY);
+      // Un scale
+      ctx.scale(1 / this.style.scale, 1 / this.style.scale);
+
+      // Draw debug lines
+      var shape = this._entity.model.shape;
+
+      ctx.fillStyle = 'rgba(255, 0, 0, 0.4)';
+      if (shape.radius) {
+        ctx.beginPath();
+        ctx.arc(shape.adjX, shape.adjY, shape.radius, 0, 2 * Math.PI, false);
+        ctx.fill();
+      } else if (shape.width && shape.height) {
+        ctx.fillRect(shape.adjX, shape.adjY, shape.width, shape.height);
+      }
+      ctx.restore();
     }
   };
 

@@ -17,7 +17,6 @@ exports = Class(Shape, function (supr) {
     * @arg {number} [opts.y2]
     */
   this.init = function (opts) {
-    opts = opts || {};
     supr(this, 'init', [opts]);
 
     /** The endpoint for this line
@@ -27,16 +26,19 @@ exports = Class(Shape, function (supr) {
         @var {number} Shape#y2 */
     this.y2 = (opts.y2 !== undefined) ? opts.y2 : this.y;
 
+    utils.addReadOnlyProperty(this, 'adjX2', function() { return this.x2 + this.offsetX; });
+    utils.addReadOnlyProperty(this, 'adjY2', function() { return this.y2 + this.offsetY; });
+
     utils.addReadOnlyObject(this, 'bounds', {
-      minX: function () { return min(this.x, this.x2); },
-      minY: function () { return min(this.y, this.y2); },
-      maxX: function () { return max(this.x, this.x2); },
-      maxY: function () { return max(this.y, this.y2); }
+      minX: function () { return min(this.adjX, this.adjX2); },
+      minY: function () { return min(this.adjY, this.adjY2); },
+      maxX: function () { return max(this.adjX, this.adjX2); },
+      maxY: function () { return max(this.adjY, this.adjY2); }
     });
 
     utils.addReadOnlyObject(this, 'center', {
-      x: function () { return (this.x + this.x2) / 2; },
-      y: function () { return (this.y + this.y2) / 2; }
+      x: function () { return (this.adjX + this.adjX2) / 2; },
+      y: function () { return (this.adjY + this.adjY2) / 2; }
     });
   };
 
@@ -44,27 +46,27 @@ exports = Class(Shape, function (supr) {
   this.contains = function(x, y) {
     // if this is vertical
     if (this.x === this.x2) {
-      return x === this.x
-          && y >= Math.min(this.y, this.y2)
-          && y <= Math.max(this.y, this.y2);
+      return x === this.adjX
+          && y >= Math.min(this.adjY, this.adjY2)
+          && y <= Math.max(this.adjY, this.adjY2);
     }
     // if this is horizonal
     if (this.y === this.y2) {
-      return y === this.y
-          && x >= Math.min(this.x, this.x2)
-          && x <= Math.max(this.x, this.x2);
+      return y === this.adjY
+          && x >= Math.min(this.adjX, this.adjX2)
+          && x <= Math.max(this.adjX, this.adjX2);
     }
     // match the gradients
-    return (this.x - x) * (this.y - y) === (x - this.x2) * (y - this.y2);
+    return (this.adjX - x) * (this.adjY - y) === (x - this.adjX2) * (y - this.adjY2);
   };
 
   this.getRandomPoint = function () {
-    var dx = this.x2 - this.x;
-    var dy = this.y2 - this.y;
+    var dx = this.adjX2 - this.adjX;
+    var dy = this.adjY2 - this.adjY;
     var rand = random();
     return {
-      x: this.x + rand * dx,
-      y: this.y + rand * dy
+      x: this.adjX + rand * dx,
+      y: this.adjY + rand * dy
     };
   };
 });

@@ -26,15 +26,15 @@ exports = Class(Shape, function (supr) {
     this.height = opts.height || 0;
 
     utils.addReadOnlyObject(this, 'bounds', {
-      minX: function () { return this.x; },
-      minY: function () { return this.y; },
-      maxX: function () { return this.x + this.width; },
-      maxY: function () { return this.y + this.height; }
+      minX: function () { return this.adjX; },
+      minY: function () { return this.adjY; },
+      maxX: function () { return this.adjX + this.width; },
+      maxY: function () { return this.adjY + this.height; }
     });
 
     utils.addReadOnlyObject(this, 'center', {
-      x: function () { return this.x + this.width / 2; },
-      y: function () { return this.y + this.height / 2; }
+      x: function () { return this.adjX + this.width / 2; },
+      y: function () { return this.adjY + this.height / 2; }
     });
   };
 
@@ -45,32 +45,32 @@ exports = Class(Shape, function (supr) {
 
   this.getRandomPoint = function () {
     return {
-      x: this.x + random() * this.width,
-      y: this.y + random() * this.height
+      x: this.adjX + random() * this.width,
+      y: this.adjY + random() * this.height
     };
   };
 
   /** @func Rect#top
       @returns {number} */
   utils.addReadOnlyProperty(this, 'top', function () {
-    return this.y;
+    return this.adjY;
   });
 
   /** @func Rect#right
       @returns {number} */
   utils.addReadOnlyProperty(this, 'right', function () {
-    return this.x + this.width;
+    return this.adjX + this.width;
   });
 
   /** @func Rect#bottom
       @returns {number} */
   utils.addReadOnlyProperty(this, 'bottom', function () {
-    return this.y + this.height;
+    return this.adjY + this.height;
   });
 
   /** @func Rect#left
       @returns {number} */
   utils.addReadOnlyProperty(this, 'left', function () {
-    return this.x;
+    return this.adjX;
   });
 });

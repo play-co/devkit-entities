@@ -6,34 +6,35 @@ var TAU = 2 * PI;
 var sin = Math.sin;
 var cos = Math.cos;
 var random = Math.random;
+var sqrt = Math.sqrt;
 
 /**
  * Circle Class - inherits Shape
  */
-exports = Class(Shape, function () {
+exports = Class(Shape, function (supr) {
   this.name = "Circle";
 
   this.init = function (opts) {
-    this.x = opts.x || 0;
-    this.y = opts.y || 0;
+    supr(this, 'init', [opts]);
+
     this.radius = opts.radius || 0;
 
     utils.addReadOnlyObject(this, 'bounds', {
-      minX: function () { return this.x; },
-      minY: function () { return this.y; },
-      maxX: function () { return this.x + 2 * this.radius; },
-      maxY: function () { return this.y + 2 * this.radius; }
+      minX: function () { return this.adjX - this.radius; },
+      minY: function () { return this.adjY - this.radius; },
+      maxX: function () { return this.adjX + this.radius; },
+      maxY: function () { return this.adjY + this.radius; }
     });
 
     utils.addReadOnlyObject(this, 'center', {
-      x: function () { return this.x + this.radius; },
-      y: function () { return this.y + this.radius; }
+      x: function () { return this.adjX + this.radius; },
+      y: function () { return this.adjY + this.radius; }
     });
   };
 
   this.contains = function(x, y) {
-    var dx = x - this.x;
-    var dy = y - this.y;
+    var dx = x - this.adjX;
+    var dy = y - this.adjY;
     var dist = sqrt(dx * dx + dy * dy);
     return dist <= this.radius;
   };
@@ -42,8 +43,8 @@ exports = Class(Shape, function () {
     var angle = random() * TAU;
     var radius = random() * this.radius;
     return {
-      x: this.x + this.radius + radius * cos(angle),
-      y: this.y + this.radius + radius * sin(angle)
+      x: this.adjX + this.radius + radius * cos(angle),
+      y: this.adjY + this.radius + radius * sin(angle)
     };
   };
 });

@@ -44,6 +44,24 @@ var SHAPE_INSIDE_MAP = {
   }
 };
 
+var _genericResolution = function(genericName, lookupMap, defaultResult) {
+  return function (shape1, shape2) {
+    var fn = null;
+    var result = defaultResult;
+    var map = lookupMap[shape1.name];
+    if (map) {
+      fn = map[shape2.name];
+    }
+
+    if (fn) {
+      result = this[fn](shape1, shape2);
+    } else {
+      logger.warn(genericName + " function not found for:", shape1, shape2);
+    }
+    return result;
+  };
+};
+
 /**
  * IMPORTANT NOTES:
  * ~ by default, collisions support circles and axis-aligned rectangles only
@@ -56,21 +74,7 @@ exports = {
    * ~ collide defines how collisions are detected
    * ~ by default, only works with circles and axis-aligned rectangles
    */
-  collide: function (shape1, shape2) {
-    var fn = null;
-    var colliding = false;
-    var map = SHAPE_COLLIDE_MAP[shape1.name];
-    if (map) {
-      fn = map[shape2.name];
-    }
-
-    if (fn) {
-      colliding = this[fn](shape1, shape2);
-    } else {
-      logger.warn("Collide function not found for:", shape1, shape2);
-    }
-    return colliding;
-  },
+  collide: _genericResolution('Collide', SHAPE_COLLIDE_MAP, false),
 
   /**
    * ~ resolveCollision guarantees that two models are not colliding
@@ -78,42 +82,14 @@ exports = {
    * ~ shapes with fixed = true are never moved
    * ~ returns total distance moved to separate the objects
    */
-  resolveCollision: function (shape1, shape2) {
-    var fn = null;
-    var deltaDistance = 0;
-    var map = SHAPE_RESOLVE_MAP[shape1.name];
-    if (map) {
-      fn = map[shape2.name];
-    }
-
-    if (fn) {
-      deltaDistance = this[fn](shape1, shape2);
-    } else {
-      logger.warn("Resolve collision function not found for:", shape1, shape2);
-    }
-    return deltaDistance;
-  },
+  resolveCollision: _genericResolution('Resolve', SHAPE_RESOLVE_MAP, 0),
 
   /**
    * ~ REQUIRED
    * ~ isInside is used to determine if one entity is fully contained by another
    * ~ by default, returns a bool, and only works with circles and rects
    */
-  isInside: function (shape1, shape2) {
-    var fn = null;
-    var inside = false;
-    var map = SHAPE_INSIDE_MAP[shape1.name];
-    if (map) {
-      fn = map[shape2.name];
-    }
-
-    if (fn) {
-      inside = this[fn](shape1, shape2);
-    } else {
-      logger.warn("Inside function not found for:", shape1, shape2);
-    }
-    return inside;
-  },
+  isInside: _genericResolution('Inside', SHAPE_INSIDE_MAP, false),
 
   circleCollidesWithCircle: function (circ1, circ2) {
     var x1 = circ1.x;

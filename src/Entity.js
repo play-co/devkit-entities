@@ -1,5 +1,6 @@
 import .EntityModel;
 import .EntityView;
+import .utils;
 
 var _uid = 1;
 
@@ -60,79 +61,98 @@ exports = Class(function () {
 
   /**
    * Public API Extensions
-   * ~ properties and functions exposed for ease of use from the model and view
+   * ~ properties exposed for ease of use from the model and view
    */
 
   // expose x position
   Object.defineProperty(this, 'x', {
-   enumerable: true,
-   get: function () { return this.model.getX(); },
-   set: function (value) { this.model.setX(value); }
+    enumerable: true,
+    get: function () { return this.model.x; },
+    set: function (value) { this.model.x = value; }
   });
 
   // expose y position
   Object.defineProperty(this, 'y', {
-   enumerable: true,
-   get: function () { return this.model.getY(); },
-   set: function (value) { this.model.setY(value); }
+    enumerable: true,
+    get: function () { return this.model.y; },
+    set: function (value) { this.model.y = value; }
+  });
+
+  // expose read-only previous x position
+  utils.addReadOnlyProperty(this, 'previousX', function () {
+    return this.model.previousX;
+  });
+
+  // expose read-only previous y position
+  utils.addReadOnlyProperty(this, 'previousY', function () {
+    return this.model.previousY;
   });
 
   // expose x velocity
   Object.defineProperty(this, 'vx', {
-   enumerable: true,
-   get: function () { return this.model.getVelocityX(); },
-   set: function (value) { this.model.setVelocityX(value); }
+    enumerable: true,
+    get: function () { return this.model.vx; },
+    set: function (value) { this.model.vx = value; }
   });
 
   // expose y velocity
   Object.defineProperty(this, 'vy', {
-   enumerable: true,
-   get: function () { return this.model.getVelocityY(); },
-   set: function (value) { this.model.setVelocityY(value); }
+    enumerable: true,
+    get: function () { return this.model.vy; },
+    set: function (value) { this.model.vy = value; }
   });
 
   // expose x acceleration
   Object.defineProperty(this, 'ax', {
-   enumerable: true,
-   get: function () { return this.model.getAccelerationX(); },
-   set: function (value) { this.model.setAccelerationX(value); }
+    enumerable: true,
+    get: function () { return this.model.ax; },
+    set: function (value) { this.model.ax = value; }
   });
 
   // expose y acceleration
   Object.defineProperty(this, 'ay', {
-   enumerable: true,
-   get: function () { return this.model.getAccelerationY(); },
-   set: function (value) { this.model.setAccelerationY(value); }
+    enumerable: true,
+    get: function () { return this.model.ay; },
+    set: function (value) { this.model.ay = value; }
   });
 
-  // expose left-most x-coordinate of the view
-  this.getViewMinX = function () {
-    return (this.view && this.view.getMinX()) || 0;
-  };
-
-  // expose right-most x-coordinate of the view
-  this.getViewMaxX = function () {
-    return (this.view && this.view.getMaxX()) || 0;
-  };
-
-  // expose top-most y-coordinate of the view
-  this.getViewMinY = function () {
-    return (this.view && this.view.getMinY()) || 0;
-  };
-
-  // expose bottom-most y-coordinate of the view
-  this.getViewMaxY = function () {
-    return (this.view && this.view.getMaxY()) || 0;
-  };
+  // expose the model's physical shape,
+  utils.addReadOnlyProperty(this, 'shape', function () {
+    return this.model.shape;
+  });
 
   // expose the view width
-  this.getViewWidth = function () {
-    return (this.view && this.view.getWidth()) || 0;
-  };
+  Object.defineProperty(this, 'viewWidth', {
+    enumerable: true,
+    get: function () { return (this.view && this.view.style.width) || 0; },
+    set: function (value) { this.view && (this.view.style.width = value); }
+  });
 
   // expose the view height
-  this.getViewHeight = function () {
-    return (this.view && this.view.getHeight()) || 0;
-  };
+  Object.defineProperty(this, 'viewHeight', {
+    enumerable: true,
+    get: function () { return (this.view && this.view.style.height) || 0; },
+    set: function (value) { this.view && (this.view.style.height = value); }
+  });
+
+  // expose read-only left-most x-coordinate of the view
+  utils.addReadOnlyProperty(this, 'viewMinX', function () {
+    return (this.view && this.view.minX) || 0;
+  });
+
+  // expose read-only right-most x-coordinate of the view
+  utils.addReadOnlyProperty(this, 'viewMaxX', function () {
+    return (this.view && this.view.maxX) || 0;
+  });
+
+  // expose read-only top-most y-coordinate of the view
+  utils.addReadOnlyProperty(this, 'viewMinY', function () {
+    return (this.view && this.view.minY) || 0;
+  });
+
+  // expose read-only bottom-most y-coordinate of the view
+  utils.addReadOnlyProperty(this, 'viewMaxY', function () {
+    return (this.view && this.view.maxY) || 0;
+  });
 
 });

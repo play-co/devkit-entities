@@ -1,22 +1,21 @@
 import .physics;
+import .utils;
 
 exports = Class(function () {
+  this.name = "EntityModel";
+
   /**
    * ~ REQUIRED
    * ~ init is the constructor for each model instance
    */
   this.init = function (opts) {
-    this.entity = opts.entity;
-    this.physics = opts.physics || physics;
+    this._entity = opts.entity;
+    this._physics = opts.physics || physics;
 
-    this.position = this.physics.getPoint();
-    this.previous = this.physics.getPoint();
-    this.velocity = this.physics.getVector();
-    this.acceleration = this.physics.getVector();
-    this.hitBounds = this.physics.getBounds();
-
-    this.circle = false;
-    this.fixed = false;
+    this._shape = this._physics.shapeFactory.getShape();
+    this._previous = { x: 0, y: 0 };
+    this._velocity = { x: 0, y: 0 };
+    this._acceleration = { x: 0, y: 0 };
   };
 
   /**
@@ -25,31 +24,23 @@ exports = Class(function () {
    */
   this.reset = function (opts) {
     opts = opts || {};
-    var x = opts.x || 0;
-    var y = opts.y || 0;
     var vx = opts.vx || 0;
     var vy = opts.vy || 0;
     var ax = opts.ax || 0;
     var ay = opts.ay || 0;
 
-    this.position.x = this.previous.x = x;
-    this.position.y = this.previous.y = y;
-    this.velocity.x = vx;
-    this.velocity.y = vy;
-    this.acceleration.x = ax;
-    this.acceleration.y = ay;
+    this._shape = this._physics.shapeFactory.getShape(opts.hitBounds || opts);
+    this._shape.fixed = opts.fixed || false;
 
-    var hitBounds = opts.hitBounds || this.physics.getBounds(opts);
-    this.hitBounds.x = hitBounds.x || 0;
-    this.hitBounds.y = hitBounds.y || 0;
-    this.hitBounds.radius = hitBounds.radius || 0;
-    this.hitBounds.width = hitBounds.width || 0;
-    this.hitBounds.height = hitBounds.height || 0;
+    this._previous.x = this._shape.x = opts.x !== undefined ? opts.x : this._shape.x;
+    this._previous.y = this._shape.y = opts.y !== undefined ? opts.y : this._shape.y;
 
-    this.circle = opts.circle || false;
-    this.fixed = opts.fixed || false;
+    this._velocity.x = vx;
+    this._velocity.y = vy;
+    this._acceleration.x = ax;
+    this._acceleration.y = ay;
 
-    return this.validate();
+    return this._validate();
   };
 
   /**
@@ -57,9 +48,9 @@ exports = Class(function () {
    * ~ update is called each tick while an entity is active
    */
   this.update = function (dt) {
-    this.previous.x = this.position.x;
-    this.previous.y = this.position.y;
-    this.physics.step(this, dt);
+    this._previous.x = this._shape.x;
+    this._previous.y = this._shape.y;
+    this._physics.step(this, dt);
   };
 
   /**
@@ -68,18 +59,18 @@ exports = Class(function () {
    * ~ by default, only works with circles and axis-aligned rectangles
    */
   this.collidesWith = function (model) {
-    return this.physics.collide(this, model);
+    return this._physics.collide(this, model);
   };
 
   /**
    * ~ REQUIRED
    * ~ resolveCollisionWith guarantees that two models are not colliding
    *   by pushing them apart
-   * ~ entities with fixed = true are never moved
+   * ~ shapes with fixed = true are never moved
    * ~ returns total distance moved to separate the objects
    */
   this.resolveCollisionWith = function (model) {
-    return this.physics.resolveCollision(this, model);
+    return this._physics.resolveCollision(this, model);
   };
 
   /**
@@ -88,22 +79,22 @@ exports = Class(function () {
    * ~ by default, returns a bool, and only works with circles and rects
    */
   this.isInside = function (model) {
-    return this.physics.isInside(this, model);
+    return this._physics.isInside(this, model);
   };
 
   /**
-   * ~ validate warns if a model is improperly configured or broken
+   * ~ _validate warns if a model is improperly configured or broken
    */
-  this.validate = function () {
+  this._validate = function () {
     var valid = true;
-    if (this.circle) {
-      if (this.hitBounds.radius <= 0) {
-        logger.warn("Invalid hit radius:", this.entity.uid, this.hitBounds);
+    if (this._shape.radius !== undefined) {
+      if (this._shape.radius <= 0) {
+        logger.warn("Invalid circle radius:", this._entity.uid, this._shape);
         valid = false;
       }
-    } else {
-      if (this.hitBounds.width <= 0 || this.hitBounds.height <= 0) {
-        logger.warn("Invalid hit dimensions:", this.entity.uid, this.hitBounds);
+    } else if (this._shape.width !== undefined) {
+      if (this._shape.width <= 0 || this._shape.height <= 0) {
+        logger.warn("Invalid rect dimensions:", this._entity.uid, this._shape);
         valid = false;
       }
     }
@@ -111,91 +102,65 @@ exports = Class(function () {
   };
 
   /**
-   * Getters
+   * Public API Extensions
+   * ~ properties exposed for ease of use
    */
 
-  this.getX = function () {
-    return this.position.x;
-  };
+  // expose x position
+  Object.defineProperty(this, 'x', {
+    enumerable: true,
+    get: function () { return this._shape.x; },
+    set: function (value) { this._shape.x = value; }
+  });
 
-  this.getY = function () {
-    return this.position.y;
-  };
+  // expose y position
+  Object.defineProperty(this, 'y', {
+    enumerable: true,
+    get: function () { return this._shape.y; },
+    set: function (value) { this._shape.y = value; }
+  });
 
-  this.setX = function (value) {
-    this.position.x = value;
-  };
+  // expose read-only previous x position
+  utils.addReadOnlyProperty(this, 'previousX', function () {
+    return this._previous.x;
+  });
 
-  this.setY = function (value) {
-    this.position.y = value;
-  };
+  // expose read-only previous y position
+  utils.addReadOnlyProperty(this, 'previousY', function () {
+    return this._previous.y;
+  });
 
-  this.getPreviousX = function () {
-    return this.previous.x;
-  };
+  // expose x velocity
+  Object.defineProperty(this, 'vx', {
+    enumerable: true,
+    get: function () { return this._velocity.x; },
+    set: function (value) { this._velocity.x = value; }
+  });
 
-  this.getPreviousY = function () {
-    return this.previous.y;
-  };
+  // expose y velocity
+  Object.defineProperty(this, 'vy', {
+    enumerable: true,
+    get: function () { return this._velocity.y; },
+    set: function (value) { this._velocity.y = value; }
+  });
 
-  this.getVelocityX = function () {
-    return this.velocity.x;
-  };
+  // expose x acceleration
+  Object.defineProperty(this, 'ax', {
+    enumerable: true,
+    get: function () { return this._acceleration.x; },
+    set: function (value) { this._acceleration.x = value; }
+  });
 
-  this.getVelocityY = function () {
-    return this.velocity.y;
-  };
+  // expose y acceleration
+  Object.defineProperty(this, 'ay', {
+    enumerable: true,
+    get: function () { return this._acceleration.y; },
+    set: function (value) { this._acceleration.y = value; }
+  });
 
-  this.setVelocityX = function (value) {
-    this.velocity.x = value;
-  };
-
-  this.setVelocityY = function (value) {
-    this.velocity.y = value;
-  };
-
-  this.getAccelerationX = function () {
-    return this.acceleration.x;
-  };
-
-  this.getAccelerationY = function () {
-    return this.acceleration.y;
-  };
-
-  this.setAccelerationX = function (value) {
-    this.acceleration.x = value;
-  };
-
-  this.setAccelerationY = function (value) {
-    this.acceleration.y = value;
-  };
-
-  this.getHitX = function () {
-    return this.position.x + this.hitBounds.x;
-  };
-
-  this.getHitY = function () {
-    return this.position.y + this.hitBounds.y;
-  };
-
-  this.getHitWidth = function () {
-    return this.hitBounds.width;
-  };
-
-  this.getHitHeight = function () {
-    return this.hitBounds.height;
-  };
-
-  this.getHitRadius = function () {
-    return this.hitBounds.radius;
-  };
-
-  this.isCircle = function () {
-    return this.circle;
-  };
-
-  this.isFixed = function () {
-    return this.fixed;
-  };
+  // expose read-only shape
+  utils.addReadOnlyProperty(this, 'shape', function () {
+    return this._shape;
+  });
 
 });

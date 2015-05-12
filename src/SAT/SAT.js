@@ -318,6 +318,7 @@
   function Polygon(pos, points) {
     this['pos'] = pos || new Vector();
     this['angle'] = 0;
+    this['scale'] = new Vector(1, 1);
     this['offset'] = new Vector();
     this['pivot'] = new Vector();
     this.setPoints(points || []);
@@ -325,6 +326,11 @@
   SAT['Polygon'] = Polygon;
   
   // Set the points of the polygon.
+  //
+  // Note: The points are counter-clockwise *with respect to the coordinate system*.
+  // If you directly draw the points on a screen that has the origin at the top-left corner
+  // it will _appear_ visually that the points are being specified clockwise. This is just
+  // because of the inversion of the Y-axis when being displayed.
   /**
    * @param {Array.<Vector>=} points An array of vectors representing the points in the polygon,
    *   in counter-clockwise order.
@@ -371,6 +377,17 @@
     this._recalc();
     return this;
   };
+
+  // Set the current scale of the polygon
+  /**
+    * @param {Vector} scale The new scale vector.
+    * @return {Polygon} This for chaining.
+    */
+  Polygon.prototype['setScale'] = Polygon.prototype.setScale = function(scale) {
+    this['scale'] = scale;
+    this._recalc();
+     return this;
+   };
 
   /**
    * @param {Vector} pivot The pivot point.
@@ -445,6 +462,7 @@
     var points = this['points'];
     var offset = this['offset'];
     var angle = this['angle'];
+    var scale = this['scale'];
     var pivot = this['pivot'];
     var len = points.length;
     var i;
@@ -455,6 +473,7 @@
       if (angle !== 0) {
         calcPoint.rotate(angle, pivot);
       }
+      calcPoint.scale(scale.x, scale.y);
     }
     // Calculate the edges/normals
     for (i = 0; i < len; i++) {

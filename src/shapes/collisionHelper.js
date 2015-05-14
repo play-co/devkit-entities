@@ -94,10 +94,10 @@ exports = {
   circleCollidesWithCircle: function (circ1, circ2) {
     var x1 = circ1.x;
     var y1 = circ1.y;
-    var r1 = circ1.radius;
+    var r1 = circ1.shape.radius;
     var x2 = circ2.x;
     var y2 = circ2.y;
-    var r2 = circ2.radius;
+    var r2 = circ2.shape.radius;
     var dx = x2 - x1;
     var dy = y2 - y1;
     var distSqrd = dx * dx + dy * dy;
@@ -109,9 +109,9 @@ exports = {
   circleCollidesWithRect: function (circ, rect) {
     var cx = circ.x;
     var cy = circ.y;
-    var cr = circ.radius;
-    var rwHalf = rect.width / 2;
-    var rhHalf = rect.height / 2;
+    var cr = circ.shape.radius;
+    var rwHalf = rect.shape.width / 2;
+    var rhHalf = rect.shape.height / 2;
     var rx = rect.x + rwHalf;
     var ry = rect.y + rhHalf;
     var dx = abs(cx - rx);
@@ -138,12 +138,12 @@ exports = {
   rectCollidesWithRect: function (rect1, rect2) {
     var x1 = rect1.x;
     var y1 = rect1.y;
-    var xf1 = x1 + rect1.width;
-    var yf1 = y1 + rect1.height;
+    var xf1 = x1 + rect1.shape.width;
+    var yf1 = y1 + rect1.shape.height;
     var x2 = rect2.x;
     var y2 = rect2.y;
-    var xf2 = x2 + rect2.width;
-    var yf2 = y2 + rect2.height;
+    var xf2 = x2 + rect2.shape.width;
+    var yf2 = y2 + rect2.shape.height;
     return x1 <= xf2 && xf1 >= x2 && y1 <= yf2 && yf1 >= y2;
   },
 
@@ -153,11 +153,11 @@ exports = {
   resolveCollidingCircles: function (circ1, circ2) {
     var x1 = circ1.x;
     var y1 = circ1.y;
-    var r1 = circ1.radius;
+    var r1 = circ1.shape.radius;
     var mult1 = 0.5;
     var x2 = circ2.x;
     var y2 = circ2.y;
-    var r2 = circ2.radius;
+    var r2 = circ2.shape.radius;
     var mult2 = 0.5;
     var dx = x2 - x1;
     var dy = y2 - y1;
@@ -198,9 +198,9 @@ exports = {
   resolveCollidingCircleRect: function (circ, rect) {
     var cx = circ.x;
     var cy = circ.y;
-    var cr = circ.radius;
-    var rwHalf = rect.width / 2;
-    var rhHalf = rect.height / 2;
+    var cr = circ.shape.radius;
+    var rwHalf = rect.shape.width / 2;
+    var rhHalf = rect.shape.height / 2;
     var rx = rect.x + rwHalf;
     var ry = rect.y + rhHalf;
     var dx = abs(cx - rx);
@@ -261,15 +261,15 @@ exports = {
   resolveCollidingRects: function (rect1, rect2) {
     var x1 = rect1.x;
     var y1 = rect1.y;
-    var w1 = rect1.width;
-    var h1 = rect1.height;
+    var w1 = rect1.shape.width;
+    var h1 = rect1.shape.height;
     var xf1 = x1 + w1;
     var yf1 = y1 + h1;
     var mult1 = 0.5;
     var x2 = rect2.x;
     var y2 = rect2.y;
-    var w2 = rect2.width;
-    var h2 = rect2.height;
+    var w2 = rect2.shape.width;
+    var h2 = rect2.shape.height;
     var xf2 = x2 + w2;
     var yf2 = y2 + h2;
     var mult2 = 0.5;
@@ -347,10 +347,10 @@ exports = {
   circleInsideCircle: function (circ1, circ2) {
     var x1 = circ1.x;
     var y1 = circ1.y;
-    var r1 = circ1.radius;
+    var r1 = circ1.shape.radius;
     var x2 = circ2.x;
     var y2 = circ2.y;
-    var r2 = circ2.radius;
+    var r2 = circ2.shape.radius;
     var dx = x2 - x1;
     var dy = y2 - y1;
     var dist = sqrt(dx * dx + dy * dy);
@@ -363,7 +363,7 @@ exports = {
   circleInsideRect: function (circ, rect) {
     var cx = circ.x;
     var cy = circ.y;
-    var cr = circ.radius;
+    var cr = circ.shape.radius;
     var tempHitBounds = {
       x: cx - cr,
       y: cy - cr,
@@ -378,9 +378,9 @@ exports = {
    */
   rectInsideCircle: function (rect, circ) {
     var l = rect.x;
-    var r = l + rect.width;
+    var r = l + rect.shape.width;
     var t = rect.y;
-    var b = t + rect.height;
+    var b = t + rect.shape.height;
     return circ.contains(l, t)
         && circ.contains(r, t)
         && circ.contains(r, b)
@@ -392,9 +392,9 @@ exports = {
    */
   rectInsideRect: function (rect1, rect2) {
     var l = rect1.x;
-    var r = l + rect1.width;
+    var r = l + rect1.shape.width;
     var t = rect1.y;
-    var b = t + rect1.height;
+    var b = t + rect1.shape.height;
     return rect2.contains(l, t)
         && rect2.contains(r, t)
         && rect2.contains(r, b)

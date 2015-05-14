@@ -24,17 +24,16 @@ exports = Class(function () {
    */
   this.reset = function (opts) {
     opts = opts || {};
+
+    this._shape = this._physics.shapeFactory.getShape(opts);
+    this._shape.fixed = opts.fixed || false;
+    this._previous.x = this._shape.x;
+    this._previous.y = this._shape.y;
+
     var vx = opts.vx || 0;
     var vy = opts.vy || 0;
     var ax = opts.ax || 0;
     var ay = opts.ay || 0;
-
-    this._shape = this._physics.shapeFactory.getShape(opts.hitBounds || opts);
-    this._shape.fixed = opts.fixed || false;
-
-    this._previous.x = this._shape.x = opts.x !== undefined ? opts.x : this._shape.x;
-    this._previous.y = this._shape.y = opts.y !== undefined ? opts.y : this._shape.y;
-
     this._velocity.x = vx;
     this._velocity.y = vy;
     this._acceleration.x = ax;

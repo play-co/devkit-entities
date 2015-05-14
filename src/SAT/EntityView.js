@@ -1,32 +1,32 @@
 import ..EntityView as EntityView;
 
-exports = Class(EntityView, function(supr) {
+exports = Class(EntityView, function () {
+  var supr = SpriteView.prototype;
 
   this.render = function (ctx) {
-    supr(this, 'render', [ctx]);
+    supr.render.call(this, ctx);
 
-    if (this.debugDraw) {
+    if (this._debugDraw) {
       ctx.save();
-      // Un offset
-      ctx.translate(-this.style.offsetX, -this.style.offsetY);
-      // Un scale
-      ctx.scale(1 / this.style.scale, 1 / this.style.scale);
+
+      // remove offsets and scale
+      var invScale = 1 / this.style.scale;
+      ctx.translate(-this.minX, -this.minY);
+      ctx.scale(invScale, invScale);
 
       // Draw debug lines
       var verts = this._entity.model.shape.calcPoints;
       if (verts.length > 0) {
         ctx.fillStyle = 'rgba(255, 0, 0, 0.5)';
         ctx.beginPath();
-
         ctx.moveTo(verts[0].x, verts[0].y);
-
         for (var i = 1; i < verts.length; i++) {
           ctx.lineTo(verts[i].x, verts[i].y);
         }
-
         ctx.closePath();
         ctx.fill();
       }
+
       ctx.restore();
     }
   };

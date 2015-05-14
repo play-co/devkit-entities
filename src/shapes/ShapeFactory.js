@@ -18,7 +18,8 @@ exports = Class(function () {
     }
 
     if (opts.radius === undefined
-        && (opts.width === undefined || opts.height === undefined)) {
+        && (opts.width === undefined || opts.height === undefined))
+    {
       this.applyDefaultBounds(opts);
     }
 
@@ -56,5 +57,7 @@ exports = Class(function () {
       opts.height = opts.height || (map.h + map.marginTop + map.marginBottom);
       opts.radius = opts.radius || (opts.width + opts.height) / 4;
     }
+
+    return opts;
   };
 });

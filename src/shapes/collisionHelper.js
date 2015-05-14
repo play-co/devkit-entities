@@ -92,11 +92,11 @@ exports = {
   isInside: _genericResolution('Inside', SHAPE_INSIDE_MAP, false),
 
   circleCollidesWithCircle: function (circ1, circ2) {
-    var x1 = circ1.adjX;
-    var y1 = circ1.adjY;
+    var x1 = circ1.x;
+    var y1 = circ1.y;
     var r1 = circ1.radius;
-    var x2 = circ2.adjX;
-    var y2 = circ2.adjY;
+    var x2 = circ2.x;
+    var y2 = circ2.y;
     var r2 = circ2.radius;
     var dx = x2 - x1;
     var dy = y2 - y1;
@@ -107,13 +107,13 @@ exports = {
   },
 
   circleCollidesWithRect: function (circ, rect) {
-    var cx = circ.adjX;
-    var cy = circ.adjY;
+    var cx = circ.x;
+    var cy = circ.y;
     var cr = circ.radius;
     var rwHalf = rect.width / 2;
     var rhHalf = rect.height / 2;
-    var rx = rect.adjX + rwHalf;
-    var ry = rect.adjY + rhHalf;
+    var rx = rect.x + rwHalf;
+    var ry = rect.y + rhHalf;
     var dx = abs(cx - rx);
     var dy = abs(cy - ry);
     if (dx > rwHalf + cr || dy > rhHalf + cr) {
@@ -136,12 +136,12 @@ exports = {
   },
 
   rectCollidesWithRect: function (rect1, rect2) {
-    var x1 = rect1.adjX;
-    var y1 = rect1.adjY;
+    var x1 = rect1.x;
+    var y1 = rect1.y;
     var xf1 = x1 + rect1.width;
     var yf1 = y1 + rect1.height;
-    var x2 = rect2.adjX;
-    var y2 = rect2.adjY;
+    var x2 = rect2.x;
+    var y2 = rect2.y;
     var xf2 = x2 + rect2.width;
     var yf2 = y2 + rect2.height;
     return x1 <= xf2 && xf1 >= x2 && y1 <= yf2 && yf1 >= y2;
@@ -151,12 +151,12 @@ exports = {
    * ~ resolveCollidingCircles forces two circles apart based on their centers
    */
   resolveCollidingCircles: function (circ1, circ2) {
-    var x1 = circ1.adjX;
-    var y1 = circ1.adjY;
+    var x1 = circ1.x;
+    var y1 = circ1.y;
     var r1 = circ1.radius;
     var mult1 = 0.5;
-    var x2 = circ2.adjX;
-    var y2 = circ2.adjY;
+    var x2 = circ2.x;
+    var y2 = circ2.y;
     var r2 = circ2.radius;
     var mult2 = 0.5;
     var dx = x2 - x1;
@@ -196,13 +196,13 @@ exports = {
    *   hitting the side (missing the platform)
    */
   resolveCollidingCircleRect: function (circ, rect) {
-    var cx = circ.adjX;
-    var cy = circ.adjY;
+    var cx = circ.x;
+    var cy = circ.y;
     var cr = circ.radius;
     var rwHalf = rect.width / 2;
     var rhHalf = rect.height / 2;
-    var rx = rect.adjX + rwHalf;
-    var ry = rect.adjY + rhHalf;
+    var rx = rect.x + rwHalf;
+    var ry = rect.y + rhHalf;
     var dx = abs(cx - rx);
     var dy = abs(cy - ry);
     if (dx > rwHalf + cr || dy > rhHalf + cr || (circ.fixed && rect.fixed)) {
@@ -259,15 +259,15 @@ exports = {
    *   hitting the side (missing the platform)
    */
   resolveCollidingRects: function (rect1, rect2) {
-    var x1 = rect1.adjX;
-    var y1 = rect1.adjY;
+    var x1 = rect1.x;
+    var y1 = rect1.y;
     var w1 = rect1.width;
     var h1 = rect1.height;
     var xf1 = x1 + w1;
     var yf1 = y1 + h1;
     var mult1 = 0.5;
-    var x2 = rect2.adjX;
-    var y2 = rect2.adjY;
+    var x2 = rect2.x;
+    var y2 = rect2.y;
     var w2 = rect2.width;
     var h2 = rect2.height;
     var xf2 = x2 + w2;
@@ -345,11 +345,11 @@ exports = {
    * ~ circleInsideCircle returns true if circ1 is fully contained in circ2
    */
   circleInsideCircle: function (circ1, circ2) {
-    var x1 = circ1.adjX;
-    var y1 = circ1.adjY;
+    var x1 = circ1.x;
+    var y1 = circ1.y;
     var r1 = circ1.radius;
-    var x2 = circ2.adjX;
-    var y2 = circ2.adjY;
+    var x2 = circ2.x;
+    var y2 = circ2.y;
     var r2 = circ2.radius;
     var dx = x2 - x1;
     var dy = y2 - y1;
@@ -361,12 +361,12 @@ exports = {
    * ~ circleInsideRect returns true if circ is fully contained in rect
    */
   circleInsideRect: function (circ, rect) {
-    var cx = circ.adjX;
-    var cy = circ.adjY;
+    var cx = circ.x;
+    var cy = circ.y;
     var cr = circ.radius;
     var tempHitBounds = {
-      adjX: cx - cr,
-      adjY: cy - cr,
+      x: cx - cr,
+      y: cy - cr,
       width: 2 * cr,
       height: 2 * cr
     };
@@ -377,9 +377,9 @@ exports = {
    * ~ rectInsideCircle returns true if rect is fully contained in circ
    */
   rectInsideCircle: function (rect, circ) {
-    var l = rect.adjX;
+    var l = rect.x;
     var r = l + rect.width;
-    var t = rect.adjY;
+    var t = rect.y;
     var b = t + rect.height;
     return circ.contains(l, t)
         && circ.contains(r, t)
@@ -391,9 +391,9 @@ exports = {
    * ~ rectInsideRect returns true if rect1 is fully contained in rect2
    */
   rectInsideRect: function (rect1, rect2) {
-    var l = rect1.adjX;
+    var l = rect1.x;
     var r = l + rect1.width;
-    var t = rect1.adjY;
+    var t = rect1.y;
     var b = t + rect1.height;
     return rect2.contains(l, t)
         && rect2.contains(r, t)

@@ -13,6 +13,7 @@ exports = Class(function () {
     this._physics = opts.physics || physics;
 
     this._shape = this._physics.shapeFactory.getShape();
+    this._offset = { x: 0, y: 0 };
     this._previous = { x: 0, y: 0 };
     this._velocity = { x: 0, y: 0 };
     this._acceleration = { x: 0, y: 0 };
@@ -27,17 +28,14 @@ exports = Class(function () {
 
     this._shape = this._physics.shapeFactory.getShape(opts);
     this._shape.fixed = opts.fixed || false;
-    this._previous.x = this._shape.x;
-    this._previous.y = this._shape.y;
-
-    var vx = opts.vx || 0;
-    var vy = opts.vy || 0;
-    var ax = opts.ax || 0;
-    var ay = opts.ay || 0;
-    this._velocity.x = vx;
-    this._velocity.y = vy;
-    this._acceleration.x = ax;
-    this._acceleration.y = ay;
+    this._offset.x = opts.offsetX || 0;
+    this._offset.y = opts.offsetY || 0;
+    this._previous.x = this.x;
+    this._previous.y = this.y;
+    this._velocity.x = opts.vx || 0;
+    this._velocity.y = opts.vy || 0;
+    this._acceleration.x = opts.ax || 0;
+    this._acceleration.y = opts.ay || 0;
 
     return this._validate();
   };
@@ -47,8 +45,8 @@ exports = Class(function () {
    * ~ update is called each tick while an entity is active
    */
   this.update = function (dt) {
-    this._previous.x = this._shape.x;
-    this._previous.y = this._shape.y;
+    this._previous.x = this.x;
+    this._previous.y = this.y;
     this._physics.step(this, dt);
   };
 
@@ -108,15 +106,29 @@ exports = Class(function () {
   // expose x position
   Object.defineProperty(this, 'x', {
     enumerable: true,
-    get: function () { return this._shape.x; },
-    set: function (value) { this._shape.x = value; }
+    get: function () { return this._shape.x + this._offset.x; },
+    set: function (value) { this._shape.x = value - this._offset.x; }
   });
 
   // expose y position
   Object.defineProperty(this, 'y', {
     enumerable: true,
-    get: function () { return this._shape.y; },
-    set: function (value) { this._shape.y = value; }
+    get: function () { return this._shape.y + this._offset.y; },
+    set: function (value) { this._shape.y = value - this._offset.y; }
+  });
+
+  // expose x offset
+  Object.defineProperty(this, 'offsetX', {
+    enumerable: true,
+    get: function () { return this._offset.x; },
+    set: function (value) { this._offset.x = value; }
+  });
+
+  // expose y offset
+  Object.defineProperty(this, 'offsetY', {
+    enumerable: true,
+    get: function () { return this._offset.y; },
+    set: function (value) { this._offset.y = value; }
   });
 
   // expose read-only previous x position

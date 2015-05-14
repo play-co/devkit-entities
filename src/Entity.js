@@ -25,7 +25,7 @@ exports = Class(function () {
     this.uid = this.name + _uid++;
 
     this.model = new this.modelClass(opts);
-    this.view = new this.viewClass(opts);
+    this.view = this.viewClass ? new this.viewClass(opts) : null;
 
     // this flag indicates whether an entity is alive or dead
     this.active = false;
@@ -43,20 +43,23 @@ exports = Class(function () {
    *   ~ destroy makes an entity inactive, hiding and releasing it, if possible
    */
   this.reset = function (opts) {
-    this.model.reset(opts);
-    this.view.reset(opts);
     this.active = true;
+    this.model.reset(opts);
+    this.view && this.view.reset(opts);
   };
 
   this.update = function (dt) {
     this.model.update(dt);
-    this.view.update(dt);
+    this.view && this.view.update(dt);
   };
 
   this.destroy = function () {
-    this._pool && this._pool.release(this);
-    this.view.style.visible = false;
     this.active = false;
+    this._pool && this._pool.release(this);
+    if (this.view) {
+      this.view.stopAnimation();
+      this.view.style.visible = false;
+    }
   };
 
   /**

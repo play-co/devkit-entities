@@ -55,7 +55,6 @@ exports = Class(function () {
     if (map) {
       opts.width = opts.width || (map.w + map.marginLeft + map.marginRight);
       opts.height = opts.height || (map.h + map.marginTop + map.marginBottom);
-      opts.radius = opts.radius || (opts.width + opts.height) / 4;
     }
 
     return opts;

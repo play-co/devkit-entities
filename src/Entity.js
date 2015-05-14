@@ -43,9 +43,14 @@ exports = Class(function () {
    *   ~ destroy makes an entity inactive, hiding and releasing it, if possible
    */
   this.reset = function (opts) {
+    opts = opts || {};
+    var hitOpts = opts.hitOpts || {};
+    var viewOpts = opts.viewOpts || {};
+    hitOpts.x = opts.x || 0;
+    hitOpts.y = opts.y || 0;
     this.active = true;
-    this.model.reset(opts);
-    this.view && this.view.reset(opts);
+    this.model.reset(hitOpts);
+    this.view && this.view.reset(viewOpts);
   };
 
   this.update = function (dt) {

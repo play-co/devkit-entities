@@ -11,8 +11,7 @@ exports = Class(function () {
   this.init = function (opts) {
     this._entity = opts.entity;
     this._physics = opts.physics || physics;
-
-    this._shape = this._physics.shapeFactory.getShape();
+    this._shape = this._physics.shapeFactory.getShape(opts);
     this._offset = { x: 0, y: 0 };
     this._previous = { x: 0, y: 0 };
     this._velocity = { x: 0, y: 0 };
@@ -24,8 +23,6 @@ exports = Class(function () {
    * ~ reset is called when an entity becomes active
    */
   this.reset = function (opts) {
-    opts = opts || {};
-
     this._shape = this._physics.shapeFactory.getShape(opts);
     this._shape.fixed = opts.fixed || false;
     this._offset.x = opts.offsetX || 0;
@@ -36,7 +33,6 @@ exports = Class(function () {
     this._velocity.y = opts.vy || 0;
     this._acceleration.x = opts.ax || 0;
     this._acceleration.y = opts.ay || 0;
-
     return this._validate();
   };
 

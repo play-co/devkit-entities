@@ -25,22 +25,14 @@ exports = Class(SpriteView, function () {
 
     var s = this.style;
     var m = this._entity.model;
-    m._physics.shapeFactory.applyDefaultBounds(opts);
+    opts.width = opts.width || m.shape.width || 2 * (m.shape.radius || 0);
+    opts.height = opts.height || m.shape.height || 2 * (m.shape.radius || 0);
+    this.updateOpts(opts);
+
     s.x = m.x;
     s.y = m.y;
-    s.offsetX = opts.offsetX || 0;
-    s.offsetY = opts.offsetY || 0;
-
-    s.autoSize = opts.autoSize || false;
-    if (!s.autoSize) {
-      s.width = opts.width || 0;
-      s.height = opts.height || 0;
-    }
-
-    // default to center anchors
     s.anchorX = opts.anchorX !== undefined ? opts.anchorX : (s.width || 0) / 2;
     s.anchorY = opts.anchorY !== undefined ? opts.anchorY : (s.height || 0) / 2;
-    s.zIndex = opts.zIndex !== undefined ? opts.zIndex : s.zIndex;
     s.visible = true;
   };
 

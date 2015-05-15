@@ -183,4 +183,28 @@ exports = Class(function () {
   // expose read-only shape
   readOnlyProp(this, 'shape', function () { return this._shape; });
 
+  // expose shape width as a hidden collision helper
+  Object.defineProperty(this, 'width', {
+    enumerable: false,
+    configurable: true,
+    get: function () { return this._shape.width || 0; },
+    set: function (value) { this._shape.width = value; }
+  });
+
+  // expose shape height as a hidden collision helper
+  Object.defineProperty(this, 'height', {
+    enumerable: false,
+    configurable: true,
+    get: function () { return this._shape.height || 0; },
+    set: function (value) { this._shape.height = value; }
+  });
+
+  // expose shape radius as a hidden collision helper
+  Object.defineProperty(this, 'radius', {
+    enumerable: false,
+    configurable: true,
+    get: function () { return this._shape.radius || 0; },
+    set: function (value) { this._shape.radius = value; }
+  });
+
 });

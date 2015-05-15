@@ -1,7 +1,7 @@
 import ..EntityView as EntityView;
 
 exports = Class(EntityView, function () {
-  var supr = SpriteView.prototype;
+  var supr = EntityView.prototype;
 
   this.render = function (ctx) {
     supr.render.call(this, ctx);

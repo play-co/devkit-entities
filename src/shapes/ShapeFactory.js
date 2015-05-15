@@ -13,12 +13,11 @@ exports = Class(function () {
    * returns a new shape
    */
   this.getShape = function (opts) {
-    if (!opts) {
-      return new Shape();
-    }
+    opts = opts || {};
 
     if (opts.radius === undefined
-        && (opts.width === undefined || opts.height === undefined))
+        && (opts.width === undefined
+          || opts.height === undefined))
     {
       this.applyDefaultBounds(opts);
     }
@@ -34,7 +33,6 @@ exports = Class(function () {
    * returns a hit bounds object with defaults based on image or sprite url
    */
   this.applyDefaultBounds = function (opts) {
-    // default bounds to image or sprite frame size if available from opts
     if (!opts) {
       return null;
     }

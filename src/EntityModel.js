@@ -1,6 +1,8 @@
 import .physics;
 import .utils;
 
+var readOnlyProp = utils.addReadOnlyProperty;
+
 exports = Class(function () {
   this.name = "EntityModel";
 
@@ -9,6 +11,7 @@ exports = Class(function () {
    * ~ init is the constructor for each model instance
    */
   this.init = function (opts) {
+    this.fixed = false;
     this._entity = opts.entity;
     this._physics = opts.physics || physics;
     this._shape = this._physics.shapeFactory.getShape(opts);
@@ -31,8 +34,8 @@ exports = Class(function () {
     hitOpts.width = hitOpts.width || opts.width || 0;
     hitOpts.height = hitOpts.height || opts.height || 0;
 
+    this.fixed = hitOpts.fixed || false;
     this._shape = this._physics.shapeFactory.getShape(hitOpts);
-    this._shape.fixed = hitOpts.fixed || false;
     this._offset.x = hitOpts.offsetX;
     this._offset.y = hitOpts.offsetY;
     this._previous.x = this.x;
@@ -110,6 +113,7 @@ exports = Class(function () {
   // expose x position
   Object.defineProperty(this, 'x', {
     enumerable: true,
+    configurable: true,
     get: function () { return this._shape.x + this._offset.x; },
     set: function (value) { this._shape.x = value - this._offset.x; }
   });
@@ -117,6 +121,7 @@ exports = Class(function () {
   // expose y position
   Object.defineProperty(this, 'y', {
     enumerable: true,
+    configurable: true,
     get: function () { return this._shape.y + this._offset.y; },
     set: function (value) { this._shape.y = value - this._offset.y; }
   });
@@ -124,6 +129,7 @@ exports = Class(function () {
   // expose x offset
   Object.defineProperty(this, 'offsetX', {
     enumerable: true,
+    configurable: true,
     get: function () { return this._offset.x; },
     set: function (value) { this._offset.x = value; }
   });
@@ -131,23 +137,21 @@ exports = Class(function () {
   // expose y offset
   Object.defineProperty(this, 'offsetY', {
     enumerable: true,
+    configurable: true,
     get: function () { return this._offset.y; },
     set: function (value) { this._offset.y = value; }
   });
 
   // expose read-only previous x position
-  utils.addReadOnlyProperty(this, 'previousX', function () {
-    return this._previous.x;
-  });
+  readOnlyProp(this, 'previousX', function () { return this._previous.x; });
 
   // expose read-only previous y position
-  utils.addReadOnlyProperty(this, 'previousY', function () {
-    return this._previous.y;
-  });
+  readOnlyProp(this, 'previousY', function () { return this._previous.y; });
 
   // expose x velocity
   Object.defineProperty(this, 'vx', {
     enumerable: true,
+    configurable: true,
     get: function () { return this._velocity.x; },
     set: function (value) { this._velocity.x = value; }
   });
@@ -155,6 +159,7 @@ exports = Class(function () {
   // expose y velocity
   Object.defineProperty(this, 'vy', {
     enumerable: true,
+    configurable: true,
     get: function () { return this._velocity.y; },
     set: function (value) { this._velocity.y = value; }
   });
@@ -162,6 +167,7 @@ exports = Class(function () {
   // expose x acceleration
   Object.defineProperty(this, 'ax', {
     enumerable: true,
+    configurable: true,
     get: function () { return this._acceleration.x; },
     set: function (value) { this._acceleration.x = value; }
   });
@@ -169,13 +175,12 @@ exports = Class(function () {
   // expose y acceleration
   Object.defineProperty(this, 'ay', {
     enumerable: true,
+    configurable: true,
     get: function () { return this._acceleration.y; },
     set: function (value) { this._acceleration.y = value; }
   });
 
   // expose read-only shape
-  utils.addReadOnlyProperty(this, 'shape', function () {
-    return this._shape;
-  });
+  readOnlyProp(this, 'shape', function () { return this._shape; });
 
 });

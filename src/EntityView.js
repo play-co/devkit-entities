@@ -3,6 +3,8 @@ import ui.SpriteView as SpriteView;
 
 import .utils;
 
+var readOnlyProp = utils.addReadOnlyProperty;
+
 exports = Class(SpriteView, function () {
   var supr = SpriteView.prototype;
 
@@ -82,40 +84,43 @@ exports = Class(SpriteView, function () {
    * Helpers
    */
 
-  utils.addReadOnlyProperty(this, 'minX', function () {
+  readOnlyProp(this, 'minX', function () {
    var s = this.style;
    return s.x + s.offsetX;
   });
 
-  utils.addReadOnlyProperty(this, 'maxX', function () {
+  readOnlyProp(this, 'maxX', function () {
    var s = this.style;
    return s.x + s.offsetX + s.width;
   });
 
-  utils.addReadOnlyProperty(this, 'minY', function () {
+  readOnlyProp(this, 'minY', function () {
    var s = this.style;
    return s.y + s.offsetY;
   });
 
-  utils.addReadOnlyProperty(this, 'maxY', function () {
+  readOnlyProp(this, 'maxY', function () {
    var s = this.style;
    return s.y + s.offsetY + s.height;
   });
 
   Object.defineProperty(this, 'width', {
     enumerable: true,
+    configurable: true,
     get: function () { return this.style.width; },
     set: function (value) { this.style.width = value; }
   });
 
   Object.defineProperty(this, 'height', {
     enumerable: true,
+    configurable: true,
     get: function () { return this.style.height; },
     set: function (value) { this.style.height = value; }
   });
 
   Object.defineProperty(this, 'visible', {
     enumerable: true,
+    configurable: true,
     get: function () { return this.style.visible; },
     set: function (value) { this.style.visible = value; }
   });
@@ -144,14 +149,15 @@ exports = Class(SpriteView, function () {
       ctx.scale(invScale, invScale);
 
       // draw debug lines
-      var shape = this._entity.model.shape;
+      var model = this._entity.model;
+      var shape = model.shape;
       ctx.fillStyle = 'rgba(255, 0, 0, 0.5)';
       if (shape.radius) {
         ctx.beginPath();
-        ctx.arc(shape.x, shape.y, shape.radius, 0, 2 * Math.PI, false);
+        ctx.arc(model.x, model.y, shape.radius, 0, 2 * Math.PI, false);
         ctx.fill();
       } else if (shape.width && shape.height) {
-        ctx.fillRect(shape.x, shape.y, shape.width, shape.height);
+        ctx.fillRect(model.x, model.y, shape.width, shape.height);
       }
 
       ctx.restore();

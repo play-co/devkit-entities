@@ -25,6 +25,7 @@ exports = Class(Entity, function(supr) {
   // expose rotation
   Object.defineProperty(this, 'r', {
     enumerable: true,
+    configurable: true,
     get: function () {
       return this.view.style.r;
     },
@@ -37,6 +38,7 @@ exports = Class(Entity, function(supr) {
   // expose scale
   Object.defineProperty(this, 'scale', {
     enumerable: true,
+    configurable: true,
     get: function () {
       return this.view.style.scale;
     },

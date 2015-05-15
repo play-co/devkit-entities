@@ -45,18 +45,19 @@ var SHAPE_INSIDE_MAP = {
 };
 
 var _genericResolution = function(genericName, lookupMap, defaultResult) {
-  return function (shape1, shape2) {
+  return function (model1, model2) {
     var fn = null;
     var result = defaultResult;
-    var map = lookupMap[shape1.name];
+    var map = lookupMap[model1.shape.name];
     if (map) {
-      fn = map[shape2.name];
+      fn = map[model2.shape.name];
     }
 
     if (fn) {
-      result = this[fn](shape1, shape2);
+      result = this[fn](model1, model2);
     } else {
-      logger.warn(genericName + " function not found for:", shape1, shape2);
+      logger.warn(genericName + " function not found for:",
+        model1.shape, model2.shape);
     }
     return result;
   };

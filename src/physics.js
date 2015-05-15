@@ -38,15 +38,21 @@ var Physics = Class(function () {
   };
 
   this.collide = function (entity1, entity2) {
-    return collisionHelper.collide(entity1, entity2);
+    return collisionHelper.collide(
+      entity1.model || entity1,
+      entity2.model || entity2);
   };
 
   this.resolveCollision = function (entity1, entity2) {
-    return collisionHelper.resolveCollision(entity1, entity2);
+    return collisionHelper.resolveCollision(
+      entity1.model || entity1,
+      entity2.model || entity2);
   };
 
   this.isInside = function (entity1, entity2) {
-    return collisionHelper.isInside(entity1, entity2);
+    return collisionHelper.isInside(
+      entity1.model || entity1,
+      entity2.model || entity2);
   };
 
 });

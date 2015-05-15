@@ -44,13 +44,9 @@ exports = Class(function () {
    */
   this.reset = function (opts) {
     opts = opts || {};
-    var hitOpts = opts.hitOpts || {};
-    var viewOpts = opts.viewOpts || {};
-    hitOpts.x = opts.x || 0;
-    hitOpts.y = opts.y || 0;
     this.active = true;
-    this.model.reset(hitOpts);
-    this.view && this.view.reset(viewOpts);
+    this.model.reset(opts);
+    this.view && this.view.reset(opts);
   };
 
   this.update = function (dt) {

@@ -23,10 +23,18 @@ exports = Class(function () {
    * ~ reset is called when an entity becomes active
    */
   this.reset = function (opts) {
-    this._shape = this._physics.shapeFactory.getShape(opts);
-    this._shape.fixed = opts.fixed || false;
-    this._offset.x = opts.offsetX || 0;
-    this._offset.y = opts.offsetY || 0;
+    var hitOpts = opts.hitOpts || opts;
+    hitOpts.x = opts.x || 0;
+    hitOpts.y = opts.y || 0;
+    hitOpts.offsetX = hitOpts.offsetX || opts.offsetX || 0;
+    hitOpts.offsetY = hitOpts.offsetY || opts.offsetY || 0;
+    hitOpts.width = hitOpts.width || opts.width || 0;
+    hitOpts.height = hitOpts.height || opts.height || 0;
+
+    this._shape = this._physics.shapeFactory.getShape(hitOpts);
+    this._shape.fixed = hitOpts.fixed || false;
+    this._offset.x = hitOpts.offsetX;
+    this._offset.y = hitOpts.offsetY;
     this._previous.x = this.x;
     this._previous.y = this.y;
     this._velocity.x = opts.vx || 0;

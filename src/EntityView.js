@@ -21,26 +21,31 @@ exports = Class(SpriteView, function () {
   };
 
   this.reset = function (opts) {
-    this.resetAllAnimations(opts);
+    var viewOpts = opts.viewOpts || opts;
+    viewOpts.offsetX = viewOpts.offsetX || opts.offsetX || 0;
+    viewOpts.offsetY = viewOpts.offsetY || opts.offsetY || 0;
+    viewOpts.width = viewOpts.width || opts.width || 0;
+    viewOpts.height = viewOpts.height || opts.height || 0;
+    this.resetAllAnimations(viewOpts);
+
+    var shape = this._entity.model.shape;
+    viewOpts.width = viewOpts.width || shape.width || 2 * (shape.radius || 0);
+    viewOpts.height = viewOpts.height || shape.height || 2 * (shape.radius || 0);
+    viewOpts.anchorX = viewOpts.anchorX !== undefined ? viewOpts.anchorX : viewOpts.width / 2;
+    viewOpts.anchorY = viewOpts.anchorY !== undefined ? viewOpts.anchorY : viewOpts.height / 2;
+    this.updateOpts(viewOpts);
 
     var s = this.style;
-    var m = this._entity.model;
-    opts.width = opts.width || m.shape.width || 2 * (m.shape.radius || 0);
-    opts.height = opts.height || m.shape.height || 2 * (m.shape.radius || 0);
-    this.updateOpts(opts);
-
-    s.x = m.x;
-    s.y = m.y;
-    s.anchorX = opts.anchorX !== undefined ? opts.anchorX : (s.width || 0) / 2;
-    s.anchorY = opts.anchorY !== undefined ? opts.anchorY : (s.height || 0) / 2;
+    s.x = shape.x;
+    s.y = shape.y;
     s.visible = true;
   };
 
   this.update = function (dt) {
+    var shape = this._entity.model.shape;
     var s = this.style;
-    var m = this._entity.model;
-    s.x = m.x;
-    s.y = m.y;
+    s.x = shape.x;
+    s.y = shape.y;
   };
 
   /**

@@ -1,14 +1,10 @@
 import ui.resource.loader as loader;
 var _imageMap = loader.getMap();
 
-import math.geom.Point as Point;
-import math.geom.Vec2D as Vec2D;
-
-import .Shape;
 import .Rect;
 import .Circle;
 
-exports = Class(function () {
+var ShapeFactory = Class(function () {
   /**
    * returns a new shape
    */
@@ -16,10 +12,9 @@ exports = Class(function () {
     opts = opts || {};
 
     if (opts.radius === undefined
-        && (opts.width === undefined
-          || opts.height === undefined))
+      && (opts.width === undefined || opts.height === undefined))
     {
-      this.applyDefaultBounds(opts);
+      this.applyImageDimensions(opts);
     }
 
     if (opts.radius !== undefined) {
@@ -30,9 +25,22 @@ exports = Class(function () {
   };
 
   /**
+   * updates an opts object for default view dimensions based on art
+   */
+  this.applyDefaultViewOpts = function (opts) {
+    opts = opts || {};
+
+    if (opts.width === undefined || opts.height === undefined) {
+      this.applyImageDimensions(opts);
+    }
+
+    return opts;
+  };
+
+  /**
    * returns a hit bounds object with defaults based on image or sprite url
    */
-  this.applyDefaultBounds = function (opts) {
+  this.applyImageDimensions = function (opts) {
     if (!opts) {
       return null;
     }
@@ -49,7 +57,7 @@ exports = Class(function () {
       }
     }
 
-    var map = _imageMap[img];
+    var map = _imageMap[img || url];
     if (map) {
       opts.width = opts.width || (map.w + map.marginLeft + map.marginRight);
       opts.height = opts.height || (map.h + map.marginTop + map.marginBottom);
@@ -58,3 +66,12 @@ exports = Class(function () {
     return opts;
   };
 });
+
+// class exposed for inheritance
+exports = ShapeFactory;
+
+// used as a singleton
+var _instance = new ShapeFactory();
+exports.get = function () {
+  return _instance;
+};

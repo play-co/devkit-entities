@@ -2,7 +2,9 @@ import ui.ImageView as ImageView;
 import ui.SpriteView as SpriteView;
 
 import .utils;
+import .shapes.ShapeFactory as ShapeFactory;
 
+var shapes = ShapeFactory.get();
 var readOnlyProp = utils.addReadOnlyProperty;
 
 exports = Class(SpriteView, function () {
@@ -23,18 +25,15 @@ exports = Class(SpriteView, function () {
   };
 
   this.reset = function (opts) {
-    var viewOpts = opts.viewOpts || opts;
+    var viewOpts = shapes.applyDefaultViewOpts(opts.viewOpts || opts);
+    var shape = this._entity.model.shape;
     viewOpts.offsetX = viewOpts.offsetX || opts.offsetX || 0;
     viewOpts.offsetY = viewOpts.offsetY || opts.offsetY || 0;
     viewOpts.width = viewOpts.width || opts.width || 0;
     viewOpts.height = viewOpts.height || opts.height || 0;
-    this.resetAllAnimations(viewOpts);
-
-    var shape = this._entity.model.shape;
-    viewOpts.width = viewOpts.width || shape.width || 2 * (shape.radius || 0);
-    viewOpts.height = viewOpts.height || shape.height || 2 * (shape.radius || 0);
     viewOpts.anchorX = viewOpts.anchorX !== undefined ? viewOpts.anchorX : viewOpts.width / 2;
     viewOpts.anchorY = viewOpts.anchorY !== undefined ? viewOpts.anchorY : viewOpts.height / 2;
+    this.resetAllAnimations(viewOpts);
     this.updateOpts(viewOpts);
 
     var s = this.style;

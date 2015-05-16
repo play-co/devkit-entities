@@ -3,6 +3,8 @@ import ..EntityView as EntityView;
 exports = Class(EntityView, function () {
   var supr = EntityView.prototype;
 
+  this.name = "SATEntityView";
+
   this.render = function (ctx) {
     supr.render.call(this, ctx);
 

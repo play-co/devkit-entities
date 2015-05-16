@@ -1,7 +1,3 @@
-import .Shape as Shape;
-import .Rect as Rect;
-import .Circle as Circle;
-
 var min = Math.min;
 var max = Math.max;
 var abs = Math.abs;
@@ -215,10 +211,9 @@ exports = {
       var tempHitBounds = {
         x: cx - cr,
         y: cy - cr,
-        w: 2 * cr,
-        h: 2 * cr
+        width: 2 * cr,
+        height: 2 * cr
       };
-
       var dd = this.resolveCollidingRects(rect, tempHitBounds);
       return dd;
     } else {

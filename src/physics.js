@@ -1,13 +1,7 @@
-import .shapes.ShapeFactory as ShapeFactory;
 import .shapes.collisionHelper as collisionHelper;
 
 var Physics = Class(function () {
-
-  this.init = function (opts) {
-    opts = opts || {};
-
-    this.shapeFactory = opts.shapeFactory || new ShapeFactory();
-  };
+  this.init = function (opts) {};
 
   /**
    * ~ REQUIRED

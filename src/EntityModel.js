@@ -1,6 +1,8 @@
 import .physics;
 import .utils;
+import .shapes.ShapeFactory as ShapeFactory;
 
+var shapes = ShapeFactory.get();
 var readOnlyProp = utils.addReadOnlyProperty;
 
 exports = Class(function () {
@@ -11,14 +13,20 @@ exports = Class(function () {
    * ~ init is the constructor for each model instance
    */
   this.init = function (opts) {
+    // public props
     this.fixed = false;
+
+    // private props
+    this._shape = null;
     this._entity = opts.entity;
-    this._physics = opts.physics || physics;
-    this._shape = this._physics.shapeFactory.getShape(opts);
     this._offset = { x: 0, y: 0 };
     this._previous = { x: 0, y: 0 };
     this._velocity = { x: 0, y: 0 };
     this._acceleration = { x: 0, y: 0 };
+  };
+
+  this._initShape = function (opts) {
+    this._shape = shapes.getShape(opts);
   };
 
   /**
@@ -26,16 +34,16 @@ exports = Class(function () {
    * ~ reset is called when an entity becomes active
    */
   this.reset = function (opts) {
-    var hitOpts = opts.hitOpts || opts;
+    var hitOpts = opts.hitOpts = opts.hitOpts || {};
     hitOpts.x = opts.x || 0;
     hitOpts.y = opts.y || 0;
     hitOpts.offsetX = hitOpts.offsetX || opts.offsetX || 0;
     hitOpts.offsetY = hitOpts.offsetY || opts.offsetY || 0;
     hitOpts.width = hitOpts.width || opts.width || 0;
     hitOpts.height = hitOpts.height || opts.height || 0;
+    this._initShape(hitOpts);
 
     this.fixed = hitOpts.fixed || false;
-    this._shape = this._physics.shapeFactory.getShape(hitOpts);
     this._offset.x = hitOpts.offsetX;
     this._offset.y = hitOpts.offsetY;
     this._previous.x = this.x;
@@ -54,7 +62,7 @@ exports = Class(function () {
   this.update = function (dt) {
     this._previous.x = this.x;
     this._previous.y = this.y;
-    this._physics.step(this, dt);
+    physics.step(this, dt);
   };
 
   /**
@@ -63,7 +71,7 @@ exports = Class(function () {
    * ~ by default, only works with circles and axis-aligned rectangles
    */
   this.collidesWith = function (model) {
-    return this._physics.collide(this, model);
+    return physics.collide(this, model);
   };
 
   /**
@@ -74,7 +82,7 @@ exports = Class(function () {
    * ~ returns total distance moved to separate the objects
    */
   this.resolveCollisionWith = function (model) {
-    return this._physics.resolveCollision(this, model);
+    return physics.resolveCollision(this, model);
   };
 
   /**
@@ -83,7 +91,7 @@ exports = Class(function () {
    * ~ by default, returns a bool, and only works with circles and rects
    */
   this.isInside = function (model) {
-    return this._physics.isInside(this, model);
+    return physics.isInside(this, model);
   };
 
   /**

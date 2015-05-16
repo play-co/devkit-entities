@@ -5,7 +5,7 @@ import .utils;
 var _uid = 1;
 var readOnlyProp = utils.addReadOnlyProperty;
 
-exports = Class(function () {
+var Entity = exports = Class(function () {
   /**
    * Entity Prototype Properties
    * ~ these properties are class-wide, not instance-specific
@@ -163,3 +163,13 @@ exports = Class(function () {
   readOnlyProp(this, 'viewMaxY', function () { return (this.view && this.view.maxY) || 0; });
 
 });
+
+// global show all hit bounds
+Entity.showHitBounds = function () {
+  EntityView.prototype._debugDraw = true;
+};
+
+// global hide all hit bounds
+Entity.hideHitBounds = function () {
+  EntityView.prototype._debugDraw = true;
+};

@@ -11,6 +11,7 @@ exports = Class(SpriteView, function () {
   var supr = SpriteView.prototype;
 
   this.name = "EntityView";
+  this._debugDraw = false;
 
   this.init = function (opts) {
     opts.tag = opts.tag || opts.entity.uid;
@@ -141,6 +142,24 @@ exports = Class(SpriteView, function () {
 
     if (this._debugDraw) {
       ctx.save();
+
+      // remove flips if necessary
+      if (this.style.flipX || this.style.flipY) {
+        ctx.translate(
+          this.style.flipX ? this.style.width / 2 : 0,
+          this.style.flipY ? this.style.height / 2 : 0
+        );
+
+        ctx.scale(
+          this.style.flipX ? -1 : 1,
+          this.style.flipY ? -1 : 1
+        );
+
+        ctx.translate(
+          this.style.flipX ? -this.style.width / 2 : 0,
+          this.style.flipY ? -this.style.height / 2 : 0
+        );
+      }
 
       // remove offsets and scale
       var invScale = 1 / this.style.scale;

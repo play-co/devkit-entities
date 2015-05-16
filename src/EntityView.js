@@ -2,14 +2,16 @@ import ui.ImageView as ImageView;
 import ui.SpriteView as SpriteView;
 
 import .utils;
+import .shapes.ShapeFactory as ShapeFactory;
 
-// entities module image path (for showing hit bounds)
-var IMG_PATH = "addons/devkit-entities/images/";
+var shapes = ShapeFactory.get();
+var readOnlyProp = utils.addReadOnlyProperty;
 
-exports = Class(SpriteView, function (supr) {
-  var superPrototype = SpriteView.prototype;
+exports = Class(SpriteView, function () {
+  var supr = SpriteView.prototype;
 
   this.name = "EntityView";
+  this._debugDraw = false;
 
   this.init = function (opts) {
     opts.tag = opts.tag || opts.entity.uid;
@@ -20,37 +22,32 @@ exports = Class(SpriteView, function (supr) {
       opts.image = opts.image || opts.url;
     }
 
-    superPrototype.init.call(this, opts);
+    supr.init.call(this, opts);
   };
 
   this.reset = function (opts) {
-    this.resetAllAnimations(opts);
+    var viewOpts = shapes.applyDefaultViewOpts(opts.viewOpts || opts);
+    var shape = this._entity.model.shape;
+    viewOpts.offsetX = viewOpts.offsetX || opts.offsetX || 0;
+    viewOpts.offsetY = viewOpts.offsetY || opts.offsetY || 0;
+    viewOpts.width = viewOpts.width || opts.width || 0;
+    viewOpts.height = viewOpts.height || opts.height || 0;
+    viewOpts.anchorX = viewOpts.anchorX !== undefined ? viewOpts.anchorX : viewOpts.width / 2;
+    viewOpts.anchorY = viewOpts.anchorY !== undefined ? viewOpts.anchorY : viewOpts.height / 2;
+    this.resetAllAnimations(viewOpts);
+    this.updateOpts(viewOpts);
 
     var s = this.style;
-    var m = this._entity.model;
-    var b = opts.viewBounds || m._physics.shapeFactory.applyDefaultBounds(opts);
-    s.x = m.x;
-    s.y = m.y;
-    s.offsetX = opts.offsetX || s.offsetX || 0;
-    s.offsetY = opts.offsetY || s.offsetY || 0;
-    s.anchorX = opts.anchorX || s.anchorX || 0;
-    s.anchorY = opts.anchorY || s.anchorY || 0;
-
-    s.autoSize = opts.autoSize !== undefined ? opts.autoSize : (!opts.width && !opts.height);
-    if (!s.autoSize) {
-      s.width = opts.width || b.width || s.width;
-      s.height = opts.height || b.height || s.height;
-    }
-
-    s.zIndex = opts.zIndex !== void 0 ? opts.zIndex : s.zIndex;
+    s.x = shape.x;
+    s.y = shape.y;
     s.visible = true;
   };
 
   this.update = function (dt) {
+    var shape = this._entity.model.shape;
     var s = this.style;
-    var m = this._entity.model;
-    s.x = m.x;
-    s.y = m.y;
+    s.x = shape.x;
+    s.y = shape.y;
   };
 
   /**
@@ -61,7 +58,7 @@ exports = Class(SpriteView, function (supr) {
     this._validateSprite(opts);
 
     if (this.isSprite) {
-      superPrototype.resetAllAnimations.call(this, opts);
+      supr.resetAllAnimations.call(this, opts);
       this.setImage(this._animations[opts.defaultAnimation].frames[0]);
     } else {
       // setImage is expensive, so only call it if we have to
@@ -75,7 +72,7 @@ exports = Class(SpriteView, function (supr) {
 
   this.startAnimation = function (name, opts) {
     if (this.isSprite && this._animations[name]) {
-      superPrototype.startAnimation.call(this, name, opts);
+      supr.startAnimation.call(this, name, opts);
     }
   };
 
@@ -87,40 +84,43 @@ exports = Class(SpriteView, function (supr) {
    * Helpers
    */
 
-  utils.addReadOnlyProperty(this, 'minX', function () {
+  readOnlyProp(this, 'minX', function () {
    var s = this.style;
    return s.x + s.offsetX;
   });
 
-  utils.addReadOnlyProperty(this, 'maxX', function () {
+  readOnlyProp(this, 'maxX', function () {
    var s = this.style;
    return s.x + s.offsetX + s.width;
   });
 
-  utils.addReadOnlyProperty(this, 'minY', function () {
+  readOnlyProp(this, 'minY', function () {
    var s = this.style;
    return s.y + s.offsetY;
   });
 
-  utils.addReadOnlyProperty(this, 'maxY', function () {
+  readOnlyProp(this, 'maxY', function () {
    var s = this.style;
    return s.y + s.offsetY + s.height;
   });
 
   Object.defineProperty(this, 'width', {
     enumerable: true,
+    configurable: true,
     get: function () { return this.style.width; },
     set: function (value) { this.style.width = value; }
   });
 
   Object.defineProperty(this, 'height', {
     enumerable: true,
+    configurable: true,
     get: function () { return this.style.height; },
     set: function (value) { this.style.height = value; }
   });
 
   Object.defineProperty(this, 'visible', {
     enumerable: true,
+    configurable: true,
     get: function () { return this.style.visible; },
     set: function (value) { this.style.visible = value; }
   });
@@ -130,59 +130,54 @@ exports = Class(SpriteView, function (supr) {
    */
 
   this.showHitBounds = function () {
-    if (!this.hitBoundsView) {
-      this.hitBoundsView = new ImageView({ parent: this });
-    } else {
-      this.hitBoundsView.style.visible = true;
-    }
-
-    var s = this.style;
-    var m = this._entity.model;
-    var shape = m.shape;
-    var hbvs = this.hitBoundsView.style;
-    if (shape.radius !== undefined) {
-      var r = shape.radius;
-      hbvs.x = -s.offsetX - r;
-      hbvs.y = -s.offsetY - r;
-      hbvs.width = 2 * r;
-      hbvs.height = 2 * r;
-      this.hitBoundsView.setImage(IMG_PATH + "shapeCircle.png");
-    } else {
-      hbvs.x = -s.offsetX + shape.x;
-      hbvs.y = -s.offsetY + shape.y;
-      hbvs.width = shape.width;
-      hbvs.height = shape.height;
-      this.hitBoundsView.setImage(IMG_PATH + "shapeRect.png");
-    }
+    this._debugDraw = true;
   };
 
   this.hideHitBounds = function () {
-    if (this.hitBoundsView) {
-      this.hitBoundsView.style.visible = false;
-    }
+    this._debugDraw = false;
   };
 
   this.render = function (ctx) {
-    supr(this, 'render', [ctx]);
+    supr.render.call(this, ctx);
 
-    if (this.debugDraw) {
+    if (this._debugDraw) {
       ctx.save();
-      // Un offset
-      ctx.translate(-this.style.x-this.style.offsetX, -this.style.y-this.style.offsetY);
-      // Un scale
-      ctx.scale(1 / this.style.scale, 1 / this.style.scale);
 
-      // Draw debug lines
-      var shape = this._entity.model.shape;
+      // remove flips if necessary
+      if (this.style.flipX || this.style.flipY) {
+        ctx.translate(
+          this.style.flipX ? this.style.width / 2 : 0,
+          this.style.flipY ? this.style.height / 2 : 0
+        );
 
-      ctx.fillStyle = 'rgba(255, 0, 0, 0.4)';
+        ctx.scale(
+          this.style.flipX ? -1 : 1,
+          this.style.flipY ? -1 : 1
+        );
+
+        ctx.translate(
+          this.style.flipX ? -this.style.width / 2 : 0,
+          this.style.flipY ? -this.style.height / 2 : 0
+        );
+      }
+
+      // remove offsets and scale
+      var invScale = 1 / this.style.scale;
+      ctx.translate(-this.minX, -this.minY);
+      ctx.scale(invScale, invScale);
+
+      // draw debug lines
+      var model = this._entity.model;
+      var shape = model.shape;
+      ctx.fillStyle = 'rgba(255, 0, 0, 0.5)';
       if (shape.radius) {
         ctx.beginPath();
-        ctx.arc(shape.adjX, shape.adjY, shape.radius, 0, 2 * Math.PI, false);
+        ctx.arc(model.x, model.y, shape.radius, 0, 2 * Math.PI, false);
         ctx.fill();
       } else if (shape.width && shape.height) {
-        ctx.fillRect(shape.adjX, shape.adjY, shape.width, shape.height);
+        ctx.fillRect(model.x, model.y, shape.width, shape.height);
       }
+
       ctx.restore();
     }
   };

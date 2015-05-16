@@ -1,25 +1,33 @@
-
 import ..EntityModel;
 import .SAT;
+import .ShapeFactory;
 
-exports = Class(EntityModel, function (supr) {
+var shapes = ShapeFactory.get();
 
-  this.reset = function(opts) {
-    supr(this, 'reset', [opts]);
+exports = Class(EntityModel, function () {
+  var supr = EntityModel.prototype;
 
-    this.shape.setPivot(new SAT.Vector(
-        (opts.anchorX || 0) + opts.x, (opts.anchorY || 0) + opts.y
-      ));
+  this.name = "SATEntityModel";
+
+  this._initShape = function (opts) {
+    this._shape = shapes.getShape(opts);
+  };
+
+  this.reset = function (opts) {
+    supr.reset.call(this, opts);
+
+    var pivot = new SAT.Vector(
+      (opts.anchorX || 0) + opts.x,
+      (opts.anchorY || 0) + opts.y);
+    this._shape.setPivot(pivot);
 
     // Make sure that offsets are correct on the polygon (if it is one)
-    if (this.shape instanceof SAT.Polygon) {
-      this.shape.setOffset(new SAT.Vector(
-          (opts.offsetX || 0), (opts.offsetY || 0)
-        ));
+    if (this._shape instanceof SAT.Polygon) {
+      var offset = new SAT.Vector((opts.offsetX || 0), (opts.offsetY || 0));
+      this._shape.setOffset(offset);
 
-      this.shape.setScale(new SAT.Vector(
-          (opts.scale || 1), (opts.scale || 1)
-        ));
+      var scale = new SAT.Vector((opts.scale || 1), (opts.scale || 1));
+      this._shape.setScale(scale);
     }
   };
 });

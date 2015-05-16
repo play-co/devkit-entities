@@ -1,13 +1,11 @@
 import .SAT;
-
 import ..shapes.ShapeFactory as ShapeFactory;
-import ..shapes.Circle as Circle;
 
 var PI = Math.PI;
 var TAU = 2 * PI;
 var random = Math.random;
 
-exports = Class(ShapeFactory, function () {
+var SATShapeFactory = Class(ShapeFactory, function () {
   // Ensure that all points are SAT points
   this.getPoints = function(points) {
     var res = [];
@@ -84,3 +82,12 @@ exports = Class(ShapeFactory, function () {
     return res;
   };
 });
+
+// class exposed for inheritance
+exports = SATShapeFactory;
+
+// used as a singleton
+var _instance = new SATShapeFactory();
+exports.get = function () {
+  return _instance;
+};

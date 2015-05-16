@@ -2,8 +2,11 @@ import .Shape;
 import ..utils;
 
 var random = Math.random;
+var readOnlyProp = utils.addReadOnlyProperty;
 
-exports = Class(Shape, function (supr) {
+exports = Class(Shape, function () {
+  var supr = Shape.prototype;
+
   this.name = "Rect";
 
   /**
@@ -18,59 +21,55 @@ exports = Class(Shape, function (supr) {
     */
   this.init = function (opts) {
     opts = opts || {};
-    supr(this, "init", [opts]);
+    supr.init.call(this, opts);
 
     /** @var {number} Rect#width */
     this.width = opts.width || 0;
     /** @var {number} Rect#height */
     this.height = opts.height || 0;
-
-    utils.addReadOnlyObject(this, 'bounds', {
-      minX: function () { return this.adjX; },
-      minY: function () { return this.adjY; },
-      maxX: function () { return this.adjX + this.width; },
-      maxY: function () { return this.adjY + this.height; }
-    });
-
-    utils.addReadOnlyObject(this, 'center', {
-      x: function () { return this.adjX + this.width / 2; },
-      y: function () { return this.adjY + this.height / 2; }
-    });
   };
 
+  /** @var {number} Rect#minX
+      @readOnly */
+  readOnlyProp(this, 'minX', function () { return this.x; });
+  /** @var {number} Rect#maxX
+      @readOnly */
+  readOnlyProp(this, 'maxX', function () { return this.x + this.width; });
+  /** @var {number} Rect#minY
+      @readOnly */
+  readOnlyProp(this, 'minY', function () { return this.y; });
+  /** @var {number} Rect#maxY
+      @readOnly */
+  readOnlyProp(this, 'maxY', function () { return this.y + this.height; });
+
+  /** @var {number} Rect#centerX
+      @readOnly */
+  readOnlyProp(this, 'centerX', function () { return this.x + this.width / 2; });
+  /** @var {number} Rect#centerY
+      @readOnly */
+  readOnlyProp(this, 'centerY', function () { return this.y + this.height / 2; });
+
+  /** @var {number} Rect#top
+      @readOnly */
+  readOnlyProp(this, 'top', function () { return this.y; });
+  /** @var {number} Rect#right
+      @readOnly */
+  readOnlyProp(this, 'right', function () { return this.x + this.width; });
+  /** @var {number} Rect#bottom
+      @readOnly */
+  readOnlyProp(this, 'bottom', function () { return this.y + this.height; });
+  /** @var {number} Rect#left
+      @readOnly */
+  readOnlyProp(this, 'left', function () { return this.x; });
+
   this.contains = function (x, y) {
-    return x >= this.left && x <= this.right
-      && y >= this.top && y <= this.bottom;
+    return x >= this.left && x <= this.right && y >= this.top && y <= this.bottom;
   };
 
   this.getRandomPoint = function () {
     return {
-      x: this.adjX + random() * this.width,
-      y: this.adjY + random() * this.height
+      x: this.x + random() * this.width,
+      y: this.y + random() * this.height
     };
   };
-
-  /** @func Rect#top
-      @returns {number} */
-  utils.addReadOnlyProperty(this, 'top', function () {
-    return this.adjY;
-  });
-
-  /** @func Rect#right
-      @returns {number} */
-  utils.addReadOnlyProperty(this, 'right', function () {
-    return this.adjX + this.width;
-  });
-
-  /** @func Rect#bottom
-      @returns {number} */
-  utils.addReadOnlyProperty(this, 'bottom', function () {
-    return this.adjY + this.height;
-  });
-
-  /** @func Rect#left
-      @returns {number} */
-  utils.addReadOnlyProperty(this, 'left', function () {
-    return this.adjX;
-  });
 });

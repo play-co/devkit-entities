@@ -1,5 +1,9 @@
 import .physics;
 import .utils;
+import .shapes.ShapeFactory as ShapeFactory;
+
+var shapes = ShapeFactory.get();
+var readOnlyProp = utils.addReadOnlyProperty;
 
 exports = Class(function () {
   this.name = "EntityModel";
@@ -9,13 +13,20 @@ exports = Class(function () {
    * ~ init is the constructor for each model instance
    */
   this.init = function (opts) {
-    this._entity = opts.entity;
-    this._physics = opts.physics || physics;
+    // public props
+    this.fixed = false;
 
-    this._shape = this._physics.shapeFactory.getShape();
+    // private props
+    this._shape = null;
+    this._entity = opts.entity;
+    this._offset = { x: 0, y: 0 };
     this._previous = { x: 0, y: 0 };
     this._velocity = { x: 0, y: 0 };
     this._acceleration = { x: 0, y: 0 };
+  };
+
+  this._initShape = function (opts) {
+    this._shape = shapes.getShape(opts);
   };
 
   /**
@@ -23,23 +34,24 @@ exports = Class(function () {
    * ~ reset is called when an entity becomes active
    */
   this.reset = function (opts) {
-    opts = opts || {};
-    var vx = opts.vx || 0;
-    var vy = opts.vy || 0;
-    var ax = opts.ax || 0;
-    var ay = opts.ay || 0;
+    var hitOpts = opts.hitOpts = opts.hitOpts || {};
+    hitOpts.x = opts.x || 0;
+    hitOpts.y = opts.y || 0;
+    hitOpts.offsetX = hitOpts.offsetX || opts.offsetX || 0;
+    hitOpts.offsetY = hitOpts.offsetY || opts.offsetY || 0;
+    hitOpts.width = hitOpts.width || opts.width || 0;
+    hitOpts.height = hitOpts.height || opts.height || 0;
+    this._initShape(hitOpts);
 
-    this._shape = this._physics.shapeFactory.getShape(opts.hitBounds || opts);
-    this._shape.fixed = opts.fixed || false;
-
-    this._previous.x = this._shape.x = opts.x !== undefined ? opts.x : this._shape.x;
-    this._previous.y = this._shape.y = opts.y !== undefined ? opts.y : this._shape.y;
-
-    this._velocity.x = vx;
-    this._velocity.y = vy;
-    this._acceleration.x = ax;
-    this._acceleration.y = ay;
-
+    this.fixed = hitOpts.fixed || false;
+    this._offset.x = hitOpts.offsetX;
+    this._offset.y = hitOpts.offsetY;
+    this._previous.x = this.x;
+    this._previous.y = this.y;
+    this._velocity.x = opts.vx || 0;
+    this._velocity.y = opts.vy || 0;
+    this._acceleration.x = opts.ax || 0;
+    this._acceleration.y = opts.ay || 0;
     return this._validate();
   };
 
@@ -48,9 +60,9 @@ exports = Class(function () {
    * ~ update is called each tick while an entity is active
    */
   this.update = function (dt) {
-    this._previous.x = this._shape.x;
-    this._previous.y = this._shape.y;
-    this._physics.step(this, dt);
+    this._previous.x = this.x;
+    this._previous.y = this.y;
+    physics.step(this, dt);
   };
 
   /**
@@ -59,7 +71,7 @@ exports = Class(function () {
    * ~ by default, only works with circles and axis-aligned rectangles
    */
   this.collidesWith = function (model) {
-    return this._physics.collide(this, model);
+    return physics.collide(this, model);
   };
 
   /**
@@ -70,7 +82,7 @@ exports = Class(function () {
    * ~ returns total distance moved to separate the objects
    */
   this.resolveCollisionWith = function (model) {
-    return this._physics.resolveCollision(this, model);
+    return physics.resolveCollision(this, model);
   };
 
   /**
@@ -79,7 +91,7 @@ exports = Class(function () {
    * ~ by default, returns a bool, and only works with circles and rects
    */
   this.isInside = function (model) {
-    return this._physics.isInside(this, model);
+    return physics.isInside(this, model);
   };
 
   /**
@@ -109,30 +121,45 @@ exports = Class(function () {
   // expose x position
   Object.defineProperty(this, 'x', {
     enumerable: true,
-    get: function () { return this._shape.x; },
-    set: function (value) { this._shape.x = value; }
+    configurable: true,
+    get: function () { return this._shape.x + this._offset.x; },
+    set: function (value) { this._shape.x = value - this._offset.x; }
   });
 
   // expose y position
   Object.defineProperty(this, 'y', {
     enumerable: true,
-    get: function () { return this._shape.y; },
-    set: function (value) { this._shape.y = value; }
+    configurable: true,
+    get: function () { return this._shape.y + this._offset.y; },
+    set: function (value) { this._shape.y = value - this._offset.y; }
+  });
+
+  // expose x offset
+  Object.defineProperty(this, 'offsetX', {
+    enumerable: true,
+    configurable: true,
+    get: function () { return this._offset.x; },
+    set: function (value) { this._offset.x = value; }
+  });
+
+  // expose y offset
+  Object.defineProperty(this, 'offsetY', {
+    enumerable: true,
+    configurable: true,
+    get: function () { return this._offset.y; },
+    set: function (value) { this._offset.y = value; }
   });
 
   // expose read-only previous x position
-  utils.addReadOnlyProperty(this, 'previousX', function () {
-    return this._previous.x;
-  });
+  readOnlyProp(this, 'previousX', function () { return this._previous.x; });
 
   // expose read-only previous y position
-  utils.addReadOnlyProperty(this, 'previousY', function () {
-    return this._previous.y;
-  });
+  readOnlyProp(this, 'previousY', function () { return this._previous.y; });
 
   // expose x velocity
   Object.defineProperty(this, 'vx', {
     enumerable: true,
+    configurable: true,
     get: function () { return this._velocity.x; },
     set: function (value) { this._velocity.x = value; }
   });
@@ -140,6 +167,7 @@ exports = Class(function () {
   // expose y velocity
   Object.defineProperty(this, 'vy', {
     enumerable: true,
+    configurable: true,
     get: function () { return this._velocity.y; },
     set: function (value) { this._velocity.y = value; }
   });
@@ -147,6 +175,7 @@ exports = Class(function () {
   // expose x acceleration
   Object.defineProperty(this, 'ax', {
     enumerable: true,
+    configurable: true,
     get: function () { return this._acceleration.x; },
     set: function (value) { this._acceleration.x = value; }
   });
@@ -154,13 +183,36 @@ exports = Class(function () {
   // expose y acceleration
   Object.defineProperty(this, 'ay', {
     enumerable: true,
+    configurable: true,
     get: function () { return this._acceleration.y; },
     set: function (value) { this._acceleration.y = value; }
   });
 
   // expose read-only shape
-  utils.addReadOnlyProperty(this, 'shape', function () {
-    return this._shape;
+  readOnlyProp(this, 'shape', function () { return this._shape; });
+
+  // expose shape width as a hidden collision helper
+  Object.defineProperty(this, 'width', {
+    enumerable: false,
+    configurable: true,
+    get: function () { return this._shape.width; },
+    set: function (value) { this._shape.width = value; }
+  });
+
+  // expose shape height as a hidden collision helper
+  Object.defineProperty(this, 'height', {
+    enumerable: false,
+    configurable: true,
+    get: function () { return this._shape.height; },
+    set: function (value) { this._shape.height = value; }
+  });
+
+  // expose shape radius as a hidden collision helper
+  Object.defineProperty(this, 'radius', {
+    enumerable: false,
+    configurable: true,
+    get: function () { return this._shape.radius; },
+    set: function (value) { this._shape.radius = value; }
   });
 
 });

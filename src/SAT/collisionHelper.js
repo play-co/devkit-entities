@@ -17,8 +17,6 @@ var COLLISION_OFFSET = 0.001;
  * developer to manage the time step of his/her game to prevent this behavior
  */
 exports = {
-  name: "SATPhysics",
-
   // anchor (pivot) point, offset from the primary point
   this.anchorX = 0;
   this.anchorY = 0;

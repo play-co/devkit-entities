@@ -1,13 +1,7 @@
-import .shapes.ShapeFactory as ShapeFactory;
 import .shapes.collisionHelper as collisionHelper;
 
 var Physics = Class(function () {
-
-  this.init = function (opts) {
-    opts = opts || {};
-
-    this.shapeFactory = opts.shapeFactory || new ShapeFactory();
-  };
+  this.init = function (opts) {};
 
   /**
    * ~ REQUIRED
@@ -39,23 +33,20 @@ var Physics = Class(function () {
 
   this.collide = function (entity1, entity2) {
     return collisionHelper.collide(
-        (entity1.shape || entity1),
-        (entity2.shape || entity2)
-      );
+      entity1.model || entity1,
+      entity2.model || entity2);
   };
 
   this.resolveCollision = function (entity1, entity2) {
     return collisionHelper.resolveCollision(
-        (entity1.shape || entity1),
-        (entity2.shape || entity2)
-      );
+      entity1.model || entity1,
+      entity2.model || entity2);
   };
 
   this.isInside = function (entity1, entity2) {
     return collisionHelper.isInside(
-        (entity1.shape || entity1),
-        (entity2.shape || entity2)
-      );
+      entity1.model || entity1,
+      entity2.model || entity2);
   };
 
 });

@@ -1,5 +1,7 @@
 import ..utils;
 
+var readOnlyProp = utils.addReadOnlyProperty;
+
 exports = Class(function () {
   this.name = "Shape";
 
@@ -16,41 +18,27 @@ exports = Class(function () {
     this.x = opts.x || 0;
     /** @var {number} Shape#y */
     this.y = opts.y || 0;
-
-    this.offsetX = opts.offsetX || 0;
-    this.offsetY = opts.offsetY || 0;
-
-    utils.addReadOnlyProperty(this, 'adjX', function() { return this.x + this.offsetX; });
-    utils.addReadOnlyProperty(this, 'adjY', function() { return this.y + this.offsetY; });
-
-    // TODO: make the bounds properties on the shape, nothing is really gained from having
-    //         one more dot in the way
-    /**
-     * @var {Object} Shape#bounds
-     * @property {Number} minX
-     * @property {Number} minY
-     * @property {Number} maxX
-     * @property {Number} maxY
-     * @readOnly
-     */
-    utils.addReadOnlyObject(this, 'bounds', {
-      minX: function () { return this.adjX; },
-      minY: function () { return this.adjY; },
-      maxX: function () { return this.adjX; },
-      maxY: function () { return this.adjY; }
-    });
-
-    /**
-     * @var {Object} Shape#center
-     * @property {Number} x
-     * @property {Number} y
-     * @readOnly
-     */
-    utils.addReadOnlyObject(this, 'center', {
-      x: function () { return this.adjX; },
-      y: function () { return this.adjY; }
-    });
   };
+
+  /** @var {number} Shape#minX
+      @readOnly */
+  readOnlyProp(this, 'minX', function () { return this.x; });
+  /** @var {number} Shape#maxX
+      @readOnly */
+  readOnlyProp(this, 'maxX', function () { return this.x; });
+  /** @var {number} Shape#minY
+      @readOnly */
+  readOnlyProp(this, 'minY', function () { return this.y; });
+  /** @var {number} Shape#maxY
+      @readOnly */
+  readOnlyProp(this, 'maxY', function () { return this.y; });
+
+  /** @var {number} Shape#centerX
+      @readOnly */
+  readOnlyProp(this, 'centerX', function () { return this.x; });
+  /** @var {number} Shape#centerY
+      @readOnly */
+  readOnlyProp(this, 'centerY', function () { return this.y; });
 
   /**
     * returns if arg x and y are on the shape
@@ -59,8 +47,8 @@ exports = Class(function () {
     * @arg {Number} y
     * @returns {Boolean} result
     */
-  this.contains = function(x, y) {
-    return x === this.adjX && y === this.adjY;
+  this.contains = function (x, y) {
+    return x === this.x && y === this.y;
   };
 
   /**
@@ -71,8 +59,8 @@ exports = Class(function () {
     */
   this.getRandomPoint = function () {
     return {
-      x: this.adjX,
-      y: this.adjY
+      x: this.x,
+      y: this.y
     };
   };
 
@@ -89,8 +77,4 @@ exports = Class(function () {
     * @todo not yet implemented
     */
   // this.getNearestPoint = function(x, y) {};
-
-  // this.translate = function(dx, dy) {};
-  // this.rotate = function(deg, anchorX, anchorY) {};
-  // this.scale = function(dScale, anchorX, anchorY) {};
 });

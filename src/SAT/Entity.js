@@ -1,30 +1,25 @@
 import ..Entity;
-
 import .EntityModel as SATEntityModel;
 import .EntityView as SATEntityView;
-import .physics as SATPhysics;
 
 var DEG_TO_RAD = (Math.PI / 180);
 
-exports = Class(Entity, function(supr) {
+exports = Class(Entity, function () {
+  var supr = Entity.prototype;
 
+  this.name = "SATEntity";
   this.modelClass = SATEntityModel;
   this.viewClass = SATEntityView;
 
-  this.init = function(opts) {
+  this.init = function (opts) {
     opts = opts || {};
-    opts.physics = SATPhysics;
-    supr(this, 'init', [opts]);
-  };
-
-  this.reset = function(opts) {
-    opts.hitBounds = opts.satBounds || opts.hitBounds;
-    supr(this, 'reset', [opts]);
+    supr.init.call(this, opts);
   };
 
   // expose rotation
   Object.defineProperty(this, 'r', {
     enumerable: true,
+    configurable: true,
     get: function () {
       return this.view.style.r;
     },
@@ -37,6 +32,7 @@ exports = Class(Entity, function(supr) {
   // expose scale
   Object.defineProperty(this, 'scale', {
     enumerable: true,
+    configurable: true,
     get: function () {
       return this.view.style.scale;
     },

@@ -13,7 +13,6 @@
     "buildTargets": {},
     "clientPaths": {
       "entities": "src"
-    },
-    "extensions": {}
+    }
   }
 }

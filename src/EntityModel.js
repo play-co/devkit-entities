@@ -195,7 +195,7 @@ exports = Class(function () {
   Object.defineProperty(this, 'width', {
     enumerable: false,
     configurable: true,
-    get: function () { return this._shape.width || 0; },
+    get: function () { return this._shape.width; },
     set: function (value) { this._shape.width = value; }
   });
 
@@ -203,7 +203,7 @@ exports = Class(function () {
   Object.defineProperty(this, 'height', {
     enumerable: false,
     configurable: true,
-    get: function () { return this._shape.height || 0; },
+    get: function () { return this._shape.height; },
     set: function (value) { this._shape.height = value; }
   });
 
@@ -211,7 +211,7 @@ exports = Class(function () {
   Object.defineProperty(this, 'radius', {
     enumerable: false,
     configurable: true,
-    get: function () { return this._shape.radius || 0; },
+    get: function () { return this._shape.radius; },
     set: function (value) { this._shape.radius = value; }
   });
 

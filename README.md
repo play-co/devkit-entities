@@ -1,6 +1,9 @@
 DevKit Entities Module
 ======================
 
+The README is currently out-of-date :)
+TODO: Bring it up to date!
+
 `Entity` serves as a base class for game elements in DevKit. It provides functionality for coordinates in a game-space; circular and rectangular bounds for offsetting views and hitboxes; implicit view management; basic physics including velocity, acceleration, and collisions; and a lifecycle interface to easily facilitate pooling.
 
 This module includes the [Entity](https://github.com/gameclosure/devkit-entities/blob/master/src/Entity.js) base class, [EntityPhysics](https://github.com/gameclosure/devkit-entities/blob/master/src/EntityPhysics.js) as a default physics component, and [EntityPool](https://github.com/gameclosure/devkit-entities/blob/master/src/EntityPool.js) to efficiently recycle entities. Thanks to [@tuanna222](https://github.com/tuanna222) for adding [SATPhysics](https://github.com/gameclosure/devkit-entities/blob/master/src/SATPhysics.js) based on [SAT.js](https://github.com/jriecken/sat-js) as an optional advanced physics implementation.

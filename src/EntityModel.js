@@ -122,16 +122,16 @@ exports = Class(function () {
   Object.defineProperty(this, 'x', {
     enumerable: true,
     configurable: true,
-    get: function () { return this._shape.x + this._offset.x; },
-    set: function (value) { this._shape.x = value - this._offset.x; }
+    get: function () { return this._shape.x - this._offset.x; },
+    set: function (value) { this._shape.x = value + this._offset.x; }
   });
 
   // expose y position
   Object.defineProperty(this, 'y', {
     enumerable: true,
     configurable: true,
-    get: function () { return this._shape.y + this._offset.y; },
-    set: function (value) { this._shape.y = value - this._offset.y; }
+    get: function () { return this._shape.y - this._offset.y; },
+    set: function (value) { this._shape.y = value + this._offset.y; }
   });
 
   // expose x offset

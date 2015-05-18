@@ -52,7 +52,7 @@ var _genericResolution = function(genericName, lookupMap, defaultResult) {
     }
 
     if (fn) {
-      result = this[fn](model1, model2);
+      result = this[fn](shape1, shape2);
     } else {
       logger.warn(genericName + " function not found for:", shape1, shape2);
     }

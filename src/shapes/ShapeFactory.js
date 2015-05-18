@@ -10,14 +10,11 @@ var ShapeFactory = Class(function () {
    */
   this.getShape = function (opts) {
     opts = opts || {};
-
-    if (opts.radius === undefined
-      && (opts.width === undefined || opts.height === undefined))
-    {
+    if (!opts.radius) {
       this.applyImageDimensions(opts);
     }
 
-    if (opts.radius !== undefined) {
+    if (opts.radius) {
       return new Circle(opts);
     } else {
       return new Rect(opts);
@@ -29,11 +26,7 @@ var ShapeFactory = Class(function () {
    */
   this.applyDefaultViewOpts = function (opts) {
     opts = opts || {};
-
-    if (opts.width === undefined || opts.height === undefined) {
-      this.applyImageDimensions(opts);
-    }
-
+    this.applyImageDimensions(opts);
     return opts;
   };
 
@@ -57,10 +50,21 @@ var ShapeFactory = Class(function () {
       }
     }
 
+    // auto-size based on provided width and/or height
     var map = _imageMap[img || url];
     if (map) {
-      opts.width = opts.width || (map.w + map.marginLeft + map.marginRight);
-      opts.height = opts.height || (map.h + map.marginTop + map.marginBottom);
+      var imgWidth = map.w + map.marginLeft + map.marginRight;
+      var imgHeight = map.h + map.marginTop + map.marginBottom;
+      if (!opts.width && !opts.height) {
+        opts.width = imgWidth;
+        opts.height = imgHeight;
+      } else if (!opts.width) {
+        var scale = opts.height / imgHeight;
+        opts.width = scale * imgWidth;
+      } else if (!opts.height) {
+        var scale = opts.width / imgWidth;
+        opts.height = scale * imgHeight;
+      }
     }
 
     return opts;

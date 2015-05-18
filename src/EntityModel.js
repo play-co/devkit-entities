@@ -52,6 +52,10 @@ exports = Class(function () {
     this._velocity.y = opts.vy || 0;
     this._acceleration.x = opts.ax || 0;
     this._acceleration.y = opts.ay || 0;
+
+    // set position last since it's dependent on offset and shape
+    this.x = opts.x;
+    this.y = opts.y;
     return this._validate();
   };
 

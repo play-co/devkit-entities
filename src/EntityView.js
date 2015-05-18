@@ -27,7 +27,7 @@ exports = Class(SpriteView, function () {
 
   this.reset = function (opts) {
     var viewOpts = shapes.applyDefaultViewOpts(opts.viewOpts || opts);
-    var shape = this._entity.model.shape;
+    var model = this._entity.model;
     viewOpts.offsetX = viewOpts.offsetX || opts.offsetX || 0;
     viewOpts.offsetY = viewOpts.offsetY || opts.offsetY || 0;
     viewOpts.width = viewOpts.width || opts.width || 0;
@@ -38,16 +38,16 @@ exports = Class(SpriteView, function () {
     this.updateOpts(viewOpts);
 
     var s = this.style;
-    s.x = shape.x;
-    s.y = shape.y;
+    s.x = model.x;
+    s.y = model.y;
     s.visible = true;
   };
 
   this.update = function (dt) {
-    var shape = this._entity.model.shape;
+    var model = this._entity.model;
     var s = this.style;
-    s.x = shape.x;
-    s.y = shape.y;
+    s.x = model.x;
+    s.y = model.y;
   };
 
   /**
@@ -172,10 +172,10 @@ exports = Class(SpriteView, function () {
       ctx.fillStyle = 'rgba(255, 0, 0, 0.5)';
       if (shape.radius) {
         ctx.beginPath();
-        ctx.arc(model.x, model.y, shape.radius, 0, 2 * Math.PI, false);
+        ctx.arc(shape.x, shape.y, shape.radius, 0, 2 * Math.PI, false);
         ctx.fill();
       } else if (shape.width && shape.height) {
-        ctx.fillRect(model.x, model.y, shape.width, shape.height);
+        ctx.fillRect(shape.x, shape.y, shape.width, shape.height);
       }
 
       ctx.restore();

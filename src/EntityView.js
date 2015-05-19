@@ -63,12 +63,7 @@ exports = Class(SpriteView, function () {
       supr.resetAllAnimations.call(this, opts);
       this.setImage(this._animations[opts.defaultAnimation].frames[0]);
     } else {
-      // setImage is expensive, so only call it if we have to
-      var image = opts.image || opts.url;
-      if (image && this.setImage && this._currImage !== image) {
-        this.setImage(image);
-        this._currImage = image;
-      }
+      this.setImage(opts.image || opts.url);
     }
   };
 

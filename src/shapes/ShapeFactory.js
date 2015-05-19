@@ -10,9 +10,10 @@ var ShapeFactory = Class(function () {
    */
   this.getShape = function (opts) {
     var hitOpts = opts.hitOpts;
+    var viewOpts = opts.viewOpts || opts;
     if (!hitOpts.radius) {
-      hitOpts.image = opts.image || opts.viewOpts.image;
-      hitOpts.url = opts.url || opts.viewOpts.url;
+      hitOpts.image = viewOpts.image;
+      hitOpts.url = viewOpts.url;
       this.applyImageDimensions(hitOpts);
     }
 

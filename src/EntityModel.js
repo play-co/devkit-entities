@@ -41,7 +41,7 @@ exports = Class(function () {
     hitOpts.offsetY = hitOpts.offsetY || opts.offsetY || 0;
     hitOpts.width = hitOpts.width || opts.width || 0;
     hitOpts.height = hitOpts.height || opts.height || 0;
-    this._initShape(hitOpts);
+    this._initShape(opts);
 
     this.fixed = hitOpts.fixed || false;
     this._offset.x = hitOpts.offsetX;

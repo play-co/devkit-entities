@@ -26,7 +26,9 @@ exports = Class(SpriteView, function () {
   };
 
   this.reset = function (opts) {
-    var viewOpts = shapes.applyDefaultViewOpts(opts.viewOpts || opts);
+    var viewOpts = opts.viewOpts = opts.viewOpts || opts;
+    shapes.applyImageDimensions(viewOpts);
+
     var model = this._entity.model;
     viewOpts.offsetX = viewOpts.offsetX || opts.offsetX || 0;
     viewOpts.offsetY = viewOpts.offsetY || opts.offsetY || 0;

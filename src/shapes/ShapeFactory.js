@@ -9,25 +9,18 @@ var ShapeFactory = Class(function () {
    * returns a new shape
    */
   this.getShape = function (opts) {
-    opts = opts || {};
-    if (!opts.radius) {
-      this.applyImageDimensions(opts);
+    var hitOpts = opts.hitOpts;
+    if (!hitOpts.radius) {
+      hitOpts.image = opts.image;
+      hitOpts.url = opts.url;
+      this.applyImageDimensions(hitOpts);
     }
 
-    if (opts.radius) {
-      return new Circle(opts);
+    if (hitOpts.radius) {
+      return new Circle(hitOpts);
     } else {
-      return new Rect(opts);
+      return new Rect(hitOpts);
     }
-  };
-
-  /**
-   * updates an opts object for default view dimensions based on art
-   */
-  this.applyDefaultViewOpts = function (opts) {
-    opts = opts || {};
-    this.applyImageDimensions(opts);
-    return opts;
   };
 
   /**

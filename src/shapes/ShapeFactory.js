@@ -11,8 +11,8 @@ var ShapeFactory = Class(function () {
   this.getShape = function (opts) {
     var hitOpts = opts.hitOpts;
     if (!hitOpts.radius) {
-      hitOpts.image = opts.image || viewOpts.image;
-      hitOpts.url = opts.url || viewOpts.url;
+      hitOpts.image = opts.image || opts.viewOpts.image;
+      hitOpts.url = opts.url || opts.viewOpts.url;
       this.applyImageDimensions(hitOpts);
     }
 

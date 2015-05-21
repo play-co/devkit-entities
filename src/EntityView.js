@@ -29,6 +29,8 @@ exports = Class(SpriteView, function () {
     var viewOpts = opts.viewOpts = opts.viewOpts || opts;
     shapes.applyImageDimensions(viewOpts);
 
+    this.clipRect = opts.clipRect || null;
+
     var model = this._entity.model;
     viewOpts.offsetX = viewOpts.offsetX || opts.offsetX || 0;
     viewOpts.offsetY = viewOpts.offsetY || opts.offsetY || 0;
@@ -135,7 +137,20 @@ exports = Class(SpriteView, function () {
   };
 
   this.render = function (ctx) {
+
+    if (this.clipRect) {
+      ctx.save();
+      ctx.clipRect(
+        this.clipRect.x - this.style.offsetX,
+        this.clipRect.y - this.style.offsetY,
+        this.clipRect.width,
+        this.clipRect.height
+      );
+    }
+
     supr.render.call(this, ctx);
+
+    if (this.clipRect) { ctx.restore(); }
 
     if (this._debugDraw) {
       ctx.save();

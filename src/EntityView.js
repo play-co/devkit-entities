@@ -29,7 +29,7 @@ exports = Class(SpriteView, function () {
     var viewOpts = opts.viewOpts = opts.viewOpts || opts;
     shapes.applyImageDimensions(viewOpts);
 
-    this.clipRect = opts.clipRect;
+    this.clipRect = opts.clipRect || null;
 
     var model = this._entity.model;
     viewOpts.offsetX = viewOpts.offsetX || opts.offsetX || 0;

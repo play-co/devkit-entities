@@ -123,6 +123,38 @@ var Entity = exports = Class(function () {
     set: function (value) { this.model.ay = value; }
   });
 
+  // expose model width
+  Object.defineProperty(this, 'width', {
+    enumerable: true,
+    configurable: true,
+    get: function () {
+      return this.model.width || 2 * this.model.radius || 0;
+    },
+    set: function (value) {
+      if (this.model.radius !== undefined) {
+        this.model.radius = value / 2;
+      } else {
+        this.model.width = value;
+      }
+    }
+  });
+
+  // expose model height
+  Object.defineProperty(this, 'height', {
+    enumerable: true,
+    configurable: true,
+    get: function () {
+      return this.model.height || 2 * this.model.radius || 0;
+    },
+    set: function (value) {
+      if (this.model.radius !== undefined) {
+        this.model.radius = value / 2;
+      } else {
+        this.model.height = value;
+      }
+    }
+  });
+
   // expose the model's fixed property
   Object.defineProperty(this, 'fixed', {
     enumerable: true,

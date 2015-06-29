@@ -155,6 +155,18 @@ var Entity = exports = Class(function () {
     }
   });
 
+  // expose read-only left-most x-coordinate of the model
+  readOnlyProp(this, 'minX', function () { return this.model.minX; });
+
+  // expose read-only right-most x-coordinate of the model
+  readOnlyProp(this, 'maxX', function () { return this.model.maxX; });
+
+  // expose read-only top-most y-coordinate of the model
+  readOnlyProp(this, 'minY', function () { return this.model.minY; });
+
+  // expose read-only bottom-most y-coordinate of the model
+  readOnlyProp(this, 'maxY', function () { return this.model.maxY; });
+
   // expose the model's fixed property
   Object.defineProperty(this, 'fixed', {
     enumerable: true,

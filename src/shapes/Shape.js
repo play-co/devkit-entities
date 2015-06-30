@@ -14,29 +14,31 @@ exports = Class(function () {
   this.init = function (opts) {
     opts = opts || {};
 
-    /** @var {number} Shape#x */
+    /** @var {Number} Shape#x */
     this.x = opts.x || 0;
-    /** @var {number} Shape#y */
+    /** @var {Number} Shape#y */
     this.y = opts.y || 0;
+    /** @var {Boolean} Shape#fixed */
+    this.fixed = opts.fixed || false;
   };
 
-  /** @var {number} Shape#minX
+  /** @var {Number} Shape#minX
       @readOnly */
   readOnlyProp(this, 'minX', function () { return this.x; });
-  /** @var {number} Shape#maxX
+  /** @var {Number} Shape#maxX
       @readOnly */
   readOnlyProp(this, 'maxX', function () { return this.x; });
-  /** @var {number} Shape#minY
+  /** @var {Number} Shape#minY
       @readOnly */
   readOnlyProp(this, 'minY', function () { return this.y; });
-  /** @var {number} Shape#maxY
+  /** @var {Number} Shape#maxY
       @readOnly */
   readOnlyProp(this, 'maxY', function () { return this.y; });
 
-  /** @var {number} Shape#centerX
+  /** @var {Number} Shape#centerX
       @readOnly */
   readOnlyProp(this, 'centerX', function () { return this.x; });
-  /** @var {number} Shape#centerY
+  /** @var {Number} Shape#centerY
       @readOnly */
   readOnlyProp(this, 'centerY', function () { return this.y; });
 

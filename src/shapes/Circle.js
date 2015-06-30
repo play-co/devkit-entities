@@ -27,27 +27,27 @@ exports = Class(Shape, function () {
     opts = opts || {};
     supr.init.call(this, opts);
 
-    /** @var {number} Circle#radius */
+    /** @var {Number} Circle#radius */
     this.radius = opts.radius || 0;
   };
 
-  /** @var {number} Circle#minX
+  /** @var {Number} Circle#minX
       @readOnly */
   readOnlyProp(this, 'minX', function () { return this.x - this.radius; });
-  /** @var {number} Circle#maxX
+  /** @var {Number} Circle#maxX
       @readOnly */
   readOnlyProp(this, 'maxX', function () { return this.x + this.radius; });
-  /** @var {number} Circle#minY
+  /** @var {Number} Circle#minY
       @readOnly */
   readOnlyProp(this, 'minY', function () { return this.y - this.radius; });
-  /** @var {number} Circle#maxY
+  /** @var {Number} Circle#maxY
       @readOnly */
   readOnlyProp(this, 'maxY', function () { return this.y + this.radius; });
 
-  /** @var {number} Circle#centerX
+  /** @var {Number} Circle#centerX
       @readOnly */
   readOnlyProp(this, 'centerX', function () { return this.x; });
-  /** @var {number} Circle#centerY
+  /** @var {Number} Circle#centerY
       @readOnly */
   readOnlyProp(this, 'centerY', function () { return this.y; });
 

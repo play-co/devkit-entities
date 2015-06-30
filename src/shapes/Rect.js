@@ -23,42 +23,42 @@ exports = Class(Shape, function () {
     opts = opts || {};
     supr.init.call(this, opts);
 
-    /** @var {number} Rect#width */
+    /** @var {Number} Rect#width */
     this.width = opts.width || 0;
-    /** @var {number} Rect#height */
+    /** @var {Number} Rect#height */
     this.height = opts.height || 0;
   };
 
-  /** @var {number} Rect#minX
+  /** @var {Number} Rect#minX
       @readOnly */
   readOnlyProp(this, 'minX', function () { return this.x; });
-  /** @var {number} Rect#maxX
+  /** @var {Number} Rect#maxX
       @readOnly */
   readOnlyProp(this, 'maxX', function () { return this.x + this.width; });
-  /** @var {number} Rect#minY
+  /** @var {Number} Rect#minY
       @readOnly */
   readOnlyProp(this, 'minY', function () { return this.y; });
-  /** @var {number} Rect#maxY
+  /** @var {Number} Rect#maxY
       @readOnly */
   readOnlyProp(this, 'maxY', function () { return this.y + this.height; });
 
-  /** @var {number} Rect#centerX
+  /** @var {Number} Rect#centerX
       @readOnly */
   readOnlyProp(this, 'centerX', function () { return this.x + this.width / 2; });
-  /** @var {number} Rect#centerY
+  /** @var {Number} Rect#centerY
       @readOnly */
   readOnlyProp(this, 'centerY', function () { return this.y + this.height / 2; });
 
-  /** @var {number} Rect#top
+  /** @var {Number} Rect#top
       @readOnly */
   readOnlyProp(this, 'top', function () { return this.y; });
-  /** @var {number} Rect#right
+  /** @var {Number} Rect#right
       @readOnly */
   readOnlyProp(this, 'right', function () { return this.x + this.width; });
-  /** @var {number} Rect#bottom
+  /** @var {Number} Rect#bottom
       @readOnly */
   readOnlyProp(this, 'bottom', function () { return this.y + this.height; });
-  /** @var {number} Rect#left
+  /** @var {Number} Rect#left
       @readOnly */
   readOnlyProp(this, 'left', function () { return this.x; });
 

@@ -206,6 +206,23 @@ var Entity = exports = Class(function () {
   // expose read-only bottom-most y-coordinate of the view
   readOnlyProp(this, 'viewMaxY', function () { return (this.view && this.view.maxY) || 0; });
 
+  /**
+   * Physics API Extensions
+   * ~ handy shortcut functions for physics
+   */
+
+  this.collidesWith = function (entity) {
+    this.model.collidesWith(entity.model || entity);
+  };
+
+  this.resolveCollisionWith = function (entity) {
+    this.model.resolveCollisionWith(entity.model || entity);
+  };
+
+  this.isInside = function (entity) {
+    this.model.isInside(entity.model || entity);
+  };
+
 });
 
 // global show all hit bounds

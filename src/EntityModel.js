@@ -13,10 +13,6 @@ exports = Class(function () {
    * ~ init is the constructor for each model instance
    */
   this.init = function (opts) {
-    // public props
-    this.fixed = false;
-
-    // private props
     this._shape = null;
     this._entity = opts.entity;
     this._offset = { x: 0, y: 0 };
@@ -43,7 +39,6 @@ exports = Class(function () {
     hitOpts.height = hitOpts.height || opts.height || 0;
     this._initShape(opts);
 
-    this.fixed = hitOpts.fixed || false;
     this._offset.x = hitOpts.offsetX;
     this._offset.y = hitOpts.offsetY;
     this._previous.x = this.x;
@@ -190,6 +185,14 @@ exports = Class(function () {
     configurable: true,
     get: function () { return this._acceleration.y; },
     set: function (value) { this._acceleration.y = value; }
+  });
+
+  // expose the shape's fixed property
+  Object.defineProperty(this, 'fixed', {
+    enumerable: true,
+    configurable: true,
+    get: function () { return this._shape.fixed; },
+    set: function (value) { this._shape.fixed = value; }
   });
 
   // expose read-only shape

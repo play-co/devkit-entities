@@ -103,6 +103,34 @@ exports = Class(SpriteView, function () {
    return s.y + s.offsetY + s.height;
   });
 
+  Object.defineProperty(this, 'x', {
+    enumerable: true,
+    configurable: true,
+    get: function () { return this.style.x; },
+    set: function (value) { this.style.x = value; }
+  });
+
+  Object.defineProperty(this, 'y', {
+    enumerable: true,
+    configurable: true,
+    get: function () { return this.style.y; },
+    set: function (value) { this.style.y = value; }
+  });
+
+  Object.defineProperty(this, 'offsetX', {
+    enumerable: true,
+    configurable: true,
+    get: function () { return this.style.offsetX; },
+    set: function (value) { this.style.offsetX = value; }
+  });
+
+  Object.defineProperty(this, 'offsetY', {
+    enumerable: true,
+    configurable: true,
+    get: function () { return this.style.offsetY; },
+    set: function (value) { this.style.offsetY = value; }
+  });
+
   Object.defineProperty(this, 'width', {
     enumerable: true,
     configurable: true,

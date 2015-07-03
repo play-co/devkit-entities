@@ -212,9 +212,12 @@ exports = {
         x: cx - cr,
         y: cy - cr,
         width: 2 * cr,
-        height: 2 * cr
+        height: 2 * cr,
+        fixed: circ.fixed
       };
       var dd = this.resolveCollidingRects(rect, tempHitBounds);
+      circ.x = tempHitBounds.x + cr;
+      circ.y = tempHitBounds.y + cr;
       return dd;
     } else {
       // corner case: the two meet at a rect corner, push them away

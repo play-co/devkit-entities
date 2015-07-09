@@ -38,6 +38,7 @@ exports = Class(SpriteView, function () {
     viewOpts.height = viewOpts.height || opts.height || 0;
     viewOpts.anchorX = viewOpts.anchorX !== undefined ? viewOpts.anchorX : viewOpts.width / 2;
     viewOpts.anchorY = viewOpts.anchorY !== undefined ? viewOpts.anchorY : viewOpts.height / 2;
+    viewOpts.opacity = viewOpts.opacity !== undefined ? viewOpts.opacity : 1;
     viewOpts.compositeOperation = viewOpts.compositeOperation || "";
     this.resetAllAnimations(viewOpts);
     this.updateOpts(viewOpts);

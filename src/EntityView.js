@@ -170,7 +170,6 @@ exports = Class(SpriteView, function () {
   };
 
   this.render = function (ctx) {
-
     if (this.clipRect) {
       ctx.save();
       ctx.clipRect(

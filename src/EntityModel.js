@@ -223,15 +223,15 @@ exports = Class(function () {
   });
 
   // expose read-only left-most x-coordinate of the shape
-  readOnlyProp(this, 'minX', function () { return this._shape.minX - this._offset.x; });
+  readOnlyProp(this, 'minX', function () { return this._shape.minX; });
 
   // expose read-only right-most x-coordinate of the shape
-  readOnlyProp(this, 'maxX', function () { return this._shape.maxX - this._offset.x; });
+  readOnlyProp(this, 'maxX', function () { return this._shape.maxX; });
 
   // expose read-only top-most y-coordinate of the shape
-  readOnlyProp(this, 'minY', function () { return this._shape.minY - this._offset.y; });
+  readOnlyProp(this, 'minY', function () { return this._shape.minY; });
 
   // expose read-only bottom-most y-coordinate of the shape
-  readOnlyProp(this, 'maxY', function () { return this._shape.maxY - this._offset.y; });
+  readOnlyProp(this, 'maxY', function () { return this._shape.maxY; });
 
 });

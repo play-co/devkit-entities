@@ -33,7 +33,6 @@ var ShapeFactory = Class(function () {
       return null;
     }
 
-    // TODO: This assumes image is a string. Should probably check for this?
     var imageId = opts.image || opts.url;
     if (!imageId) { return opts; }
 

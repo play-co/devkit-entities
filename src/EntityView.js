@@ -207,8 +207,9 @@ exports = Class(SpriteView, function () {
 
       // remove offsets and scale
       var invScale = 1 / this.style.scale;
-      ctx.translate(-this.minX, -this.minY);
+      ctx.translate(this.style.anchorX, this.style.anchorY);
       ctx.scale(invScale, invScale);
+      ctx.translate(-this.minX - this.style.anchorX, -this.minY - this.style.anchorY);
 
       // draw debug lines
       var model = this._entity.model;

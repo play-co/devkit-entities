@@ -1,3 +1,4 @@
+import ui.SpriteView as SpriteView;
 import ui.resource.loader as loader;
 var _imageMap = loader.getMap();
 
@@ -32,20 +33,24 @@ var ShapeFactory = Class(function () {
       return null;
     }
 
-    var img = opts.image;
-    var url = opts.url;
-    if (!img && url) {
-      // support SpriteViews by finding the first animation match for url
-      for (var prop in _imageMap) {
-        if (prop.indexOf(url) >= 0) {
-          img = prop;
-          break;
-        }
+    var imageId = opts.image || opts.url;
+    if (!imageId) { return opts; }
+
+    var map;
+
+    // First check if sprite animation exists
+    var spriteData = SpriteView.allAnimations[imageId];
+    if (spriteData) {
+      // Grab the first animation frame
+      for (var prop in spriteData) {
+        map = spriteData[prop][0];
+        break;
       }
+    } else {
+      map = _imageMap[imageId];
     }
 
     // auto-size based on provided width and/or height
-    var map = _imageMap[img || url];
     if (map) {
       var imgWidth = map.w + map.marginLeft + map.marginRight;
       var imgHeight = map.h + map.marginTop + map.marginBottom;

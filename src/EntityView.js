@@ -26,6 +26,11 @@ exports = Class(SpriteView, function () {
   };
 
   this.reset = function (opts) {
+    // reset debugDraw to the prototype value if set on instance
+    if (this.hasOwnProperty('_debugDraw')) {
+      delete this._debugDraw;
+    }
+
     var viewOpts = opts.viewOpts = opts.viewOpts || opts;
     shapes.applyImageDimensions(viewOpts);
 

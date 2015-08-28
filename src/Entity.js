@@ -5,43 +5,70 @@ import .utils;
 var _uid = 1;
 var readOnlyProp = utils.addReadOnlyProperty;
 
+/**
+ * This class represenets a game element with a model, and optionally a view, a life-cycle, and physics
+ * @class Entity
+ */
 var Entity = exports = Class(function () {
-  /**
-   * Entity Prototype Properties
-   * ~ these properties are class-wide, not instance-specific
-   */
+  /** @var {string} Entity#name */
   this.name = "Entity";
+  /**
+   * The class used to construct the model for each instance of Entity
+   * @var {class} Entity#modelClass
+   */
   this.modelClass = EntityModel;
+  /**
+   * The class used to construct the view for each instance of Entity
+   * @var {class} Entity#viewClass
+   */
   this.viewClass = EntityView;
 
   /**
-   * Entity Initialization
-   * ~ init is the constructor for each instance
+   * @constructs
+   * @arg {object} [opts] - Used internally by {@link EntityPool} to manage recycling
+   * @arg {EntityPool} [opts.pool]
+   * @arg {number} [opts.poolIndex]
    */
   this.init = function (opts) {
     opts = opts || {};
     opts.entity = this;
 
-    // unique identifier for each entity instance
+    /**
+     * Unique identifier for each entity instance
+     * @var {string} Entity#uid
+     */
     this.uid = this.name + _uid++;
-
+    /**
+     * Holds the entity's data, like position and hit bounds
+     * @var {EntityModel} Entity#model
+     */
     this.model = new this.modelClass(opts);
+    /**
+     * A devkit View used to render the entity to the screen
+     * @var {EntityView} Entity#view
+     */
     this.view = this.viewClass ? new this.viewClass(opts) : null;
-
-    // this flag indicates whether an entity is alive or dead
+    /**
+     * Indicates whether the entity is active in the game or not
+     * @var {boolean} Entity#active
+     */
     this.active = false;
-
-    // ignore these, passed automatically from EntityPool
+    /**
+     * @var {EntityPool} Entity#_pool
+     * @private
+     */
     this._pool = opts.pool || null;
+    /**
+     * @var {number} Entity#_poolIndex
+     * @private
+     */
     this._poolIndex = opts.poolIndex || 0;
   };
 
   /**
-   * Entity Lifecycle Interface
-   * ~ reset, update, destroy
-   *   ~ reset is called when an entity becomes active
-   *   ~ update is called once each tick on each active entity
-   *   ~ destroy makes an entity inactive, hiding and releasing it, if possible
+   * Makes the entity active and sets its initial properties; if the entity belongs to a pool, it's called automatically by {@link EntityPool#obtain}
+   * @method Entity#reset
+   * @arg {object} [opts]
    */
   this.reset = function (opts) {
     opts = opts || {};
@@ -50,11 +77,20 @@ var Entity = exports = Class(function () {
     this.view && this.view.reset(opts);
   };
 
+  /**
+   * Should be called each tick on active entities; if the entity belongs to a pool, it's called automatically by {@link EntityPool#update}
+   * @method Entity#update
+   * @arg {number} dt - the number of milliseconds elapsed since last update
+   */
   this.update = function (dt) {
     this.model.update(dt);
     this.view && this.view.update(dt);
   };
 
+  /**
+   * Makes the entity inactive and hides its view; if the entity belongs to a pool, it's recycled via {@link EntityPool#release}
+   * @method Entity#destroy
+   */
   this.destroy = function () {
     this.active = false;
     this._pool && this._pool.release(this);
@@ -65,11 +101,9 @@ var Entity = exports = Class(function () {
   };
 
   /**
-   * Public API Extensions
-   * ~ properties exposed for ease of use from the model and view
+   * The entity's horizontal position in game-space; wraps {@link EntityModel#x}
+   * @var {number} Entity#x
    */
-
-  // expose x position
   Object.defineProperty(this, 'x', {
     enumerable: true,
     configurable: true,
@@ -77,7 +111,10 @@ var Entity = exports = Class(function () {
     set: function (value) { this.model.x = value; }
   });
 
-  // expose y position
+  /**
+   * The entity's vertical position in game-space; wraps {@link EntityModel#y}
+   * @var {number} Entity#y
+   */
   Object.defineProperty(this, 'y', {
     enumerable: true,
     configurable: true,
@@ -85,13 +122,24 @@ var Entity = exports = Class(function () {
     set: function (value) { this.model.y = value; }
   });
 
-  // expose read-only previous x position
+  /**
+   * The entity's x position last update; wraps {@link EntityModel#previousX}
+   * @var {number} Entity#previousX
+   * @readOnly
+   */
   readOnlyProp(this, 'previousX', function () { return this.model.previousX; });
 
-  // expose read-only previous y position
+  /**
+   * The entity's y position last update; wraps {@link EntityModel#previousY}
+   * @var {number} Entity#previousY
+   * @readOnly
+   */
   readOnlyProp(this, 'previousY', function () { return this.model.previousY; });
 
-  // expose x velocity
+  /**
+   * The entity's horizontal velocity; wraps {@link EntityModel#vx}
+   * @var {number} Entity#vx
+   */
   Object.defineProperty(this, 'vx', {
     enumerable: true,
     configurable: true,
@@ -99,7 +147,10 @@ var Entity = exports = Class(function () {
     set: function (value) { this.model.vx = value; }
   });
 
-  // expose y velocity
+  /**
+   * The entity's vertical velocity; wraps {@link EntityModel#vy}
+   * @var {number} Entity#vy
+   */
   Object.defineProperty(this, 'vy', {
     enumerable: true,
     configurable: true,
@@ -107,7 +158,10 @@ var Entity = exports = Class(function () {
     set: function (value) { this.model.vy = value; }
   });
 
-  // expose x acceleration
+  /**
+   * The entity's horizontal acceleration; wraps {@link EntityModel#ax}
+   * @var {number} Entity#ax
+   */
   Object.defineProperty(this, 'ax', {
     enumerable: true,
     configurable: true,
@@ -115,7 +169,10 @@ var Entity = exports = Class(function () {
     set: function (value) { this.model.ax = value; }
   });
 
-  // expose y acceleration
+  /**
+   * The entity's vertical acceleration; wraps {@link EntityModel#ay}
+   * @var {number} Entity#ay
+   */
   Object.defineProperty(this, 'ay', {
     enumerable: true,
     configurable: true,
@@ -123,7 +180,10 @@ var Entity = exports = Class(function () {
     set: function (value) { this.model.ay = value; }
   });
 
-  // expose model width
+  /**
+   * The entity's hit width used for collisions; wraps {@link EntityModel#width} or {@link EntityModel#radius}
+   * @var {number} Entity#width
+   */
   Object.defineProperty(this, 'width', {
     enumerable: true,
     configurable: true,
@@ -139,7 +199,10 @@ var Entity = exports = Class(function () {
     }
   });
 
-  // expose model height
+  /**
+   * The entity's hit height used for collisions; wraps {@link EntityModel#height} or {@link EntityModel#radius}
+   * @var {number} Entity#height
+   */
   Object.defineProperty(this, 'height', {
     enumerable: true,
     configurable: true,
@@ -155,19 +218,38 @@ var Entity = exports = Class(function () {
     }
   });
 
-  // expose read-only left-most x-coordinate of the model
+  /**
+   * The entity's left-most x-coordinate for collisions; wraps {@link EntityModel#minX}
+   * @var {number} Entity#minX
+   * @readOnly
+   */
   readOnlyProp(this, 'minX', function () { return this.model.minX; });
 
-  // expose read-only right-most x-coordinate of the model
+  /**
+   * The entity's right-most x-coordinate for collisions; wraps {@link EntityModel#maxX}
+   * @var {number} Entity#maxX
+   * @readOnly
+   */
   readOnlyProp(this, 'maxX', function () { return this.model.maxX; });
 
-  // expose read-only top-most y-coordinate of the model
+  /**
+   * The entity's top-most y-coordinate for collisions; wraps {@link EntityModel#minY}
+   * @var {number} Entity#minY
+   * @readOnly
+   */
   readOnlyProp(this, 'minY', function () { return this.model.minY; });
 
-  // expose read-only bottom-most y-coordinate of the model
+  /**
+   * The entity's bottom-most y-coordinate for collisions; wraps {@link EntityModel#maxY}
+   * @var {number} Entity#maxY
+   * @readOnly
+   */
   readOnlyProp(this, 'maxY', function () { return this.model.maxY; });
 
-  // expose the model's fixed property
+  /**
+   * Whether or not the entity can be moved by collisions; wraps {@link EntityModel#fixed}
+   * @var {number} Entity#fixed
+   */
   Object.defineProperty(this, 'fixed', {
     enumerable: true,
     configurable: true,
@@ -175,10 +257,17 @@ var Entity = exports = Class(function () {
     set: function (value) { this.model.fixed = value; }
   });
 
-  // expose the model's physical shape
+  /**
+   * An instance of {@link Shape} representing the entity's hit bounds; wraps {@link EntityModel#shape}
+   * @var {number} Entity#shape
+   * @readOnly
+   */
   readOnlyProp(this, 'shape', function () { return this.model.shape; });
 
-  // expose the view width
+  /**
+   * The entity view's width; wraps {@link EntityView#width}
+   * @var {number} Entity#viewWidth
+   */
   Object.defineProperty(this, 'viewWidth', {
     enumerable: true,
     configurable: true,
@@ -186,7 +275,10 @@ var Entity = exports = Class(function () {
     set: function (value) { this.view && (this.view.style.width = value); }
   });
 
-  // expose the view height
+  /**
+   * The entity view's height; wraps {@link EntityView#height}
+   * @var {number} Entity#viewHeight
+   */
   Object.defineProperty(this, 'viewHeight', {
     enumerable: true,
     configurable: true,
@@ -194,43 +286,77 @@ var Entity = exports = Class(function () {
     set: function (value) { this.view && (this.view.style.height = value); }
   });
 
-  // expose read-only left-most x-coordinate of the view
+  /**
+   * The entity view's left-most x-coordinate; wraps {@link EntityView#minX}
+   * @var {number} Entity#viewMinX
+   * @readOnly
+   */
   readOnlyProp(this, 'viewMinX', function () { return (this.view && this.view.minX) || 0; });
 
-  // expose read-only right-most x-coordinate of the view
+  /**
+   * The entity view's right-most x-coordinate; wraps {@link EntityView#maxX}
+   * @var {number} Entity#viewMaxX
+   * @readOnly
+   */
   readOnlyProp(this, 'viewMaxX', function () { return (this.view && this.view.maxX) || 0; });
 
-  // expose read-only top-most y-coordinate of the view
+  /**
+   * The entity view's top-most y-coordinate; wraps {@link EntityView#minY}
+   * @var {number} Entity#viewMinY
+   * @readOnly
+   */
   readOnlyProp(this, 'viewMinY', function () { return (this.view && this.view.minY) || 0; });
 
-  // expose read-only bottom-most y-coordinate of the view
+  /**
+   * The entity view's bottom-most y-coordinate; wraps {@link EntityView#maxY}
+   * @var {number} Entity#viewMaxY
+   * @readOnly
+   */
   readOnlyProp(this, 'viewMaxY', function () { return (this.view && this.view.maxY) || 0; });
 
   /**
-   * Physics API Extensions
-   * ~ handy shortcut functions for physics
+   * Checks for a collision between this entity and another; wraps {@link EntityModel#collidesWith}
+   * @method Entity#collidesWith
+   * @arg {Entity} entity - The other entity used in the collision test
+   * @returns {boolean} Whether or not this entity is currently colliding with the provided entity
    */
-
   this.collidesWith = function (entity) {
-    this.model.collidesWith(entity.model || entity);
+    return this.model.collidesWith(entity.model || entity);
   };
 
+  /**
+   * Resolves a collision between this entity and another by pushing them apart; wraps {@link EntityModel#resolveCollisionWith}
+   * @method Entity#resolveCollisionWith
+   * @arg {Entity} entity - The other entity with which this entity is currently colliding
+   * @returns {number} The distance the two entities were pushed apart
+   */
   this.resolveCollisionWith = function (entity) {
-    this.model.resolveCollisionWith(entity.model || entity);
+    return this.model.resolveCollisionWith(entity.model || entity);
   };
 
+  /**
+   * Checks to see if this entity is fully contained within another; wraps {@link EntityModel#isInside}
+   * @method Entity#isInside
+   * @arg {Entity} entity - The entity that may or may not contain this entity
+   * @returns {boolean} Whether or not this entity is fully contained within the provided entity
+   */
   this.isInside = function (entity) {
-    this.model.isInside(entity.model || entity);
+    return this.model.isInside(entity.model || entity);
   };
-
 });
 
-// global show all hit bounds
+/**
+ * globally show all entities' hit bounds
+ * @memberof Entity
+ */
 Entity.showHitBounds = function () {
   EntityView.prototype._debugDraw = true;
 };
 
-// global hide all hit bounds
+/**
+ * globally hide all entities' hit bounds
+ * @memberof Entity
+ */
 Entity.hideHitBounds = function () {
-  EntityView.prototype._debugDraw = true;
+  EntityView.prototype._debugDraw = false;
 };

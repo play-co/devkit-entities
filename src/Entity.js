@@ -350,7 +350,7 @@ var Entity = exports = Class(function () {
 });
 
 /**
- * globally show all entities' hit bounds
+ * Globally show all entities' hit bounds
  * @memberof Entity
  */
 Entity.showHitBounds = function () {
@@ -358,7 +358,7 @@ Entity.showHitBounds = function () {
 };
 
 /**
- * globally hide all entities' hit bounds
+ * Globally hide all entities' hit bounds
  * @memberof Entity
  */
 Entity.hideHitBounds = function () {

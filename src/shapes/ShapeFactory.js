@@ -5,9 +5,15 @@ var _imageMap = loader.getMap();
 import .Rect;
 import .Circle;
 
+/**
+ * This singleton class creates and returns shapes and default entity opts based on provided opts.image or opts.url paths and dimensions
+ * @class ShapeFactory
+ */
 var ShapeFactory = Class(function () {
   /**
-   * returns a new shape
+   * Returns a new {@link Circle} or {@link Rect} based on provided opts; also applies defaults width and height if necessary
+   * @method ShapeFactory#getShape
+   * @returns {Shape}
    */
   this.getShape = function (opts) {
     var hitOpts = opts.hitOpts;
@@ -26,7 +32,9 @@ var ShapeFactory = Class(function () {
   };
 
   /**
-   * returns a hit bounds object with defaults based on image or sprite url
+   * Adds width and height to and opts object if not defined based on image or sprite url
+   * @method ShapeFactory#applyImageDimensions
+   * @returns {object}
    */
   this.applyImageDimensions = function (opts) {
     if (!opts) {

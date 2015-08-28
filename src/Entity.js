@@ -69,6 +69,8 @@ var Entity = exports = Class(function () {
    * Makes the entity active and sets its initial properties; if the entity belongs to a pool, it's called automatically by {@link EntityPool#obtain}
    * @method Entity#reset
    * @arg {object} [opts]
+   * @see EntityModel#reset
+   * @see EntityView#reset
    */
   this.reset = function (opts) {
     opts = opts || {};
@@ -81,6 +83,8 @@ var Entity = exports = Class(function () {
    * Should be called each tick on active entities; if the entity belongs to a pool, it's called automatically by {@link EntityPool#update}
    * @method Entity#update
    * @arg {number} dt - the number of milliseconds elapsed since last update
+   * @see EntityModel#update
+   * @see EntityView#update
    */
   this.update = function (dt) {
     this.model.update(dt);
@@ -101,7 +105,7 @@ var Entity = exports = Class(function () {
   };
 
   /**
-   * The entity's horizontal position in game-space; wraps {@link EntityModel#x}
+   * The entity's horizontal position in model-space; wraps {@link EntityModel#x}
    * @var {number} Entity#x
    */
   Object.defineProperty(this, 'x', {
@@ -112,7 +116,7 @@ var Entity = exports = Class(function () {
   });
 
   /**
-   * The entity's vertical position in game-space; wraps {@link EntityModel#y}
+   * The entity's vertical position in model-space; wraps {@link EntityModel#y}
    * @var {number} Entity#y
    */
   Object.defineProperty(this, 'y', {
@@ -123,14 +127,14 @@ var Entity = exports = Class(function () {
   });
 
   /**
-   * The entity's x position last update; wraps {@link EntityModel#previousX}
+   * The entity's horizontal position last update; wraps {@link EntityModel#previousX}
    * @var {number} Entity#previousX
    * @readOnly
    */
   readOnlyProp(this, 'previousX', function () { return this.model.previousX; });
 
   /**
-   * The entity's y position last update; wraps {@link EntityModel#previousY}
+   * The entity's vertical position last update; wraps {@link EntityModel#previousY}
    * @var {number} Entity#previousY
    * @readOnly
    */
@@ -248,7 +252,7 @@ var Entity = exports = Class(function () {
 
   /**
    * Whether or not the entity can be moved by collisions; wraps {@link EntityModel#fixed}
-   * @var {number} Entity#fixed
+   * @var {boolean} Entity#fixed
    */
   Object.defineProperty(this, 'fixed', {
     enumerable: true,
@@ -259,7 +263,7 @@ var Entity = exports = Class(function () {
 
   /**
    * An instance of {@link Shape} representing the entity's hit bounds; wraps {@link EntityModel#shape}
-   * @var {number} Entity#shape
+   * @var {Shape} Entity#shape
    * @readOnly
    */
   readOnlyProp(this, 'shape', function () { return this.model.shape; });

@@ -18,27 +18,27 @@ var COLLISION_OFFSET = 0.001;
  */
 exports = {
   // anchor (pivot) point, offset from the primary point
-  this.anchorX = 0;
-  this.anchorY = 0;
+  // this.anchorX = 0;
+  // this.anchorY = 0;
 
-  this.rotate = function (dr) {
-    this.view.style.r += dr;
-    if (this.rigidBody && this.rigidBody.rotate) {
-      this.rigidBody.rotate(dr);
-    }
-  };
+  // this.rotate = function (dr) {
+  //   this.view.style.r += dr;
+  //   if (this.rigidBody && this.rigidBody.rotate) {
+  //     this.rigidBody.rotate(dr);
+  //   }
+  // };
 
-  this.setAnchor = function (x, y) {
-    this.anchorX = x || 0;
-    this.anchorY = y || 0;
-    if (this.view) {
-      this.view.style.anchorX = this.anchorX;
-      this.view.style.anchorY = this.anchorY;
-    }
-    if (this.rigidBody && this.rigidBody.setPivot) {
-      this.rigidBody.setPivot(new SAT.Vector(this.x + x, this.y + y));
-    }
-  }
+  // this.setAnchor = function (x, y) {
+  //   this.anchorX = x || 0;
+  //   this.anchorY = y || 0;
+  //   if (this.view) {
+  //     this.view.style.anchorX = this.anchorX;
+  //     this.view.style.anchorY = this.anchorY;
+  //   }
+  //   if (this.rigidBody && this.rigidBody.setPivot) {
+  //     this.rigidBody.setPivot(new SAT.Vector(this.x + x, this.y + y));
+  //   }
+  // }
 
   /**
    * ~ REQUIRED for Entity

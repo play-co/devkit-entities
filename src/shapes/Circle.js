@@ -9,48 +9,57 @@ var sqrt = Math.sqrt;
 var random = Math.random;
 var readOnlyProp = utils.addReadOnlyProperty;
 
+/**
+ * This class represenets a circle shape
+ * @class Circle
+ * @extends Shape
+ */
 exports = Class(Shape, function () {
   var supr = Shape.prototype;
 
+  /** @var {string} Circle#name */
   this.name = "Circle";
 
   /**
-    * @class Circle
-    * @extends Shape
-    *
-    * @arg {Object} [opts]
-    * @arg {Number} [opts.x]
-    * @arg {Number} [opts.y]
-    * @arg {Number} [opts.radius=0]
-    */
+   * @constructs
+   * @arg {object} [opts]
+   * @arg {number} [opts.radius=0]
+   */
   this.init = function (opts) {
     opts = opts || {};
     supr.init.call(this, opts);
 
-    /** @var {Number} Circle#radius */
+    /** @var {number} Circle#radius */
     this.radius = opts.radius || 0;
   };
 
-  /** @var {Number} Circle#minX
+  /** @var {number} Circle#minX
       @readOnly */
   readOnlyProp(this, 'minX', function () { return this.x - this.radius; });
-  /** @var {Number} Circle#maxX
+  /** @var {number} Circle#maxX
       @readOnly */
   readOnlyProp(this, 'maxX', function () { return this.x + this.radius; });
-  /** @var {Number} Circle#minY
+  /** @var {number} Circle#minY
       @readOnly */
   readOnlyProp(this, 'minY', function () { return this.y - this.radius; });
-  /** @var {Number} Circle#maxY
+  /** @var {number} Circle#maxY
       @readOnly */
   readOnlyProp(this, 'maxY', function () { return this.y + this.radius; });
 
-  /** @var {Number} Circle#centerX
+  /** @var {number} Circle#centerX
       @readOnly */
   readOnlyProp(this, 'centerX', function () { return this.x; });
-  /** @var {Number} Circle#centerY
+  /** @var {number} Circle#centerY
       @readOnly */
   readOnlyProp(this, 'centerY', function () { return this.y; });
 
+  /**
+   * Returns whether or not the provided point lies within the circle
+   * @method Circle#contains
+   * @arg {number} x
+   * @arg {number} y
+   * @returns {boolean}
+   */
   this.contains = function(x, y) {
     var dx = x - this.x;
     var dy = y - this.y;
@@ -58,6 +67,11 @@ exports = Class(Shape, function () {
     return dist <= this.radius;
   };
 
+  /**
+   * Returns a random point from within the circle
+   * @method Circle#getRandomPoint
+   * @returns {Point}
+   */
   this.getRandomPoint = function () {
     var angle = random() * TAU;
     var radius = random() * this.radius;

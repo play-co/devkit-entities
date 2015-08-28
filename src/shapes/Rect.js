@@ -12,14 +12,12 @@ var readOnlyProp = utils.addReadOnlyProperty;
 exports = Class(Shape, function () {
   var supr = Shape.prototype;
 
-  /** @member {string} Rect#name */
+  /** @var {string} Rect#name */
   this.name = "Rect";
 
   /**
    * @constructs
    * @arg {object} [opts]
-   * @arg {number} [opts.x=0]
-   * @arg {number} [opts.y=0]
    * @arg {number} [opts.width=0]
    * @arg {number} [opts.height=0]
    */
@@ -66,10 +64,22 @@ exports = Class(Shape, function () {
       @readOnly */
   readOnlyProp(this, 'left', function () { return this.x; });
 
+  /**
+   * Returns whether or not the provided point lies within the rectangle
+   * @method Rect#contains
+   * @arg {number} x
+   * @arg {number} y
+   * @returns {boolean}
+   */
   this.contains = function (x, y) {
     return x >= this.left && x <= this.right && y >= this.top && y <= this.bottom;
   };
 
+  /**
+   * Returns a random point from within the rectangle
+   * @method Rect#getRandomPoint
+   * @returns {Point}
+   */
   this.getRandomPoint = function () {
     return {
       x: this.x + random() * this.width,

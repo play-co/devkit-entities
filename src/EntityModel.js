@@ -84,7 +84,7 @@ exports = Class(function () {
   };
 
   /**
-   * Called by {@link Entity#update} each tick while the entity is active; moves the entity according to {@link physics#step}
+   * Called by {@link Entity#update} each tick while the entity is active; moves the entity according to {@link Physics#step}
    * @method EntityModel#update
    * @arg {number} dt - the number of milliseconds elapsed since last update
    */
@@ -95,7 +95,7 @@ exports = Class(function () {
   };
 
   /**
-   * Checks for a collision between this entity model and another; wraps {@link physics#collide}
+   * Checks for a collision between this entity model and another; wraps {@link Physics#collide}
    * @method EntityModel#collidesWith
    * @arg {EntityModel} model - The other entity model used in the collision test
    * @returns {boolean} Whether or not this entity model is currently colliding with the provided entity model
@@ -105,7 +105,7 @@ exports = Class(function () {
   };
 
   /**
-   * Resolves a collision between this entity model and another by pushing them apart; wraps {@link physics#resolveCollision}
+   * Resolves a collision between this entity model and another by pushing them apart; wraps {@link Physics#resolveCollision}
    * @method EntityModel#resolveCollisionWith
    * @arg {EntityModel} model - The other entity model with which this entity model is currently colliding
    * @returns {number} The distance the two entity models were pushed apart
@@ -115,7 +115,7 @@ exports = Class(function () {
   };
 
   /**
-   * Checks to see if this entity model is fully contained within another; wraps {@link physics#isInside}
+   * Checks to see if this entity model is fully contained within another; wraps {@link Physics#isInside}
    * @method EntityModel#isInside
    * @arg {EntityModel} model - The entity model that may or may not contain this entity model
    * @returns {boolean} Whether or not this entity model is fully contained within the provided entity model

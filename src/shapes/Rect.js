@@ -4,68 +4,82 @@ import ..utils;
 var random = Math.random;
 var readOnlyProp = utils.addReadOnlyProperty;
 
+/**
+ * This class represenets an axis-aligned rectangle shape
+ * @class Rect
+ * @extends Shape
+ */
 exports = Class(Shape, function () {
   var supr = Shape.prototype;
 
+  /** @var {string} Rect#name */
   this.name = "Rect";
 
   /**
-    * @class Rect
-    * @extends Shape
-    *
-    * @arg {Object} [opts]
-    * @arg {Number} [opts.x]
-    * @arg {Number} [opts.y]
-    * @arg {Number} [opts.width=0]
-    * @arg {Number} [opts.height=0]
-    */
+   * @constructs
+   * @arg {object} [opts]
+   * @arg {number} [opts.width=0]
+   * @arg {number} [opts.height=0]
+   */
   this.init = function (opts) {
     opts = opts || {};
     supr.init.call(this, opts);
 
-    /** @var {Number} Rect#width */
+    /** @var {number} Rect#width */
     this.width = opts.width || 0;
-    /** @var {Number} Rect#height */
+    /** @var {number} Rect#height */
     this.height = opts.height || 0;
   };
 
-  /** @var {Number} Rect#minX
+  /** @var {number} Rect#minX
       @readOnly */
   readOnlyProp(this, 'minX', function () { return this.x; });
-  /** @var {Number} Rect#maxX
+  /** @var {number} Rect#maxX
       @readOnly */
   readOnlyProp(this, 'maxX', function () { return this.x + this.width; });
-  /** @var {Number} Rect#minY
+  /** @var {number} Rect#minY
       @readOnly */
   readOnlyProp(this, 'minY', function () { return this.y; });
-  /** @var {Number} Rect#maxY
+  /** @var {number} Rect#maxY
       @readOnly */
   readOnlyProp(this, 'maxY', function () { return this.y + this.height; });
 
-  /** @var {Number} Rect#centerX
+  /** @var {number} Rect#centerX
       @readOnly */
   readOnlyProp(this, 'centerX', function () { return this.x + this.width / 2; });
-  /** @var {Number} Rect#centerY
+  /** @var {number} Rect#centerY
       @readOnly */
   readOnlyProp(this, 'centerY', function () { return this.y + this.height / 2; });
 
-  /** @var {Number} Rect#top
+  /** @var {number} Rect#top
       @readOnly */
   readOnlyProp(this, 'top', function () { return this.y; });
-  /** @var {Number} Rect#right
+  /** @var {number} Rect#right
       @readOnly */
   readOnlyProp(this, 'right', function () { return this.x + this.width; });
-  /** @var {Number} Rect#bottom
+  /** @var {number} Rect#bottom
       @readOnly */
   readOnlyProp(this, 'bottom', function () { return this.y + this.height; });
-  /** @var {Number} Rect#left
+  /** @var {number} Rect#left
       @readOnly */
   readOnlyProp(this, 'left', function () { return this.x; });
 
+  /**
+   * Returns whether or not the provided point lies within the rectangle
+   * @method Rect#contains
+   * @arg {number} x
+   * @arg {number} y
+   * @returns {boolean}
+   */
   this.contains = function (x, y) {
     return x >= this.left && x <= this.right && y >= this.top && y <= this.bottom;
   };
 
+  /**
+   * Returns a random point from within the rectangle
+   * @method Rect#getRandomPoint
+   * @returns {Point}
+   */
   this.getRandomPoint = function () {
     return {
       x: this.x + random() * this.width,

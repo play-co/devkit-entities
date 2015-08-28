@@ -3,10 +3,18 @@ var max = Math.max;
 var abs = Math.abs;
 var sqrt = Math.sqrt;
 
-// this value helps resolve colliding state between entities
+/**
+ * This value helps resolve colliding state between entities
+ * @constant {number}
+ * @private
+ */
 var COLLISION_OFFSET = 0.001;
 
-// shape-to-function maps
+/**
+ * Shape map for function look-up {@link collisionHelper#collide}
+ * @constant {object}
+ * @private
+ */
 var SHAPE_COLLIDE_MAP = {
   Rect: {
     Rect: "rectCollidesWithRect",
@@ -18,6 +26,11 @@ var SHAPE_COLLIDE_MAP = {
   }
 };
 
+/**
+ * Shape map for function look-up {@link collisionHelper#resolveCollision}
+ * @constant {object}
+ * @private
+ */
 var SHAPE_RESOLVE_MAP = {
   Rect: {
     Rect: "resolveCollidingRects",
@@ -29,6 +42,11 @@ var SHAPE_RESOLVE_MAP = {
   }
 };
 
+/**
+ * Shape map for function look-up {@link collisionHelper#isInside}
+ * @constant {object}
+ * @private
+ */
 var SHAPE_INSIDE_MAP = {
   Rect: {
     Rect: "rectInsideRect",
@@ -40,6 +58,11 @@ var SHAPE_INSIDE_MAP = {
   }
 };
 
+/**
+ * Function factory for shape look-up
+ * @function
+ * @private
+ */
 var _genericResolution = function(genericName, lookupMap, defaultResult) {
   return function (model1, model2) {
     var fn = null;
@@ -61,34 +84,49 @@ var _genericResolution = function(genericName, lookupMap, defaultResult) {
 };
 
 /**
- * IMPORTANT NOTES:
- * ~ by default, collisions support circles and axis-aligned rectangles only
- * ~ these are NOT continuous collision detection algorithms, meaning a large
- *   value of dt could cause entities to pass through each other - it's up to the
- *   developer to manage the time step of his/her game to prevent this behavior
+ * This namespace defines the collisions used to control entities' behavior;
+ * supports circles and axis-aligned rectangles only; these are NOT continuous
+ * collision detection algorithms, meaning a large value of dt could cause
+ * entities to pass through each other - it's up to the developer to manage the
+ * time step of his/her game to prevent this behavior
+ * @namespace collisionHelper
  */
 exports = {
   /**
-   * ~ collide defines how collisions are detected
-   * ~ by default, only works with circles and axis-aligned rectangles
+   * Defines how collisions are detected
+   * @method collisionHelper#collide
+   * @arg {Shape} shape1
+   * @arg {Shape} shape2
+   * @returns {boolean} true if collision detected
    */
   collide: _genericResolution('Collide', SHAPE_COLLIDE_MAP, false),
 
   /**
-   * ~ resolveCollision guarantees that two models are not colliding
-   *   by pushing them apart
-   * ~ shapes with fixed = true are never moved
-   * ~ returns total distance moved to separate the objects
+   * Guarantees that two models are not colliding by pushing them apart;
+   * shapes with fixed=true are never moved; returns total distance moved to separate the objects
+   * @method collisionHelper#resolveCollision
+   * @arg {Shape} shape1
+   * @arg {Shape} shape2
+   * @returns {number} total distance moved
    */
   resolveCollision: _genericResolution('Resolve', SHAPE_RESOLVE_MAP, 0),
 
   /**
-   * ~ REQUIRED
-   * ~ isInside is used to determine if one entity is fully contained by another
-   * ~ by default, returns a bool, and only works with circles and rects
+   * Used to determine if one shape is fully contained by another
+   * @method collisionHelper#isInside
+   * @arg {Shape} shape1
+   * @arg {Shape} shape2
+   * @returns {boolean} true if shape1 is inside shape2
    */
   isInside: _genericResolution('Inside', SHAPE_INSIDE_MAP, false),
 
+  /**
+   * Detect collision between two circles
+   * @method collisionHelper#circleCollidesWithCircle
+   * @arg {Circle} circ1
+   * @arg {Circle} circ2
+   * @returns {boolean} true if collision detected
+   */
   circleCollidesWithCircle: function (circ1, circ2) {
     var x1 = circ1.x;
     var y1 = circ1.y;
@@ -104,6 +142,13 @@ exports = {
     return distSqrd <= distCollSqrd;
   },
 
+  /**
+   * Detect collision between a circle and a rectangle
+   * @method collisionHelper#circleCollidesWithRect
+   * @arg {Circle} circ
+   * @arg {Rect} rect
+   * @returns {boolean} true if collision detected
+   */
   circleCollidesWithRect: function (circ, rect) {
     var cx = circ.x;
     var cy = circ.y;
@@ -129,10 +174,24 @@ exports = {
     }
   },
 
+  /**
+   * Detect collision between a rectangle and a circle
+   * @method collisionHelper#rectCollidesWithCircle
+   * @arg {Rect} rect
+   * @arg {Circle} circ
+   * @returns {boolean} true if collision detected
+   */
   rectCollidesWithCircle: function (rect, circ) {
     return this.circleCollidesWithRect(circ, rect);
   },
 
+  /**
+   * Detect collision between two rectangles
+   * @method collisionHelper#rectCollidesWithRect
+   * @arg {Rect} rect1
+   * @arg {Rect} rect2
+   * @returns {boolean} true if collision detected
+   */
   rectCollidesWithRect: function (rect1, rect2) {
     var x1 = rect1.x;
     var y1 = rect1.y;
@@ -146,7 +205,11 @@ exports = {
   },
 
   /**
-   * ~ resolveCollidingCircles forces two circles apart based on their centers
+   * Resolve collision between two circles by pushing them apart relative to their centers
+   * @method collisionHelper#resolveCollidingCircles
+   * @arg {Circle} circ1
+   * @arg {Circle} circ2
+   * @returns {number} the total distance the circles moved apart
    */
   resolveCollidingCircles: function (circ1, circ2) {
     var x1 = circ1.x;
@@ -189,9 +252,11 @@ exports = {
   },
 
   /**
-   * ~ resolveCollidingCircleRect forces apart a circle and rect
-   * ~ good default collision behavior for landing on a platforms vs.
-   *   hitting the side (missing the platform)
+   * Resolve collision between circle and rectangle by pushing them apart
+   * @method collisionHelper#resolveCollidingCircleRect
+   * @arg {Circle} circ
+   * @arg {Rect} rect
+   * @returns {number} the total distance the shapes moved apart
    */
   resolveCollidingCircleRect: function (circ, rect) {
     var cx = circ.x;
@@ -249,14 +314,23 @@ exports = {
     }
   },
 
+  /**
+   * Resolve collision between rectangle and circle by pushing them apart
+   * @method collisionHelper#resolveCollidingRectCircle
+   * @arg {Rect} rect
+   * @arg {Circle} circ
+   * @returns {number} the total distance the shapes moved apart
+   */
   resolveCollidingRectCircle: function (rect, circ) {
     return resolveCollidingCircleRect(circ, rect);
   },
 
   /**
-   * ~ resolveCollidingRects forces two rects apart, but only in one direction
-   * ~ good default collision behavior for landing on a platforms vs.
-   *   hitting the side (missing the platform)
+   * Resolve collision between two rectangles by pushing them apart in one direction
+   * @method collisionHelper#resolveCollidingRects
+   * @arg {Rect} rect1
+   * @arg {Rect} rect2
+   * @returns {number} the total distance the rectangles moved apart
    */
   resolveCollidingRects: function (rect1, rect2) {
     var x1 = rect1.x;
@@ -342,7 +416,10 @@ exports = {
   },
 
   /**
-   * ~ circleInsideCircle returns true if circ1 is fully contained in circ2
+   * @method collisionHelper#circleInsideCircle
+   * @arg {Circle} circ1
+   * @arg {Circle} circ2
+   * @returns {boolean} true if circ1 is inside circ2
    */
   circleInsideCircle: function (circ1, circ2) {
     var x1 = circ1.x;
@@ -358,7 +435,10 @@ exports = {
   },
 
   /**
-   * ~ circleInsideRect returns true if circ is fully contained in rect
+   * @method collisionHelper#circleInsideRect
+   * @arg {Circle} circ
+   * @arg {Rect} rect
+   * @returns {boolean} true if circ is inside rect
    */
   circleInsideRect: function (circ, rect) {
     var cx = circ.x;
@@ -374,7 +454,10 @@ exports = {
   },
 
   /**
-   * ~ rectInsideCircle returns true if rect is fully contained in circ
+   * @method collisionHelper#rectInsideCircle
+   * @arg {Rect} rect
+   * @arg {Circle} circ
+   * @returns {boolean} true if rect is inside circ
    */
   rectInsideCircle: function (rect, circ) {
     var l = rect.x;
@@ -388,7 +471,10 @@ exports = {
   },
 
   /**
-   * ~ rectInsideRect returns true if rect1 is fully contained in rect2
+   * @method collisionHelper#rectInsideRect
+   * @arg {Rect} rect1
+   * @arg {Rect} rect2
+   * @returns {boolean} true if rect1 is inside rect2
    */
   rectInsideRect: function (rect1, rect2) {
     var l = rect1.x;
@@ -400,5 +486,4 @@ exports = {
         && rect2.contains(r, b)
         && rect2.contains(l, b);
   }
-
 };

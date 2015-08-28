@@ -5,12 +5,18 @@ import .shapes.ShapeFactory as ShapeFactory;
 var shapes = ShapeFactory.get();
 var readOnlyProp = utils.addReadOnlyProperty;
 
+/**
+ * This class represents the default model for an entity's data
+ * @class EntityModel
+ */
 exports = Class(function () {
+  /** @var {string} EntityModel#name */
   this.name = "EntityModel";
 
   /**
-   * ~ REQUIRED
-   * ~ init is the constructor for each model instance
+   * @constructs
+   * @arg {object} opts - Used internally by {@link Entity}
+   * @arg {Entity} opts.entity
    */
   this.init = function (opts) {
     this._shape = null;
@@ -21,13 +27,36 @@ exports = Class(function () {
     this._acceleration = { x: 0, y: 0 };
   };
 
+  /**
+   * Initializes the model's hit shape
+   * @method EntityModel#_initShape
+   * @arg {object} opts - defines the shape type and properties
+   * @private
+   */
   this._initShape = function (opts) {
     this._shape = shapes.getShape(opts);
   };
 
   /**
-   * ~ REQUIRED
-   * ~ reset is called when an entity becomes active
+   * Called by {@link Entity#reset} when the entity becomes active
+   * @method EntityModel#reset
+   * @arg {object} opts
+   * @arg {number} [opts.x=0] - The horizontal coordinate of the entity in model-space
+   * @arg {number} [opts.y=0] - The vertical coordinate of the entity in model-space
+   * @arg {number} [opts.offsetX=0] - The horizontal offset of the entity in model-space
+   * @arg {number} [opts.offsetY=0] - The vertical offset of the entity in model-space
+   * @arg {number} [opts.width=0] - The width of the entity's hit bounds if opts.hitOpts.width is not defined
+   * @arg {number} [opts.height=0] - The height of the entity's hit bounds if opts.hitOpts.height is not defined
+   * @arg {number} [opts.vx=0] - The initial horizontal velocity of the entity
+   * @arg {number} [opts.vy=0] - The initial vertical velocity of the entity
+   * @arg {number} [opts.ax=0] - The initial horizontal acceleration of the entity
+   * @arg {number} [opts.ay=0] - The initial vertical acceleration of the entity
+   * @arg {object} [opts.hitOpts] - A set of properties to apply only to the hit bounds of an entity (and not its view); the opts object itself is used if no hitOpts is specified
+   * @arg {number} [opts.hitOpts.offsetX=0] - The horizontal offset of the entity's hit bounds; overrides opts.offsetX
+   * @arg {number} [opts.hitOpts.offsetY=0] - The vertical offset of the entity's hit bounds; overrides opts.offsetY
+   * @arg {number} [opts.hitOpts.width=0] - The width of the entity's hit bounds; overrides opts.width
+   * @arg {number} [opts.hitOpts.height=0] - The height of the entity's hit bounds; overrides opts.height
+   * @arg {number} [opts.hitOpts.radius] - Makes the entity's hit bounds a circle instead of a rectangle and defines its radius
    */
   this.reset = function (opts) {
     var hitOpts = opts.hitOpts = opts.hitOpts || {};
@@ -55,8 +84,9 @@ exports = Class(function () {
   };
 
   /**
-   * ~ REQUIRED
-   * ~ update is called each tick while an entity is active
+   * Called by {@link Entity#update} each tick while the entity is active; moves the entity according to {@link Physics#step}
+   * @method EntityModel#update
+   * @arg {number} dt - the number of milliseconds elapsed since last update
    */
   this.update = function (dt) {
     this._previous.x = this.x;
@@ -65,36 +95,39 @@ exports = Class(function () {
   };
 
   /**
-   * ~ REQUIRED
-   * ~ collidesWith defines how collisions are detected
-   * ~ by default, only works with circles and axis-aligned rectangles
+   * Checks for a collision between this entity model and another; wraps {@link Physics#collide}
+   * @method EntityModel#collidesWith
+   * @arg {EntityModel} model - The other entity model used in the collision test
+   * @returns {boolean} Whether or not this entity model is currently colliding with the provided entity model
    */
   this.collidesWith = function (model) {
     return physics.collide(this, model);
   };
 
   /**
-   * ~ REQUIRED
-   * ~ resolveCollisionWith guarantees that two models are not colliding
-   *   by pushing them apart
-   * ~ shapes with fixed = true are never moved
-   * ~ returns total distance moved to separate the objects
+   * Resolves a collision between this entity model and another by pushing them apart; wraps {@link Physics#resolveCollision}
+   * @method EntityModel#resolveCollisionWith
+   * @arg {EntityModel} model - The other entity model with which this entity model is currently colliding
+   * @returns {number} The distance the two entity models were pushed apart
    */
   this.resolveCollisionWith = function (model) {
     return physics.resolveCollision(this, model);
   };
 
   /**
-   * ~ REQUIRED
-   * ~ isInside is used to determine if one entity is fully contained by another
-   * ~ by default, returns a bool, and only works with circles and rects
+   * Checks to see if this entity model is fully contained within another; wraps {@link Physics#isInside}
+   * @method EntityModel#isInside
+   * @arg {EntityModel} model - The entity model that may or may not contain this entity model
+   * @returns {boolean} Whether or not this entity model is fully contained within the provided entity model
    */
   this.isInside = function (model) {
     return physics.isInside(this, model);
   };
 
   /**
-   * ~ _validate warns if a model is improperly configured or broken
+   * Warns if a model is improperly configured or broken in some way
+   * @method EntityModel#_validate
+   * @private
    */
   this._validate = function () {
     var valid = true;
@@ -113,11 +146,9 @@ exports = Class(function () {
   };
 
   /**
-   * Public API Extensions
-   * ~ properties exposed for ease of use
+   * The entity's horizontal position in model-space; wraps {@link Shape#x} and {@link EntityModel#offsetX}
+   * @var {number} EntityModel#x
    */
-
-  // expose x position
   Object.defineProperty(this, 'x', {
     enumerable: true,
     configurable: true,
@@ -125,7 +156,10 @@ exports = Class(function () {
     set: function (value) { this._shape.x = value + this._offset.x; }
   });
 
-  // expose y position
+  /**
+   * The entity's vertical position in model-space; wraps {@link Shape#y} and {@link EntityModel#offsetY}
+   * @var {number} EntityModel#y
+   */
   Object.defineProperty(this, 'y', {
     enumerable: true,
     configurable: true,
@@ -133,7 +167,10 @@ exports = Class(function () {
     set: function (value) { this._shape.y = value + this._offset.y; }
   });
 
-  // expose x offset
+  /**
+   * The entity's horizontal offset in model-space
+   * @var {number} EntityModel#offsetX
+   */
   Object.defineProperty(this, 'offsetX', {
     enumerable: true,
     configurable: true,
@@ -141,7 +178,10 @@ exports = Class(function () {
     set: function (value) { this._offset.x = value; }
   });
 
-  // expose y offset
+  /**
+   * The entity's vertical offset in model-space
+   * @var {number} EntityModel#offsetY
+   */
   Object.defineProperty(this, 'offsetY', {
     enumerable: true,
     configurable: true,
@@ -149,13 +189,24 @@ exports = Class(function () {
     set: function (value) { this._offset.y = value; }
   });
 
-  // expose read-only previous x position
+  /**
+   * The entity's horizontal position last update
+   * @var {number} EntityModel#previousX
+   * @readOnly
+   */
   readOnlyProp(this, 'previousX', function () { return this._previous.x; });
 
-  // expose read-only previous y position
+  /**
+   * The entity's vertical position last update
+   * @var {number} EntityModel#previousY
+   * @readOnly
+   */
   readOnlyProp(this, 'previousY', function () { return this._previous.y; });
 
-  // expose x velocity
+  /**
+   * The entity's horizontal velocity
+   * @var {number} EntityModel#vx
+   */
   Object.defineProperty(this, 'vx', {
     enumerable: true,
     configurable: true,
@@ -163,7 +214,10 @@ exports = Class(function () {
     set: function (value) { this._velocity.x = value; }
   });
 
-  // expose y velocity
+  /**
+   * The entity's vertical velocity
+   * @var {number} EntityModel#vy
+   */
   Object.defineProperty(this, 'vy', {
     enumerable: true,
     configurable: true,
@@ -171,7 +225,10 @@ exports = Class(function () {
     set: function (value) { this._velocity.y = value; }
   });
 
-  // expose x acceleration
+  /**
+   * The entity's horizontal acceleration
+   * @var {number} EntityModel#ax
+   */
   Object.defineProperty(this, 'ax', {
     enumerable: true,
     configurable: true,
@@ -179,7 +236,10 @@ exports = Class(function () {
     set: function (value) { this._acceleration.x = value; }
   });
 
-  // expose y acceleration
+  /**
+   * The entity's vertical acceleration
+   * @var {number} EntityModel#ay
+   */
   Object.defineProperty(this, 'ay', {
     enumerable: true,
     configurable: true,
@@ -187,7 +247,10 @@ exports = Class(function () {
     set: function (value) { this._acceleration.y = value; }
   });
 
-  // expose the shape's fixed property
+  /**
+   * Whether or not the entity can be moved by collisions; wraps {@link Shape#fixed}
+   * @var {boolean} EntityModel#fixed
+   */
   Object.defineProperty(this, 'fixed', {
     enumerable: true,
     configurable: true,
@@ -195,10 +258,17 @@ exports = Class(function () {
     set: function (value) { this._shape.fixed = value; }
   });
 
-  // expose read-only shape
+  /**
+   * An instance of {@link Shape} representing the entity's hit bounds
+   * @var {Shape} EntityModel#shape
+   * @readOnly
+   */
   readOnlyProp(this, 'shape', function () { return this._shape; });
 
-  // expose shape width as a hidden collision helper
+  /**
+   * The entity's hit width used for collisions; wraps {@link Rect#width}
+   * @var {number} EntityModel#width
+   */
   Object.defineProperty(this, 'width', {
     enumerable: false,
     configurable: true,
@@ -206,7 +276,10 @@ exports = Class(function () {
     set: function (value) { this._shape.width = value; }
   });
 
-  // expose shape height as a hidden collision helper
+  /**
+   * The entity's hit height used for collisions; wraps {@link Rect#height}
+   * @var {number} EntityModel#height
+   */
   Object.defineProperty(this, 'height', {
     enumerable: false,
     configurable: true,
@@ -214,7 +287,10 @@ exports = Class(function () {
     set: function (value) { this._shape.height = value; }
   });
 
-  // expose shape radius as a hidden collision helper
+  /**
+   * The entity's hit radius used for collisions; wraps {@link Circle#radius}
+   * @var {number} EntityModel#radius
+   */
   Object.defineProperty(this, 'radius', {
     enumerable: false,
     configurable: true,
@@ -222,16 +298,31 @@ exports = Class(function () {
     set: function (value) { this._shape.radius = value; }
   });
 
-  // expose read-only left-most x-coordinate of the shape
+  /**
+   * The entity's left-most x-coordinate for collisions; wraps {@link Shape#minX}
+   * @var {number} EntityModel#minX
+   * @readOnly
+   */
   readOnlyProp(this, 'minX', function () { return this._shape.minX; });
 
-  // expose read-only right-most x-coordinate of the shape
+  /**
+   * The entity's right-most x-coordinate for collisions; wraps {@link Shape#maxX}
+   * @var {number} EntityModel#maxX
+   * @readOnly
+   */
   readOnlyProp(this, 'maxX', function () { return this._shape.maxX; });
 
-  // expose read-only top-most y-coordinate of the shape
+  /**
+   * The entity's top-most y-coordinate for collisions; wraps {@link Shape#minY}
+   * @var {number} EntityModel#minY
+   * @readOnly
+   */
   readOnlyProp(this, 'minY', function () { return this._shape.minY; });
 
-  // expose read-only bottom-most y-coordinate of the shape
+  /**
+   * The entity's bottom-most y-coordinate for collisions; wraps {@link Shape#maxY}
+   * @var {number} EntityModel#maxY
+   * @readOnly
+   */
   readOnlyProp(this, 'maxY', function () { return this._shape.maxY; });
-
 });

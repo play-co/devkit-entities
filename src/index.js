@@ -1,9 +1,13 @@
 import .Entity;
+import .EntityModel;
+import .EntityView;
 import .EntityPool;
-import .EntityPhysics;
+import .physics;
 
 exports = {
   Entity: Entity,
+  EntityModel: EntityModel,
+  EntityView: EntityView,
   EntityPool: EntityPool,
-  EntityPhysics: EntityPhysics
+  physics: physics
 };

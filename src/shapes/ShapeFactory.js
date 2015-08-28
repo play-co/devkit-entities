@@ -13,6 +13,7 @@ var ShapeFactory = Class(function () {
   /**
    * Returns a new {@link Circle} or {@link Rect} based on provided opts; also applies defaults width and height if necessary
    * @method ShapeFactory#getShape
+   * @arg {object} opts
    * @returns {Shape}
    */
   this.getShape = function (opts) {
@@ -32,8 +33,9 @@ var ShapeFactory = Class(function () {
   };
 
   /**
-   * Adds width and height to and opts object if not defined based on image or sprite url
+   * Adds width and height to an opts object if not defined based on image or sprite url
    * @method ShapeFactory#applyImageDimensions
+   * @arg {object} opts
    * @returns {object}
    */
   this.applyImageDimensions = function (opts) {

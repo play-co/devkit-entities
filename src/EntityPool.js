@@ -3,7 +3,6 @@ import .Entity;
 /**
  * This class represents a group of recycled entities; styled after devkit's ViewPool
  * @class EntityPool
- * @private for devkit-scene
  */
 exports = Class(function () {
   /**

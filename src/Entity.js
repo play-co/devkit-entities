@@ -8,7 +8,6 @@ var readOnlyProp = utils.addReadOnlyProperty;
 /**
  * This class represenets a game element with a model, and optionally a view, a life-cycle, and physics
  * @class Entity
- * @private for devkit-scene
  */
 var Entity = exports = Class(function () {
   /** @var {string} Entity#name */

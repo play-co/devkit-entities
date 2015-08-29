@@ -8,7 +8,6 @@ import .Circle;
 /**
  * This singleton class creates and returns shapes and default entity opts based on provided opts.image or opts.url paths and dimensions
  * @class ShapeFactory
- * @private for devkit-scene
  */
 var ShapeFactory = Class(function () {
   /**

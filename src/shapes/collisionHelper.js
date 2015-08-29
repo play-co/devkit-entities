@@ -90,6 +90,7 @@ var _genericResolution = function(genericName, lookupMap, defaultResult) {
  * entities to pass through each other - it's up to the developer to manage the
  * time step of his/her game to prevent this behavior
  * @namespace collisionHelper
+ * @private for devkit-scene
  */
 exports = {
   /**

@@ -3,6 +3,7 @@ import .shapes.collisionHelper as collisionHelper;
 /**
  * This singleton class defines the physics used to control entities' behavior
  * @class Physics
+ * @private for devkit-scene
  */
 var Physics = Class(function () {
   /**

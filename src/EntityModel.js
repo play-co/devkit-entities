@@ -8,6 +8,7 @@ var readOnlyProp = utils.addReadOnlyProperty;
 /**
  * This class represents the default model for an entity's data
  * @class EntityModel
+ * @private for devkit-scene
  */
 exports = Class(function () {
   /** @var {string} EntityModel#name */

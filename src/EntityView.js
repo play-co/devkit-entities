@@ -10,6 +10,7 @@ var readOnlyProp = utils.addReadOnlyProperty;
 /**
  * This class represents the default view used to render an entity to devkit's view hierarchy
  * @class EntityView
+ * @private for devkit-scene
  */
 exports = Class(SpriteView, function () {
   var supr = SpriteView.prototype;

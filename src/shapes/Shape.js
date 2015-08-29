@@ -24,7 +24,10 @@ exports = Class(function () {
     this.x = opts.x || 0;
     /** @var {number} Shape#y */
     this.y = opts.y || 0;
-    /** @var {boolean} Shape#fixed */
+    /**
+     * Whether or not this shape can be moved by physics
+     * @var {boolean} Shape#fixed
+     */
     this.fixed = opts.fixed || false;
   };
 

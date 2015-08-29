@@ -24,7 +24,8 @@ exports = Class(SpriteView, function () {
   this._debugDraw = false;
 
   /**
-   * @constructs
+   * Constructs EntityView; called automatically when a new instance is created
+   * @method EntityView#init
    * @arg {object} opts - Used internally by {@link Entity}
    * @arg {Entity} opts.entity
    */

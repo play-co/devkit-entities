@@ -11,7 +11,8 @@ exports = Class(function () {
   this.name = "Shape";
 
   /**
-   * @constructs
+   * Constructs Shape; called automatically when a new instance is created
+   * @method Shape#init
    * @arg {object} [opts]
    * @arg {number} [opts.x=0]
    * @arg {number} [opts.y=0]

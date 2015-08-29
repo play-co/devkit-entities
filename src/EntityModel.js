@@ -14,7 +14,8 @@ exports = Class(function () {
   this.name = "EntityModel";
 
   /**
-   * @constructs
+   * Constructs EntityModel; called automatically when a new instance is created
+   * @method EntityModel#init
    * @arg {object} opts - Used internally by {@link Entity}
    * @arg {Entity} opts.entity
    */

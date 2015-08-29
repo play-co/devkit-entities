@@ -24,7 +24,8 @@ var Entity = exports = Class(function () {
   this.viewClass = EntityView;
 
   /**
-   * @constructs
+   * Constructs Entity; called automatically when a new instance is created
+   * @method Entity#init
    * @arg {object} [opts] - Used internally by {@link EntityPool} to manage recycling
    * @arg {EntityPool} [opts.pool]
    * @arg {number} [opts.poolIndex]

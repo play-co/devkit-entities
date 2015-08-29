@@ -6,7 +6,8 @@ import .Entity;
  */
 exports = Class(function () {
   /**
-   * @constructs
+   * Constructs EntityPool; called automatically when a new instance is created
+   * @method EntityPool#init
    * @arg {object} [opts]
    * @arg {class} [opts.ctor=Entity] - The constructor of the class to manage in this pool
    * @arg {View} [opts.superview] - The parent view of all entities' views in this pool

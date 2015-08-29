@@ -21,7 +21,8 @@ exports = Class(Shape, function () {
   this.name = "Circle";
 
   /**
-   * @constructs
+   * Constructs Circle; called automatically when a new instance is created
+   * @method Circle#init
    * @arg {object} [opts]
    * @arg {number} [opts.radius=0]
    */

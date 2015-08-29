@@ -18,7 +18,8 @@ exports = Class(Shape, function () {
   this.name = "Line";
 
   /**
-   * @constructs
+   * Constructs Line; called automatically when a new instance is created
+   * @method Line#init
    * @arg {object} [opts]
    * @arg {number} [opts.x2]
    * @arg {number} [opts.y2]

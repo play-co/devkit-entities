@@ -17,7 +17,7 @@ Once installed, you can import classes from this module like this:
 
 ## Docs
 
-We use JSDoc to generate documentation, here's the latest: [devkit-entities docs](http://docgen.js.io/gameclosure/devkit-entities/).
+We use JSDoc to generate documentation, here's the latest: [devkit-entities docs](http://docgen.js.io/gameclosure/devkit-entities/branch/master/).
 
 ## Examples
 

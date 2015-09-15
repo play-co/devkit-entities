@@ -23,5 +23,5 @@ We use JSDoc to generate documentation, here's the latest: [devkit-entities docs
 
 Open source examples built on devkit with this module:
 
- * [Scene.js](http://www.gameclosure.com/devkit-scene)
- * [Drone Swarm](https://github.com/weebygames/swarm)
+ * [Scene.js](http://www.gameclosure.com/devkit-scene) (devkit-entities v0.5.0)
+ * [Drone Swarm](https://github.com/weebygames/swarm) (devkit-entities v0.2.4)

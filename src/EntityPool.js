@@ -18,10 +18,10 @@ exports = Class(function () {
 
     this.entities = [];
 
-    if (typeof opts.ctor !== 'function') {
+    this._ctor = opts.ctor || Entity;
+    if (typeof this._ctor !== 'function') {
       throw new Error('EntityPool opts.ctor must be a constructor function');
     }
-    this._ctor = opts.ctor || Entity;
 
     this._freeIndex = 0;
     this._superview = opts.superview || opts.parent;

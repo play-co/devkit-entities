@@ -69,15 +69,18 @@ var _genericResolution = function(genericName, lookupMap, defaultResult) {
     var result = defaultResult;
     var shape1 = model1.shape || model1;
     var shape2 = model2.shape || model2;
-    var map = lookupMap[shape1.name];
+    var shapeName1 = shape1.name || shape1.__class__;
+    var shapeName2 = shape2.name || shape2.__class__;
+    var map = lookupMap[shapeName1];
     if (map) {
-      fn = map[shape2.name];
+      fn = map[shapeName2];
     }
 
     if (fn) {
       result = this[fn](shape1, shape2);
     } else {
-      logger.warn(genericName + " function not found for:", shape1, shape2);
+      logger.error("Error! No", genericName, "function for", shape1, shape2);
+      throw new Error(genericName + " function not found for " + shapeName1 + " and " + shapeName2);
     }
     return result;
   };
